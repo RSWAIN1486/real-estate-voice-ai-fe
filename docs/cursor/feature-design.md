@@ -1,7 +1,90 @@
-# Voice Agent Feature Design
+# Real Estate Voice Agent Feature Design
 
 ## Overview
-The Voice Agent is a conversational interface that allows users to order food from Dontminos Pizza restaurant using natural language voice or text interactions. It provides a seamless experience where customers can speak their orders, receive responses from a virtual agent, and checkout without needing to navigate the traditional menu UI.
+
+This document outlines the design and architecture for converting the existing restaurant voice agent into a real estate property search voice agent. The conversion focuses primarily on the frontend components while maintaining the existing voice agent functionality.
+
+## Core Components
+
+### 1. Frontend UI Components
+
+- **HeroSection**: Large banner with search functionality and voice assistant access
+  - Background image of luxury property
+  - Search bar with location input
+  - Quick city selection buttons
+  - Voice agent access button
+
+- **SearchFilters**: Comprehensive property search filters
+  - Location search
+  - Price range slider
+  - Bedrooms/bathrooms filters
+  - Property type selection
+  - Listing type filter (Buy/Rent/New Development)
+  - Advanced filter options (toggle-able)
+
+- **PropertyList**: Display of property listings
+  - Property cards with images
+  - Property details (price, location, beds, baths, sqft)
+  - Status tags (For Rent, New Development, etc.)
+  - Loading states with skeletons
+  - Empty state messaging
+
+- **Header/Footer**: Site navigation and branding
+  - Global Estates branding
+  - Navigation links (Buy, Rent, Sell, About, Contact)
+  - Theme toggle functionality
+  - Voice agent settings access
+
+### 2. Voice Agent Integration
+
+We'll maintain the core voice agent functionality while adapting it to understand and respond to real estate queries:
+
+- Keep the existing voice recognition and synthesis technology
+- Adapt the interface to match the real estate aesthetic
+- Update voice agent responses to be contextually appropriate for real estate
+- Enable the voice agent to understand property search criteria:
+  - Locations
+  - Price ranges
+  - Number of bedrooms/bathrooms
+  - Property types
+  - Specific amenities
+
+### 3. Data Flow
+
+1. User initiates voice search via the voice agent
+2. Voice input is processed and converted to structured filter criteria
+3. Filter criteria are passed to the search system
+4. Results are displayed in the PropertyList component
+5. User can further refine results using the SearchFilters component
+
+## Design Choices
+
+- **Colors**: Blue and orange color scheme (primary: #2B4162, secondary: #F5853F)
+  - Blue conveys trust and professionalism
+  - Orange adds warmth and approachability
+  - High contrast for accessibility
+
+- **Typography**: 
+  - Clean, modern sans-serif (Inter) for readability
+  - Bold headings for emphasis
+  - Consistent type scale for hierarchy
+
+- **Layout**:
+  - Hero section with search prominently featured
+  - Filters panel at top of results
+  - 3-column grid of property cards on desktop
+  - Responsive design that adapts to mobile devices
+
+## Implementation Strategy
+
+Rather than rebuilding the entire application, we're taking an incremental approach:
+
+1. Update the theme and styling to match real estate branding
+2. Create new React components for property search UI
+3. Implement the components in the existing app structure
+4. Maintain existing voice agent functionality but adapt the UI
+
+This approach allows us to leverage the robust voice agent technology while providing a new user experience focused on real estate property search.
 
 ## Core Features
 

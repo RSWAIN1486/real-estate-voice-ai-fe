@@ -1,7 +1,7 @@
 import { ThemeProvider, CssBaseline, createTheme, Container, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { RootState } from './store/store';
 import { setUser } from './store/slices/authSlice';
 import { getCurrentUser } from './services/authService';
@@ -12,10 +12,22 @@ import Register from './components/Auth/Register';
 import Profile from './components/Profile/Profile';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import HeroSection, { VoiceFilterCriteria } from './components/HeroSection';
+import SearchFilters, { Filters } from './components/SearchFilters';
+import PropertyList from './components/PropertyList';
 
 function App() {
   const dispatch = useDispatch();
   const themeMode = useSelector((state: RootState) => state.theme.mode);
+  const [filters, setFilters] = useState<Filters>({
+    location: "",
+    minPrice: 0,
+    maxPrice: 10000000,
+    bedrooms: "",
+    bathrooms: "",
+    propertyType: "",
+    listingType: "",
+  });
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -37,24 +49,55 @@ function App() {
     initializeAuth();
   }, [dispatch]);
 
+  const handleFilterChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+  };
+
+  const handleVoiceSearch = (criteria: VoiceFilterCriteria) => {
+    const updatedFilters = { ...filters };
+
+    if (criteria.location) {
+      updatedFilters.location = criteria.location;
+    }
+
+    if (criteria.bedrooms) {
+      updatedFilters.bedrooms = criteria.bedrooms;
+    }
+
+    if (criteria.propertyType) {
+      updatedFilters.propertyType = criteria.propertyType;
+    }
+
+    if (criteria.listingType) {
+      updatedFilters.listingType = criteria.listingType;
+    }
+
+    if (criteria.priceRange) {
+      updatedFilters.minPrice = criteria.priceRange[0];
+      updatedFilters.maxPrice = criteria.priceRange[1];
+    }
+
+    setFilters(updatedFilters);
+  };
+
   const theme = createTheme({
     palette: {
       mode: themeMode,
       primary: {
-        main: '#e53935', // Vibrant pizza sauce red
-        light: '#ff6f60',
-        dark: '#ab000d',
+        main: '#2B4162', // Deep blue
+        light: '#385F71', // Light blue
+        dark: '#1B2845', // Dark blue
         contrastText: '#ffffff',
       },
       secondary: {
-        main: '#fdd835', // Cheese yellow
-        light: '#ffff6b',
-        dark: '#c6a700',
+        main: '#F5853F', // Orange
+        light: '#FF9B54', // Light orange
+        dark: '#D65A31', // Dark orange
         contrastText: '#000000',
       },
       background: {
-        default: themeMode === 'light' ? '#f9f9f9' : '#121212',
-        paper: themeMode === 'light' ? '#ffffff' : '#1e1e1e',
+        default: themeMode === 'light' ? '#F5F5F5' : '#121212',
+        paper: themeMode === 'light' ? '#FFFFFF' : '#1e1e1e',
       },
       error: {
         main: '#d50000',
@@ -64,7 +107,7 @@ function App() {
       },
     },
     typography: {
-      fontFamily: '"Montserrat", "Roboto", "Helvetica", "Arial", sans-serif',
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       h1: {
         fontWeight: 700,
         letterSpacing: '-0.01em',
@@ -100,9 +143,9 @@ function App() {
       MuiCssBaseline: {
         styleOverrides: {
           ':root': {
-            '--primary-color': '#e53935',
-            '--secondary-color': '#fdd835',
-            '--background-light': '#f9f9f9',
+            '--primary-color': '#2B4162',
+            '--secondary-color': '#F5853F',
+            '--background-light': '#F5F5F5',
             '--card-hover-shadow': '0 8px 24px rgba(0, 0, 0, 0.12)',
           },
           body: {
@@ -116,7 +159,7 @@ function App() {
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: '50px',
+            borderRadius: '8px',
             padding: '8px 24px',
             boxShadow: 'none',
             '&:hover': {
@@ -127,7 +170,7 @@ function App() {
           },
           contained: {
             '&:hover': {
-              boxShadow: '0 6px 12px rgba(229, 57, 53, 0.25)',
+              boxShadow: '0 6px 12px rgba(43, 65, 98, 0.25)',
             },
           },
         },
@@ -168,22 +211,86 @@ function App() {
           }}
         >
           <Header />
-          <Container 
-            component="main" 
-            sx={{ 
-              flex: 1,
-              py: 4,
-              maxWidth: { xs: 'lg', lg: 'xl' },
-            }}
-          >
-            <Routes>
-              <Route path="/" element={<Menu />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<Profile />} />
-            </Routes>
-          </Container>
+          <Routes>
+            <Route path="/" element={
+              <>
+                <HeroSection onVoiceSearch={handleVoiceSearch} />
+                <Container 
+                  component="main" 
+                  sx={{ 
+                    flex: 1,
+                    py: 4,
+                    maxWidth: { xs: 'lg', lg: 'xl' },
+                  }}
+                >
+                  <SearchFilters onFilterChange={handleFilterChange} />
+                  <Box sx={{ mt: 4 }}>
+                    <PropertyList filters={filters} />
+                  </Box>
+                </Container>
+              </>
+            } />
+            <Route path="/menu" element={
+              <Container 
+                component="main" 
+                sx={{ 
+                  flex: 1,
+                  py: 4,
+                  maxWidth: { xs: 'lg', lg: 'xl' },
+                }}
+              >
+                <Menu />
+              </Container>
+            } />
+            <Route path="/cart" element={
+              <Container 
+                component="main" 
+                sx={{ 
+                  flex: 1,
+                  py: 4,
+                  maxWidth: { xs: 'lg', lg: 'xl' },
+                }}
+              >
+                <Cart />
+              </Container>
+            } />
+            <Route path="/login" element={
+              <Container 
+                component="main" 
+                sx={{ 
+                  flex: 1,
+                  py: 4,
+                  maxWidth: { xs: 'lg', lg: 'xl' },
+                }}
+              >
+                <Login />
+              </Container>
+            } />
+            <Route path="/register" element={
+              <Container 
+                component="main" 
+                sx={{ 
+                  flex: 1,
+                  py: 4,
+                  maxWidth: { xs: 'lg', lg: 'xl' },
+                }}
+              >
+                <Register />
+              </Container>
+            } />
+            <Route path="/profile" element={
+              <Container 
+                component="main" 
+                sx={{ 
+                  flex: 1,
+                  py: 4,
+                  maxWidth: { xs: 'lg', lg: 'xl' },
+                }}
+              >
+                <Profile />
+              </Container>
+            } />
+          </Routes>
           <Footer />
         </Box>
       </BrowserRouter>

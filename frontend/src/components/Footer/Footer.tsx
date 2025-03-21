@@ -7,7 +7,8 @@ import {
   LocalPizza as PizzaIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
-  LocationOn as LocationIcon
+  LocationOn as LocationIcon,
+  AccountBalance as BuildingIcon
 } from '@mui/icons-material';
 import styles from './Footer.module.css';
 
@@ -22,20 +23,20 @@ const Footer = () => {
           <Grid item xs={12} sm={6} md={3}>
             <Box className={styles.logoSection}>
               <Box className={styles.logoContainer}>
-                <PizzaIcon sx={{ mr: 1, fontSize: '2rem', transform: 'rotate(45deg)' }} />
+                <BuildingIcon sx={{ mr: 1, fontSize: '2rem' }} />
                 <Typography 
                   variant="h6" 
                   className={styles.footerLogo}
                   sx={{
-                    fontFamily: 'Montserrat, sans-serif',
+                    fontFamily: 'Inter, sans-serif',
                     fontWeight: 800,
                   }}
                 >
-                  DONTMINOS
+                  Global Estates
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ mt: 2, mb: 2 }}>
-                Your favorite pizza delivered fresh and hot to your doorstep.
+                Your trusted partner in finding your dream property across the globe.
               </Typography>
               <Box className={styles.socialIcons}>
                 <IconButton color="inherit" aria-label="facebook" className={styles.socialIcon}>
@@ -57,22 +58,22 @@ const Footer = () => {
           <Grid item xs={12} sm={6} md={3}>
             <Typography variant="h6" className={styles.sectionTitle}>Quick Links</Typography>
             <ul className={styles.footerLinks}>
-              <li><Link href="/" color="inherit">Menu</Link></li>
-              <li><Link href="/profile" color="inherit">My Account</Link></li>
-              <li><Link href="/cart" color="inherit">Track Order</Link></li>
-              <li><Link href="#" color="inherit">Deals & Offers</Link></li>
-              <li><Link href="#" color="inherit">Locations</Link></li>
+              <li><Link href="/" color="inherit">Buy</Link></li>
+              <li><Link href="/menu" color="inherit">Rent</Link></li>
+              <li><Link href="/cart" color="inherit">Sell</Link></li>
+              <li><Link href="/profile" color="inherit">About</Link></li>
+              <li><Link href="#" color="inherit">Contact</Link></li>
             </ul>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="h6" className={styles.sectionTitle}>Our Menu</Typography>
+            <Typography variant="h6" className={styles.sectionTitle}>Property Types</Typography>
             <ul className={styles.footerLinks}>
-              <li><Link href="/" color="inherit">Pizzas</Link></li>
-              <li><Link href="/" color="inherit">Sides</Link></li>
-              <li><Link href="/" color="inherit">Beverages</Link></li>
-              <li><Link href="/" color="inherit">Desserts</Link></li>
-              <li><Link href="/" color="inherit">Create Your Own</Link></li>
+              <li><Link href="/" color="inherit">Apartments</Link></li>
+              <li><Link href="/" color="inherit">Houses</Link></li>
+              <li><Link href="/" color="inherit">Villas</Link></li>
+              <li><Link href="/" color="inherit">Penthouses</Link></li>
+              <li><Link href="/" color="inherit">Commercial</Link></li>
             </ul>
           </Grid>
 
@@ -85,11 +86,11 @@ const Footer = () => {
               </Box>
               <Box className={styles.contactItem}>
                 <EmailIcon fontSize="small" />
-                <Typography variant="body2">contact@dontminos.com</Typography>
+                <Typography variant="body2">contact@globalestates.com</Typography>
               </Box>
               <Box className={styles.contactItem}>
                 <LocationIcon fontSize="small" />
-                <Typography variant="body2">123 Pizza Street, Foodville, CA 90210</Typography>
+                <Typography variant="body2">123 Real Estate Blvd, New York, NY 10001</Typography>
               </Box>
             </Box>
           </Grid>
@@ -99,7 +100,7 @@ const Footer = () => {
         
         <Box className={styles.bottomFooter}>
           <Typography variant="body2" align="center">
-            © {new Date().getFullYear()} Dontminos. All rights reserved.
+            © {new Date().getFullYear()} Global Estates. All rights reserved.
           </Typography>
           <Box className={styles.footerPolicies}>
             <Link color="inherit" href="#" underline="hover">Privacy Policy</Link>

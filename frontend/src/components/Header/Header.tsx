@@ -23,9 +23,9 @@ import {
   Brightness7 as LightModeIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
-  LocalPizza as PizzaIcon,
   Close as CloseIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  AccountBalance as BuildingIcon
 } from '@mui/icons-material';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -105,19 +105,19 @@ const Header = () => {
             onClick={handleHomeClick}
             sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}
           >
-            <PizzaIcon sx={{ mr: 1, fontSize: '2rem', transform: 'rotate(45deg)' }} />
+            <BuildingIcon sx={{ mr: 1, fontSize: '2rem' }} />
             <Typography
               variant="h5"
               component="div"
               className={styles.logoText}
               sx={{ 
-                fontFamily: 'Montserrat, sans-serif',
+                fontFamily: 'Inter, sans-serif',
                 fontWeight: 800,
-                letterSpacing: '.2rem',
+                letterSpacing: '.1rem',
                 cursor: 'pointer'
               }}
             >
-              DONTMINOS
+              Global Estates
             </Typography>
           </Box>
 
@@ -129,9 +129,24 @@ const Header = () => {
                 component={Link} 
                 to="/"
                 className={location.pathname === '/' ? styles.activeLink : ''}
-                startIcon={<HomeIcon />}
               >
-                Menu
+                Buy
+              </Button>
+              <Button 
+                color="inherit" 
+                component={Link} 
+                to="/menu"
+                className={location.pathname === '/menu' ? styles.activeLink : ''}
+              >
+                Rent
+              </Button>
+              <Button 
+                color="inherit" 
+                component={Link} 
+                to="/cart"
+                className={location.pathname === '/cart' ? styles.activeLink : ''}
+              >
+                Sell
               </Button>
               <Button 
                 color="inherit" 
@@ -139,7 +154,15 @@ const Header = () => {
                 to="/profile"
                 className={location.pathname === '/profile' ? styles.activeLink : ''}
               >
-                My Profile
+                About
+              </Button>
+              <Button 
+                color="inherit" 
+                component={Link} 
+                to="/contact"
+                className={location.pathname === '/contact' ? styles.activeLink : ''}
+              >
+                Contact
               </Button>
             </Box>
           )}
@@ -152,7 +175,7 @@ const Header = () => {
                 color="inherit"
                 onClick={handleOpenSettings}
                 className={styles.actionButton}
-                sx={{ backgroundColor: 'rgba(253, 216, 53, 0.3)', '&:hover': { backgroundColor: 'rgba(253, 216, 53, 0.5)' } }}
+                sx={{ backgroundColor: 'rgba(245, 133, 63, 0.3)', '&:hover': { backgroundColor: 'rgba(245, 133, 63, 0.5)' } }}
               >
                 <SettingsIcon />
               </IconButton>
@@ -166,30 +189,6 @@ const Header = () => {
             >
               {theme.palette.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
-
-            {/* Cart Button (visible on desktop) */}
-            {!isMobile && (
-              <Button
-                color="inherit"
-                onClick={handleCartClick}
-                disabled={location.pathname === '/cart'}
-                startIcon={
-                  <Badge badgeContent={totalItems} color="error">
-                    <ShoppingCartIcon />
-                  </Badge>
-                }
-                className={styles.cartButton}
-                sx={{ 
-                  marginLeft: 1,
-                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', 
-                  '&:hover': { 
-                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' 
-                  }
-                }}
-              >
-                Cart
-              </Button>
-            )}
             
             {/* User Menu */}
             <UserMenu />
@@ -213,8 +212,8 @@ const Header = () => {
       >
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <PizzaIcon sx={{ mr: 1, color: 'primary.main' }} />
-            <Typography variant="h6" color="primary.main" fontWeight="bold">DONTMINOS</Typography>
+            <BuildingIcon sx={{ mr: 1, color: 'primary.main' }} />
+            <Typography variant="h6" color="primary.main" fontWeight="bold">Global Estates</Typography>
           </Box>
           <IconButton onClick={toggleMobileMenu}>
             <CloseIcon />
@@ -224,15 +223,17 @@ const Header = () => {
         <List>
           <ListItem button onClick={handleHomeClick} selected={location.pathname === '/'}>
             <ListItemIcon><HomeIcon color={location.pathname === '/' ? 'primary' : 'inherit'} /></ListItemIcon>
-            <ListItemText primary="Menu" />
+            <ListItemText primary="Buy" />
+          </ListItem>
+          <ListItem button onClick={() => { navigate('/menu'); setMobileMenuOpen(false); }} selected={location.pathname === '/menu'}>
+            <ListItemIcon><HomeIcon color={location.pathname === '/menu' ? 'primary' : 'inherit'} /></ListItemIcon>
+            <ListItemText primary="Rent" />
           </ListItem>
           <ListItem button onClick={handleCartClick} selected={location.pathname === '/cart'}>
             <ListItemIcon>
-              <Badge badgeContent={totalItems} color="error">
-                <ShoppingCartIcon color={location.pathname === '/cart' ? 'primary' : 'inherit'} />
-              </Badge>
+              <BuildingIcon color={location.pathname === '/cart' ? 'primary' : 'inherit'} />
             </ListItemIcon>
-            <ListItemText primary="Cart" />
+            <ListItemText primary="Sell" />
           </ListItem>
           <ListItem 
             button 
@@ -240,18 +241,25 @@ const Header = () => {
             selected={location.pathname === '/profile'}
           >
             <ListItemIcon>
-              <PizzaIcon color={location.pathname === '/profile' ? 'primary' : 'inherit'} />
+              <BuildingIcon color={location.pathname === '/profile' ? 'primary' : 'inherit'} />
             </ListItemIcon>
-            <ListItemText primary="My Profile" />
+            <ListItemText primary="About" />
+          </ListItem>
+          <ListItem 
+            button 
+            onClick={() => { navigate('/contact'); setMobileMenuOpen(false); }}
+            selected={location.pathname === '/contact'}
+          >
+            <ListItemIcon>
+              <BuildingIcon color={location.pathname === '/contact' ? 'primary' : 'inherit'} />
+            </ListItemIcon>
+            <ListItemText primary="Contact" />
           </ListItem>
         </List>
       </Drawer>
 
       {/* Voice Agent Settings Dialog */}
-      <VoiceAgentSettings
-        open={settingsOpen}
-        onClose={handleCloseSettings}
-      />
+      <VoiceAgentSettings open={settingsOpen} onClose={handleCloseSettings} />
     </AppBar>
   );
 };
