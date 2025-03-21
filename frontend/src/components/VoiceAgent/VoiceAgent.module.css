@@ -1,0 +1,312 @@
+.dialog {
+  overflow: hidden;
+  z-index: 1300;
+}
+
+.dialogPaper {
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(245, 245, 245, 1) 0%, rgba(255, 255, 255, 1) 20%);
+}
+
+.dialogTitle {
+  padding: 16px 24px;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.dialogContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.titleAvatar {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.statusText {
+  display: block;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  padding: 32px;
+  text-align: center;
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  padding: 32px;
+  text-align: center;
+}
+
+.retryButton {
+  margin-top: 16px;
+}
+
+.currentTextContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.currentTextPaper {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.currentText {
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.instructionText {
+  font-size: 1.2rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.listeningText {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.thinkingText {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.typingIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  margin: 0 4px;
+  animation: dotPulse 1.5s infinite ease-in-out;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+.controlButton {
+  transition: all 0.2s ease-in-out;
+}
+
+.controlButton:hover {
+  transform: scale(1.1);
+}
+
+/* Add a status indicator for the mic */
+.micActive::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  bottom: -4px;
+  left: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+  animation: pulse 1.5s infinite;
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] .dialogPaper {
+  background-color: #303030;
+}
+
+[data-theme="dark"] .currentTextPaper {
+  background-color: #424242;
+  color: #fff;
+}
+
+[data-theme="dark"] .dot {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .dialogPaper {
+    max-height: none;
+    height: auto;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+  
+  .currentTextPaper {
+    min-height: 120px;
+  }
+}
+
+/* New styles for transcript display */
+.transcriptContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  max-height: 300px;
+}
+
+.emptyTranscriptContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  background-color: rgba(249, 249, 249, 0.7);
+  border-radius: 12px;
+  flex: 1;
+}
+
+.transcriptList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.transcriptItem {
+  padding: 12px 16px;
+  border-radius: 10px !important;
+  position: relative;
+}
+
+.agentTranscript {
+  background-color: rgba(229, 57, 53, 0.1) !important;
+  align-self: flex-start;
+  margin-right: 32px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.userTranscript {
+  background-color: rgba(38, 166, 154, 0.1) !important;
+  align-self: flex-end;
+  margin-left: 32px;
+  border-right: 3px solid #26a69a;
+}
+
+.transcriptSpeaker {
+  display: block;
+  margin-top: 4px;
+  text-align: right;
+  font-style: italic;
+}
+
+/* Conversation control buttons */
+.conversationControls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.actionButton {
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  transform: scale(1.05);
+}
+
+/* Exit call button */
+.exitButton {
+  margin-left: auto;
+}
+
+@media (max-width: 600px) {
+  .conversationControls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .exitButton {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+  
+  .currentTextPaper {
+    min-height: 80px;
+  }
+}
+
+.tabs {
+  padding: 0 16px;
+  margin-bottom: 8px;
+} 

@@ -1,0 +1,67 @@
+.header {
+  background: linear-gradient(90deg, var(--primary-color) 0%, #d32f2f 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar {
+  padding: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.logoContainer:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.logoText {
+  background: linear-gradient(45deg, #fff 30%, #fdd835 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.activeLink {
+  position: relative;
+  font-weight: 700;
+}
+
+.activeLink::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 3px;
+  background-color: #fdd835;
+  border-radius: 8px;
+}
+
+.actionButton {
+  transition: transform 0.2s ease;
+}
+
+.actionButton:hover {
+  transform: scale(1.1);
+}
+
+.cartButton {
+  transition: all 0.2s ease;
+  border-radius: 50px !important;
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    padding: 0.25rem 0;
+  }
+} 

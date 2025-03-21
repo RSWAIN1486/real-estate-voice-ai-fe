@@ -1,0 +1,37 @@
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.payment-method-button {
+  transition: all 0.3s ease;
+}
+
+.payment-method-button:hover {
+  transform: translateY(-2px);
+}
+
+.order-summary {
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .quantity-control {
+    margin-top: 8px;
+  }
+} 

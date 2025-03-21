@@ -1,0 +1,308 @@
+.container {
+  padding-top: 1rem;
+  padding-bottom: 3rem;
+}
+
+.heroSection {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 3rem 1rem;
+  background: linear-gradient(rgba(253, 216, 53, 0.1), rgba(255, 255, 255, 0));
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.menuTitle {
+  font-weight: 800 !important;
+  margin-bottom: 0.5rem !important;
+  background-image: linear-gradient(45deg, var(--primary-color), #ff6f60);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  font-size: 3.5rem !important;
+}
+
+.menuSubtitle {
+  opacity: 0.8;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.categoryPaper {
+  border-radius: 50px !important;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+.categoryTabs {
+  min-height: 60px;
+  background-color: rgba(253, 216, 53, 0.05);
+}
+
+.categoryTab {
+  min-height: 60px;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease;
+}
+
+.categoryHeading {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.menu-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  position: relative;
+}
+
+.menu-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.menu-card-skeleton {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out;
+}
+
+.imageContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+.cardMedia {
+  object-fit: cover;
+  background-color: rgba(0, 0, 0, 0.03);
+  transition: transform 0.5s ease;
+}
+
+.menu-card:hover .cardMedia {
+  transform: scale(1.05);
+}
+
+.vegBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.vegIndicator {
+  width: 12px;
+  height: 12px;
+  background-color: #2e7d32;
+  border-radius: 50%;
+}
+
+.ribbon {
+  position: absolute;
+  left: -5px;
+  top: 10px;
+  z-index: 1;
+  overflow: hidden;
+  width: 75px;
+  height: 75px;
+  text-align: right;
+}
+
+.ribbon span {
+  font-size: 10px;
+  font-weight: bold;
+  color: #FFF;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 20px;
+  transform: rotate(-45deg);
+  width: 100px;
+  display: block;
+  background: var(--primary-color);
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 19px;
+  left: -21px;
+}
+
+.ribbon span::before {
+  content: "";
+  position: absolute; 
+  left: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid var(--primary-color);
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid var(--primary-color);
+}
+
+.ribbon span::after {
+  content: "";
+  position: absolute; 
+  right: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid transparent;
+  border-right: 3px solid var(--primary-color);
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid var(--primary-color);
+}
+
+.cardContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px !important;
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.itemName {
+  margin-bottom: 4px !important;
+  font-weight: 700 !important;
+  flex: 1;
+}
+
+.favoriteButton {
+  color: rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.favoriteButton:hover {
+  color: var(--primary-color);
+  background-color: rgba(229, 57, 53, 0.1);
+}
+
+.categoryChip {
+  margin-bottom: 12px;
+  width: fit-content;
+  background-color: rgba(253, 216, 53, 0.2);
+  color: rgba(0, 0, 0, 0.7);
+  font-weight: 500;
+}
+
+.itemDescription {
+  margin-bottom: 16px;
+  flex-grow: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.price {
+  font-weight: 700 !important;
+}
+
+.addButton {
+  min-width: 100px;
+}
+
+.voiceAgentButton {
+  padding: 12px 24px !important;
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  border-radius: 50px !important;
+  background: linear-gradient(45deg, #fdd835, #ffb300) !important;
+  color: #333 !important;
+  box-shadow: 0 4px 15px rgba(253, 216, 53, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+  transform-origin: center;
+  animation: buttonPulse 2s infinite;
+}
+
+.voiceAgentButton:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(253, 216, 53, 0.4) !important;
+  background: linear-gradient(45deg, #ffb300, #fdd835) !important;
+}
+
+.voiceAgentButton:active {
+  transform: translateY(1px) scale(0.98) !important;
+}
+
+@keyframes buttonPulse {
+  0% {
+    box-shadow: 0 4px 15px rgba(253, 216, 53, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(253, 216, 53, 0.5);
+  }
+  100% {
+    box-shadow: 0 4px 15px rgba(253, 216, 53, 0.3);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-top: 0.5rem;
+  }
+  
+  .heroSection {
+    padding: 1rem 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .menuTitle {
+    font-size: 2.5rem !important;
+  }
+  
+  .menuSubtitle {
+    font-size: 1rem;
+  }
+  
+  .categoryPaper {
+    border-radius: 12px !important;
+  }
+  
+  .menu-card {
+    margin-bottom: 16px;
+  }
+  
+  .addButton {
+    min-width: 80px;
+  }
+  
+  .voiceAgentButton {
+    padding: 10px 20px !important;
+    font-size: 1rem !important;
+  }
+} 

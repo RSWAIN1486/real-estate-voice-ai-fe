@@ -1,0 +1,1614 @@
+{
+  "categories": {
+    "Veg Pizzas": [
+      {
+        "id": "vp1",
+        "name": "The 4 Cheese Pizza",
+        "description": "Cheese Overloaded pizza with 4 different varieties of cheese and 4 times the cheese of a normal pizza, including a spicy hit of Ghost",
+        "price": 499,
+        "category": "Veg Pizzas",
+        "image": "The_4_Cheese_Pizza_1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp2",
+        "name": "Margherita",
+        "description": "A hugely popular margherita, with a deliciously tangy single cheese topping",
+        "price": 299,
+        "category": "Veg Pizzas",
+        "image": "Margherita_2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp3",
+        "name": "Double Cheese Margherita",
+        "description": "The ever-popular Margherita - loaded with extra cheese... oodies of it!",
+        "price": 349,
+        "category": "Veg Pizzas",
+        "image": "Double_Cheese_Margherita_3.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp4",
+        "name": "Farm House",
+        "description": "A pizza that goes ballistic on veggies! Check out this mouth watering overload of crunchy, crisp capsicum, succulent mushrooms and fresh tomatoes",
+        "price": 399,
+        "category": "Veg Pizzas",
+        "image": "Farm_House_4.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp5",
+        "name": "Peppy Paneer",
+        "description": "Chunky paneer with crisp capsicum and spicy red pepper - quite a mouthful!",
+        "price": 399,
+        "category": "Veg Pizzas",
+        "image": "Peppy_Paneer_5.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp6",
+        "name": "Mexican Green Wave",
+        "description": "A pizza loaded with crunchy onions, crisp capsicum, juicy tomatoes and jalapeno with a liberal sprinkling of exotic Mexican herbs.",
+        "price": 399,
+        "category": "Veg Pizzas",
+        "image": "Mexican_Green_Wave_6.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp7",
+        "name": "Deluxe Veggie",
+        "description": "For a vegetarian looking for a BIG treat that goes easy on the spices, this one's got it all.. The onions, the capsicum, those delectable mushrooms - with paneer and golden corn to top it all.",
+        "price": 449,
+        "category": "Veg Pizzas",
+        "image": "Deluxe_Veggie_7.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp8",
+        "name": "Veg Extravaganza",
+        "description": "A pizza that decidedly staggers under an overload of golden corn, exotic black olives, crunchy onions, crisp capsicum, succulent mushrooms, juicy fresh tomatoes and jalapeno - with extra cheese to go all around.",
+        "price": 469,
+        "category": "Veg Pizzas",
+        "image": "Veg_Extravaganza_8.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp9",
+        "name": "CHEESE N CORN",
+        "description": "Cheese I Golden Corn | Cheese n Corn Pizza",
+        "price": 399,
+        "category": "Veg Pizzas",
+        "image": "CHEESE_N_CORN_9.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp10",
+        "name": "FRESH VEGGIE",
+        "description": "Onion & Capsicum",
+        "price": 299,
+        "category": "Veg Pizzas",
+        "image": "FRESH_VEGGIE_10.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp11",
+        "name": "VEGGIE PARADISE",
+        "description": "",
+        "price": 349,
+        "category": "Veg Pizzas",
+        "image": "VEGGIE_PARADISE_11.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp12",
+        "name": "PANEER MAKHANI",
+        "description": "Paneer and Capsicum on Makhani Sauce",
+        "price": 399,
+        "category": "Veg Pizzas",
+        "image": "PANEER_MAKHANI_12.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp13",
+        "name": "Indi Tandoori Paneer",
+        "description": "It is hot. It is spicy. It is oh-so-Indian. Tandoori paneer with capsicum I red paprika I mint mayo",
+        "price": 399,
+        "category": "Veg Pizzas",
+        "image": "Indi_Tandoori_Paneer_13.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp14",
+        "name": "Moroccan Spice Pasta Pizza - Veg",
+        "description": "A pizza loaded with a spicy combination of Harissa sauce and delicious pasta.",
+        "price": 449,
+        "category": "Veg Pizzas",
+        "image": "Moroccan_Spice_Pasta_Pizza___Veg_14.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "vp15",
+        "name": "Achari Do Pyaza",
+        "description": "Tangy & spicy achari flavours on a super cheesy onion pizza- as desi as it gets!",
+        "price": 399,
+        "category": "Veg Pizzas",
+        "image": "Achari_Do_Pyaza_15.jpg",
+        "isVeg": true
+      }
+    ],
+    "Non-Veg Pizzas": [
+      {
+        "id": "nvp1",
+        "name": "Chicken Golden Delight",
+        "description": "Mmm! Barbeque chicken with a topping of golden corn loaded with extra cheese. Worth its weight in gold!",
+        "price": 499,
+        "category": "Non-Veg Pizzas",
+        "image": "Chicken_Golden_Delight_1.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp2",
+        "name": "Non Veg Supreme",
+        "description": "Supreme combination of black olives, onions, grilled mushrooms, pepper BBQ chicken, peri-peri chicken, grilled chicken rashers",
+        "price": 549,
+        "category": "Non-Veg Pizzas",
+        "image": "Non_Veg_Supreme_2.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp3",
+        "name": "Chicken Dominator",
+        "description": "Loaded with double pepper barbecue chicken, peri-peri chicken, chicken tikka & grilled chicken rashers",
+        "price": 599,
+        "category": "Non-Veg Pizzas",
+        "image": "Chicken_Dominator_3.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp4",
+        "name": "Pepper Barbecue & Onion",
+        "description": "Pepper Barbecue Chicken with Onion",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "PEPPER_BARBECUE___ONION_4.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp5",
+        "name": "PEPPER BARBECUE CHICKEN",
+        "description": "Pepper Barbecue Chicken I Cheese",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "PEPPER_BARBECUE_CHICKEN_5.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp6",
+        "name": "CHICKEN SAUSAGE",
+        "description": "Chicken Sausage & Cheese",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "CHICKEN_SAUSAGE_6.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp7",
+        "name": "CHICKEN FIESTA",
+        "description": "",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "CHICKEN_FIESTA_7.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp8",
+        "name": "Indi Chicken Tikka",
+        "description": "The wholesome flavour of tandoori masala with Chicken tikka I onion I red paprika I mint mayo",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "Indi_Chicken_Tikka_8.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp9",
+        "name": "Chicken Pepperoni",
+        "description": "",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "Chicken_Pepperoni_9.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp10",
+        "name": "Creamy Tomato Pasta Pizza - Non Veg",
+        "description": "Loaded with a delicious creamy tomato pasta topping , green capsicum, crunchy red and yellow bell peppers and black olives",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "Creamy_Tomato_Pasta_Pizza___Non_Veg_10.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp11",
+        "name": "Keema Do Pyaza",
+        "description": "Delicious minced chicken keema topped with crunchy onions on your favourite cheesy pizza",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "Keema_Do_Pyaza_11.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "nvp12",
+        "name": "Moroccan Spice Pasta Pizza - Non Veg",
+        "description": "A pizza loaded with a spicy combination of Harissa sauce, Peri Peri chicken chunks and delicious pasta.",
+        "price": 449,
+        "category": "Non-Veg Pizzas",
+        "image": "Moroccan_Spice_Pasta_Pizza___Non_Veg_12.jpg",
+        "isVeg": false
+      }
+    ],
+    "Pizza Mania": [
+      {
+        "id": "pm1",
+        "name": "VEG LOADED",
+        "description": "",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "VEG_LOADED_1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pm2",
+        "name": "CHEESY",
+        "description": "Orange Cheddar Cheese I Mozzarella",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "CHEESY_2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pm3",
+        "name": "PANEER & ONION",
+        "description": "Creamy Paneer I Onion",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "PANEER___ONION_3.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pm4",
+        "name": "CAPSICUM",
+        "description": "Capsicum",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "CAPSICUM_4.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pm5",
+        "name": "ONION",
+        "description": "Onion",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "ONION_5.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pm6",
+        "name": "GOLDEN CORN",
+        "description": "Golden Corn - Sweet Corn Pizza",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "GOLDEN_CORN_6.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pm7",
+        "name": "CHEESE N TOMATO",
+        "description": "A delectable combination of cheese and juicy tomato",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "CHEESE_N_TOMATO_7.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pm8",
+        "name": "TOMATO",
+        "description": "Juicy tomato in a flavourful combination with cheese I tangy sauce",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "TOMATO_8.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pm9",
+        "name": "NON VEG LOADED",
+        "description": "",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "NON_VEG_LOADED_9.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "pm10",
+        "name": "CHICKEN SAUSAGE",
+        "description": "Chicken Sausage & Cheese",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "CHICKEN_SAUSAGE_10.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "pm11",
+        "name": "PEPPER BARBECUE CHICKEN",
+        "description": "Pepper Barbecue Chicken",
+        "price": 449,
+        "category": "Pizza Mania",
+        "image": "PEPPER_BARBECUE_CHICKEN_11.jpg",
+        "isVeg": false
+      }
+    ],
+    "Side Orders": [
+      {
+        "id": "sd1",
+        "name": "Garlic Breadsticks",
+        "description": "Freshly baked breadsticks with garlic butter and herbs",
+        "price": 149,
+        "category": "Side Orders",
+        "image": "Garlic_Breadsticks_1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd2",
+        "name": "Stuffed Garlic Bread",
+        "description": "Freshly baked garlic bread with cheese, onion and herbs",
+        "price": 169,
+        "category": "Side Orders",
+        "image": "Stuffed_Garlic_Bread_2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd3",
+        "name": "Paneer Tikka Stuffed Garlic Bread",
+        "description": "Freshly baked garlic bread with cheese, onion, paneer tikka and herbs",
+        "price": 199,
+        "category": "Side Orders",
+        "image": "Paneer_Tikka_Stuffed_Garlic_Bread_3.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd4",
+        "name": "Chicken Pepperoni Stuffed Garlic Bread",
+        "description": "Freshly Baked Garlic Bread stuffed with Delectable Chicken Pepperoni, Cheese and sprinkled with Basil Parsley",
+        "price": 199,
+        "category": "Side Orders",
+        "image": "Chicken_Pepperoni_Stuffed_Garlic_Bread_4.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "sd5",
+        "name": "Cheese Jalapeno Dip",
+        "description": "A soft creamy cheese dip spiced with jalapeno.",
+        "price": 149,
+        "category": "Side Orders",
+        "image": "Cheese_Jalapeno_Dip_5.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd6",
+        "name": "Cheese Dip",
+        "description": "A dreamy creamy cheese dip to add that extra tang to your snack.",
+        "price": 149,
+        "category": "Side Orders",
+        "image": "Cheese_Dip_6.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd7",
+        "name": "Red Velvet Lava Cake",
+        "description": "A truly indulgent experience with sweet and rich red velvet cake on a creamy cheese flavoured base to give a burst of flavour in",
+        "price": 129,
+        "category": "Side Orders",
+        "image": "Red_Velvet_Lava_Cake_7.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd8",
+        "name": "Butterscotch Mousse Cake",
+        "description": "Sweet temptation! Butterscotch flavored mousse",
+        "price": 109,
+        "category": "Side Orders",
+        "image": "Butterscotch_Mousse_Cake_8.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd9",
+        "name": "Lava Cake",
+        "description": "Chocolate cake with a gooey molten chocolate center",
+        "price": 99,
+        "category": "Side Orders",
+        "image": "Lava_Cake_9.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd10",
+        "name": "Chicken Parcel",
+        "description": "",
+        "price": 449,
+        "category": "Side Orders",
+        "image": "Chicken_Parcel_10.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "sd11",
+        "name": "Veg Parcel",
+        "description": "",
+        "price": 449,
+        "category": "Side Orders",
+        "image": "Veg_Parcel_11.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd12",
+        "name": "Crunchy Strips",
+        "description": "Oven baked wheat thin crips with peri peri seasoning with a cheesy dip",
+        "price": 149,
+        "category": "Side Orders",
+        "image": "Crunchy_Strips_12.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd13",
+        "name": "Potato Cheese Shots",
+        "description": "Crisp and golden outside,flavorful burst of cheese, potato & spice inside",
+        "price": 149,
+        "category": "Side Orders",
+        "image": "Potato_Cheese_Shots_13.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd14",
+        "name": "Taco Mexicana-Veg(Single)",
+        "description": "Truly irresistible! Crispy taco with a decicious veg patty & creamy sauce",
+        "price": 149,
+        "category": "Side Orders",
+        "image": "Taco_Mexicana_Veg_Single__14.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd15",
+        "name": "CRINKLE FRIES",
+        "description": "",
+        "price": 149,
+        "category": "Side Orders",
+        "image": "CRINKLE_FRIES_15.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd16",
+        "name": "BROWNIE FANTASY",
+        "description": "",
+        "price": 149,
+        "category": "Side Orders",
+        "image": "BROWNIE_FANTASY_16.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "sd17",
+        "name": "Taco Mexicana Non Veg",
+        "description": "",
+        "price": 449,
+        "category": "Side Orders",
+        "image": "Taco_Mexicana_Non_Veg_17.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "sd18",
+        "name": "Taco Mexicana Veg",
+        "description": "",
+        "price": 449,
+        "category": "Side Orders",
+        "image": "Taco_Mexicana_Veg_18.jpg",
+        "isVeg": true
+      }
+    ],
+    "Beverages": [
+      {
+        "id": "bv1",
+        "name": "Pepsi",
+        "description": "Sparkling and Refreshing Beverage (475ml)",
+        "price": 60,
+        "category": "Beverages",
+        "image": "Pepsi__475ml__1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "bv2",
+        "name": "7 Up",
+        "description": "Clear, Crisp & Refreshing Lemon Drink (475ml)",
+        "price": 60,
+        "category": "Beverages",
+        "image": "7Up__475ml__2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "bv3",
+        "name": "Mirinda",
+        "description": "Delicious Orange Flavored Beverage (475ml)",
+        "price": 60,
+        "category": "Beverages",
+        "image": "Mirinda__475ml__4.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "bv4",
+        "name": "PEPSI BLACK CAN",
+        "description": "",
+        "price": 60,
+        "category": "Beverages",
+        "image": "PEPSI_BLACK_CAN_5.jpg",
+        "isVeg": true
+      }
+    ],
+    "Pasta": [
+      {
+        "id": "pa1",
+        "name": "Moroccan Spice Pasta Veg",
+        "description": "Instant Fusilli Pasta, Harissa Sauce, Onion, Mushroom, Olives, Parsley sprinkle",
+        "price": 449,
+        "category": "Pasta",
+        "image": "Moroccan_Spice_Pasta_Veg_1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pa2",
+        "name": "Tikka Masala Pasta Veg",
+        "description": "",
+        "price": 449,
+        "category": "Pasta",
+        "image": "Tikka_Masala_Pasta_Veg_2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pa3",
+        "name": "Creamy Tomato Pasta Veg",
+        "description": "",
+        "price": 449,
+        "category": "Pasta",
+        "image": "Creamy_Tomato_Pasta_Veg_3.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pa4",
+        "name": "Creamy Tomato Pasta Non Veg",
+        "description": "Instant Fusilli Pasta, Creamy Culinary Dressing, Onion, Olives, BBQ Pepper Chicken, Parsley sprinkle",
+        "price": 449,
+        "category": "Pasta",
+        "image": "Creamy_Tomato_Pasta_Non_Veg_4.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "pa5",
+        "name": "Tikka Masala Pasta Non Veg",
+        "description": "Instant Fusilli Pasta, Spicy Red dressing, Onion, Chicken Tikka, Parsley sprinkle",
+        "price": 449,
+        "category": "Pasta",
+        "image": "Tikka_Masala_Pasta_Non_Veg_5.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "pa6",
+        "name": "Moroccan Spice Pasta Non Veg",
+        "description": "",
+        "price": 449,
+        "category": "Pasta",
+        "image": "Moroccan_Spice_Pasta_Non_Veg_6.jpg",
+        "isVeg": false
+      }
+    ],
+    "Burger Pizza": [
+      {
+        "id": "bp1",
+        "name": "BURGER PIZZA- CLASSIC VEG",
+        "description": "Bite into delight! Witness the epic combination of pizza and burger with our classic Burger Pizza, that looks good and tastes great!",
+        "price": 449,
+        "category": "Burger Pizza",
+        "image": "BURGER_PIZZA__CLASSIC_VEG_1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "bp2",
+        "name": "BURGER PIZZA- PREMIUM VEG",
+        "description": "The good just got better! Treat yourself to the premium taste of the Burger Pizza, that looks good and tastes great with paneer and red paprika.",
+        "price": 449,
+        "category": "Burger Pizza",
+        "image": "BURGER_PIZZA__PREMIUM_VEG_2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "bp3",
+        "name": "BURGER PIZZA- CLASSIC NON VEG",
+        "description": "For all the meat cravers, try the classic non-veg Burger Pizza loaded with the goodness of burger and the greatness of pizza.",
+        "price": 449,
+        "category": "Burger Pizza",
+        "image": "BURGER_PIZZA__CLASSIC_NON_VEG_3.jpg",
+        "isVeg": false
+      }
+    ],
+    "Chicken Wings": [
+      {
+        "id": "cw1",
+        "name": "ROASTED CHICKEN WINGS PERI-PERI",
+        "description": "",
+        "price": 449,
+        "category": "Chicken Wings",
+        "image": "ROASTED_CHICKEN_WINGS_PERI_PERI_1.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "cw2",
+        "name": "ROASTED CHICKEN WINGS CLASSIC HOT SAUCE",
+        "description": "",
+        "price": 449,
+        "category": "Chicken Wings",
+        "image": "ROASTED_CHICKEN_WINGS_CLASSIC_HOT_SAUCE_2.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "cw3",
+        "name": "CHICKEN MEATBALLS PERI-PERI",
+        "description": "",
+        "price": 449,
+        "category": "Chicken Wings",
+        "image": "CHICKEN_MEATBALLS_PERI_PERI_3.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "cw4",
+        "name": "BONELESS CHICKEN WINGS PERI-PERI",
+        "description": "",
+        "price": 449,
+        "category": "Chicken Wings",
+        "image": "BONELESS_CHICKEN_WINGS_PERI_PERI_4.jpg",
+        "isVeg": false
+      }
+    ],
+    "Choice of Crusts": [
+      {
+        "id": "cc1",
+        "name": "Cheese Burst",
+        "description": "Crust with oodles of yummy liquid Dairy cheese sauce filled inside.",
+        "price": 449,
+        "category": "Choice of Crusts",
+        "image": "Cheese_Burst_1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "cc2",
+        "name": "Classic Hand Tossed",
+        "description": "Dominos traditional hand stretched crust, crisp on outside, soft & light inside.",
+        "price": 449,
+        "category": "Choice of Crusts",
+        "image": "Classic_Hand_Tossed_2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "cc3",
+        "name": "Wheat Thin Crust",
+        "description": "Presenting the light healthier and delicious light wheat thin crust from Dominos.",
+        "price": 449,
+        "category": "Choice of Crusts",
+        "image": "Wheat_Thin_Crust_3.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "cc4",
+        "name": "Fresh Pan Pizza",
+        "description": "",
+        "price": 449,
+        "category": "Choice of Crusts",
+        "image": "Fresh_Pan_Pizza_4.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "cc5",
+        "name": "New Hand Tossed",
+        "description": "",
+        "price": 449,
+        "category": "Choice of Crusts",
+        "image": "New_Hand_Tossed_5.jpg",
+        "isVeg": true
+      }
+    ],
+    "Choice of Toppings": [
+      {
+        "id": "ct1",
+        "name": "veg toppings",
+        "description": "Black Olives, Crisp Capsicum, Paneer, Mushroom, Golden Corn, Fresh Tomato, Jalapeno, Red Pepper & Babycorn.",
+        "price": 449,
+        "category": "Choice of Toppings",
+        "image": "veg_toppings_1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "ct2",
+        "name": "Extra Cheese",
+        "description": "",
+        "price": 449,
+        "category": "Choice of Toppings",
+        "image": "Extra_Cheese_2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "ct3",
+        "name": "Non Veg Toppings",
+        "description": "Barbeque Chicken, Hot 'n' Spicy Chicken,Chunky Chicken and Chicken Salami.",
+        "price": 449,
+        "category": "Choice of Toppings",
+        "image": "Non_Veg_Toppings_3.jpg",
+        "isVeg": false
+      }
+    ],
+    "Chicken Lovers Pizza": [
+      {
+        "id": "clp1",
+        "name": "The 5 Chicken Feast Pizza",
+        "description": "",
+        "price": 449,
+        "category": "Chicken Lovers Pizza",
+        "image": "The_5_Chicken_Feast_Pizza_1.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "clp2",
+        "name": "Spiced Double Chicken",
+        "description": "",
+        "price": 449,
+        "category": "Chicken Lovers Pizza",
+        "image": "Spiced_Double_Chicken_2.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "clp3",
+        "name": "Chicken Maximus",
+        "description": "",
+        "price": 449,
+        "category": "Chicken Lovers Pizza",
+        "image": "Chicken_Maximus_3.jpg",
+        "isVeg": false
+      },
+      {
+        "id": "clp4",
+        "name": "Indo Fusion Chicken Pizza",
+        "description": "",
+        "price": 449,
+        "category": "Chicken Lovers Pizza",
+        "image": "Indo_Fusion_Chicken_Pizza_4.jpg",
+        "isVeg": false
+      }
+    ],
+    "Paratha Pizza": [
+      {
+        "id": "pp1",
+        "name": "Corn n Cheese Paratha Pizza",
+        "description": "",
+        "price": 449,
+        "category": "Paratha Pizza",
+        "image": "Corn_n_Cheese_Paratha_Pizza_1.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pp2",
+        "name": "Paneer Paratha Pizza",
+        "description": "",
+        "price": 449,
+        "category": "Paratha Pizza",
+        "image": "Paneer_Paratha_Pizza_2.jpg",
+        "isVeg": true
+      },
+      {
+        "id": "pp3",
+        "name": "Chicken Keema Paratha Pizza",
+        "description": "",
+        "price": 449,
+        "category": "Paratha Pizza",
+        "image": "Chicken_Keema_Paratha_Pizza_3.jpg",
+        "isVeg": false
+      }
+    ]
+  },
+  "items": [
+    {
+      "id": "vp1",
+      "name": "The 4 Cheese Pizza",
+      "description": "Cheese Overloaded pizza with 4 different varieties of cheese and 4 times the cheese of a normal pizza, including a spicy hit of Ghost",
+      "price": 499,
+      "category": "Veg Pizzas",
+      "image": "The_4_Cheese_Pizza_1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp2",
+      "name": "Margherita",
+      "description": "A hugely popular margherita, with a deliciously tangy single cheese topping",
+      "price": 299,
+      "category": "Veg Pizzas",
+      "image": "Margherita_2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp3",
+      "name": "Double Cheese Margherita",
+      "description": "The ever-popular Margherita - loaded with extra cheese... oodies of it!",
+      "price": 349,
+      "category": "Veg Pizzas",
+      "image": "Double_Cheese_Margherita_3.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp4",
+      "name": "Farm House",
+      "description": "A pizza that goes ballistic on veggies! Check out this mouth watering overload of crunchy, crisp capsicum, succulent mushrooms and fresh tomatoes",
+      "price": 399,
+      "category": "Veg Pizzas",
+      "image": "Farm_House_4.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp5",
+      "name": "Peppy Paneer",
+      "description": "Chunky paneer with crisp capsicum and spicy red pepper - quite a mouthful!",
+      "price": 399,
+      "category": "Veg Pizzas",
+      "image": "Peppy_Paneer_5.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp6",
+      "name": "Mexican Green Wave",
+      "description": "A pizza loaded with crunchy onions, crisp capsicum, juicy tomatoes and jalapeno with a liberal sprinkling of exotic Mexican herbs.",
+      "price": 399,
+      "category": "Veg Pizzas",
+      "image": "Mexican_Green_Wave_6.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp7",
+      "name": "Deluxe Veggie",
+      "description": "For a vegetarian looking for a BIG treat that goes easy on the spices, this one's got it all.. The onions, the capsicum, those delectable mushrooms - with paneer and golden corn to top it all.",
+      "price": 449,
+      "category": "Veg Pizzas",
+      "image": "Deluxe_Veggie_7.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp8",
+      "name": "Veg Extravaganza",
+      "description": "A pizza that decidedly staggers under an overload of golden corn, exotic black olives, crunchy onions, crisp capsicum, succulent mushrooms, juicy fresh tomatoes and jalapeno - with extra cheese to go all around.",
+      "price": 469,
+      "category": "Veg Pizzas",
+      "image": "Veg_Extravaganza_8.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp9",
+      "name": "CHEESE N CORN",
+      "description": "Cheese I Golden Corn | Cheese n Corn Pizza",
+      "price": 399,
+      "category": "Veg Pizzas",
+      "image": "CHEESE_N_CORN_9.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp10",
+      "name": "FRESH VEGGIE",
+      "description": "Onion & Capsicum",
+      "price": 299,
+      "category": "Veg Pizzas",
+      "image": "FRESH_VEGGIE_10.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp11",
+      "name": "VEGGIE PARADISE",
+      "description": "",
+      "price": 349,
+      "category": "Veg Pizzas",
+      "image": "VEGGIE_PARADISE_11.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp12",
+      "name": "PANEER MAKHANI",
+      "description": "Paneer and Capsicum on Makhani Sauce",
+      "price": 399,
+      "category": "Veg Pizzas",
+      "image": "PANEER_MAKHANI_12.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp13",
+      "name": "Indi Tandoori Paneer",
+      "description": "It is hot. It is spicy. It is oh-so-Indian. Tandoori paneer with capsicum I red paprika I mint mayo",
+      "price": 399,
+      "category": "Veg Pizzas",
+      "image": "Indi_Tandoori_Paneer_13.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp14",
+      "name": "Moroccan Spice Pasta Pizza - Veg",
+      "description": "A pizza loaded with a spicy combination of Harissa sauce and delicious pasta.",
+      "price": 449,
+      "category": "Veg Pizzas",
+      "image": "Moroccan_Spice_Pasta_Pizza___Veg_14.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "vp15",
+      "name": "Achari Do Pyaza",
+      "description": "Tangy & spicy achari flavours on a super cheesy onion pizza- as desi as it gets!",
+      "price": 399,
+      "category": "Veg Pizzas",
+      "image": "Achari_Do_Pyaza_15.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "nvp1",
+      "name": "Chicken Golden Delight",
+      "description": "Mmm! Barbeque chicken with a topping of golden corn loaded with extra cheese. Worth its weight in gold!",
+      "price": 499,
+      "category": "Non-Veg Pizzas",
+      "image": "Chicken_Golden_Delight_1.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp2",
+      "name": "Non Veg Supreme",
+      "description": "Supreme combination of black olives, onions, grilled mushrooms, pepper BBQ chicken, peri-peri chicken, grilled chicken rashers",
+      "price": 549,
+      "category": "Non-Veg Pizzas",
+      "image": "Non_Veg_Supreme_2.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp3",
+      "name": "Chicken Dominator",
+      "description": "Loaded with double pepper barbecue chicken, peri-peri chicken, chicken tikka & grilled chicken rashers",
+      "price": 599,
+      "category": "Non-Veg Pizzas",
+      "image": "Chicken_Dominator_3.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp4",
+      "name": "Pepper Barbecue & Onion",
+      "description": "Pepper Barbecue Chicken with Onion",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "PEPPER_BARBECUE___ONION_4.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp5",
+      "name": "PEPPER BARBECUE CHICKEN",
+      "description": "Pepper Barbecue Chicken I Cheese",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "PEPPER_BARBECUE_CHICKEN_5.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp6",
+      "name": "CHICKEN SAUSAGE",
+      "description": "Chicken Sausage & Cheese",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "CHICKEN_SAUSAGE_6.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp7",
+      "name": "CHICKEN FIESTA",
+      "description": "",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "CHICKEN_FIESTA_7.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp8",
+      "name": "Indi Chicken Tikka",
+      "description": "The wholesome flavour of tandoori masala with Chicken tikka I onion I red paprika I mint mayo",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "Indi_Chicken_Tikka_8.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp9",
+      "name": "Chicken Pepperoni",
+      "description": "",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "Chicken_Pepperoni_9.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp10",
+      "name": "Creamy Tomato Pasta Pizza - Non Veg",
+      "description": "Loaded with a delicious creamy tomato pasta topping , green capsicum, crunchy red and yellow bell peppers and black olives",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "Creamy_Tomato_Pasta_Pizza___Non_Veg_10.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp11",
+      "name": "Keema Do Pyaza",
+      "description": "Delicious minced chicken keema topped with crunchy onions on your favourite cheesy pizza",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "Keema_Do_Pyaza_11.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "nvp12",
+      "name": "Moroccan Spice Pasta Pizza - Non Veg",
+      "description": "A pizza loaded with a spicy combination of Harissa sauce, Peri Peri chicken chunks and delicious pasta.",
+      "price": 449,
+      "category": "Non-Veg Pizzas",
+      "image": "Moroccan_Spice_Pasta_Pizza___Non_Veg_12.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "pm1",
+      "name": "VEG LOADED",
+      "description": "",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "VEG_LOADED_1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pm2",
+      "name": "CHEESY",
+      "description": "Orange Cheddar Cheese I Mozzarella",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "CHEESY_2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pm3",
+      "name": "PANEER & ONION",
+      "description": "Creamy Paneer I Onion",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "PANEER___ONION_3.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pm4",
+      "name": "CAPSICUM",
+      "description": "Capsicum",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "CAPSICUM_4.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pm5",
+      "name": "ONION",
+      "description": "Onion",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "ONION_5.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pm6",
+      "name": "GOLDEN CORN",
+      "description": "Golden Corn - Sweet Corn Pizza",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "GOLDEN_CORN_6.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pm7",
+      "name": "CHEESE N TOMATO",
+      "description": "A delectable combination of cheese and juicy tomato",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "CHEESE_N_TOMATO_7.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pm8",
+      "name": "TOMATO",
+      "description": "Juicy tomato in a flavourful combination with cheese I tangy sauce",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "TOMATO_8.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pm9",
+      "name": "NON VEG LOADED",
+      "description": "",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "NON_VEG_LOADED_9.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "pm10",
+      "name": "CHICKEN SAUSAGE",
+      "description": "Chicken Sausage & Cheese",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "CHICKEN_SAUSAGE_10.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "pm11",
+      "name": "PEPPER BARBECUE CHICKEN",
+      "description": "Pepper Barbecue Chicken",
+      "price": 449,
+      "category": "Pizza Mania",
+      "image": "PEPPER_BARBECUE_CHICKEN_11.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "sd1",
+      "name": "Garlic Breadsticks",
+      "description": "Freshly baked breadsticks with garlic butter and herbs",
+      "price": 149,
+      "category": "Side Orders",
+      "image": "Garlic_Breadsticks_1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd2",
+      "name": "Stuffed Garlic Bread",
+      "description": "Freshly baked garlic bread with cheese, onion and herbs",
+      "price": 169,
+      "category": "Side Orders",
+      "image": "Stuffed_Garlic_Bread_2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd3",
+      "name": "Paneer Tikka Stuffed Garlic Bread",
+      "description": "Freshly baked garlic bread with cheese, onion, paneer tikka and herbs",
+      "price": 199,
+      "category": "Side Orders",
+      "image": "Paneer_Tikka_Stuffed_Garlic_Bread_3.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd4",
+      "name": "Chicken Pepperoni Stuffed Garlic Bread",
+      "description": "Freshly Baked Garlic Bread stuffed with Delectable Chicken Pepperoni, Cheese and sprinkled with Basil Parsley",
+      "price": 199,
+      "category": "Side Orders",
+      "image": "Chicken_Pepperoni_Stuffed_Garlic_Bread_4.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "sd5",
+      "name": "Cheese Jalapeno Dip",
+      "description": "A soft creamy cheese dip spiced with jalapeno.",
+      "price": 149,
+      "category": "Side Orders",
+      "image": "Cheese_Jalapeno_Dip_5.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd6",
+      "name": "Cheese Dip",
+      "description": "A dreamy creamy cheese dip to add that extra tang to your snack.",
+      "price": 149,
+      "category": "Side Orders",
+      "image": "Cheese_Dip_6.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd7",
+      "name": "Red Velvet Lava Cake",
+      "description": "A truly indulgent experience with sweet and rich red velvet cake on a creamy cheese flavoured base to give a burst of flavour in",
+      "price": 129,
+      "category": "Side Orders",
+      "image": "Red_Velvet_Lava_Cake_7.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd8",
+      "name": "Butterscotch Mousse Cake",
+      "description": "Sweet temptation! Butterscotch flavored mousse",
+      "price": 109,
+      "category": "Side Orders",
+      "image": "Butterscotch_Mousse_Cake_8.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd9",
+      "name": "Lava Cake",
+      "description": "Chocolate cake with a gooey molten chocolate center",
+      "price": 99,
+      "category": "Side Orders",
+      "image": "Lava_Cake_9.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd10",
+      "name": "Chicken Parcel",
+      "description": "",
+      "price": 449,
+      "category": "Side Orders",
+      "image": "Chicken_Parcel_10.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "sd11",
+      "name": "Veg Parcel",
+      "description": "",
+      "price": 449,
+      "category": "Side Orders",
+      "image": "Veg_Parcel_11.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd12",
+      "name": "Crunchy Strips",
+      "description": "Oven baked wheat thin crips with peri peri seasoning with a cheesy dip",
+      "price": 149,
+      "category": "Side Orders",
+      "image": "Crunchy_Strips_12.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd13",
+      "name": "Potato Cheese Shots",
+      "description": "Crisp and golden outside,flavorful burst of cheese, potato & spice inside",
+      "price": 149,
+      "category": "Side Orders",
+      "image": "Potato_Cheese_Shots_13.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd14",
+      "name": "Taco Mexicana-Veg(Single)",
+      "description": "Truly irresistible! Crispy taco with a decicious veg patty & creamy sauce",
+      "price": 149,
+      "category": "Side Orders",
+      "image": "Taco_Mexicana_Veg_Single__14.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd15",
+      "name": "CRINKLE FRIES",
+      "description": "",
+      "price": 149,
+      "category": "Side Orders",
+      "image": "CRINKLE_FRIES_15.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd16",
+      "name": "BROWNIE FANTASY",
+      "description": "",
+      "price": 149,
+      "category": "Side Orders",
+      "image": "BROWNIE_FANTASY_16.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "sd17",
+      "name": "Taco Mexicana Non Veg",
+      "description": "",
+      "price": 449,
+      "category": "Side Orders",
+      "image": "Taco_Mexicana_Non_Veg_17.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "sd18",
+      "name": "Taco Mexicana Veg",
+      "description": "",
+      "price": 449,
+      "category": "Side Orders",
+      "image": "Taco_Mexicana_Veg_18.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "bv1",
+      "name": "Pepsi",
+      "description": "Sparkling and Refreshing Beverage (475ml)",
+      "price": 60,
+      "category": "Beverages",
+      "image": "Pepsi__475ml__1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "bv2",
+      "name": "7 Up",
+      "description": "Clear, Crisp & Refreshing Lemon Drink (475ml)",
+      "price": 60,
+      "category": "Beverages",
+      "image": "7Up__475ml__2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "bv3",
+      "name": "Mirinda",
+      "description": "Delicious Orange Flavored Beverage (475ml)",
+      "price": 60,
+      "category": "Beverages",
+      "image": "Mirinda__475ml__4.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "bv4",
+      "name": "PEPSI BLACK CAN",
+      "description": "",
+      "price": 60,
+      "category": "Beverages",
+      "image": "PEPSI_BLACK_CAN_5.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pa1",
+      "name": "Moroccan Spice Pasta Veg",
+      "description": "Instant Fusilli Pasta, Harissa Sauce, Onion, Mushroom, Olives, Parsley sprinkle",
+      "price": 449,
+      "category": "Pasta",
+      "image": "Moroccan_Spice_Pasta_Veg_1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pa2",
+      "name": "Tikka Masala Pasta Veg",
+      "description": "",
+      "price": 449,
+      "category": "Pasta",
+      "image": "Tikka_Masala_Pasta_Veg_2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pa3",
+      "name": "Creamy Tomato Pasta Veg",
+      "description": "",
+      "price": 449,
+      "category": "Pasta",
+      "image": "Creamy_Tomato_Pasta_Veg_3.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pa4",
+      "name": "Creamy Tomato Pasta Non Veg",
+      "description": "Instant Fusilli Pasta, Creamy Culinary Dressing, Onion, Olives, BBQ Pepper Chicken, Parsley sprinkle",
+      "price": 449,
+      "category": "Pasta",
+      "image": "Creamy_Tomato_Pasta_Non_Veg_4.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "pa5",
+      "name": "Tikka Masala Pasta Non Veg",
+      "description": "Instant Fusilli Pasta, Spicy Red dressing, Onion, Chicken Tikka, Parsley sprinkle",
+      "price": 449,
+      "category": "Pasta",
+      "image": "Tikka_Masala_Pasta_Non_Veg_5.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "pa6",
+      "name": "Moroccan Spice Pasta Non Veg",
+      "description": "",
+      "price": 449,
+      "category": "Pasta",
+      "image": "Moroccan_Spice_Pasta_Non_Veg_6.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "bp1",
+      "name": "BURGER PIZZA- CLASSIC VEG",
+      "description": "Bite into delight! Witness the epic combination of pizza and burger with our classic Burger Pizza, that looks good and tastes great!",
+      "price": 449,
+      "category": "Burger Pizza",
+      "image": "BURGER_PIZZA__CLASSIC_VEG_1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "bp2",
+      "name": "BURGER PIZZA- PREMIUM VEG",
+      "description": "The good just got better! Treat yourself to the premium taste of the Burger Pizza, that looks good and tastes great with paneer and red paprika.",
+      "price": 449,
+      "category": "Burger Pizza",
+      "image": "BURGER_PIZZA__PREMIUM_VEG_2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "bp3",
+      "name": "BURGER PIZZA- CLASSIC NON VEG",
+      "description": "For all the meat cravers, try the classic non-veg Burger Pizza loaded with the goodness of burger and the greatness of pizza.",
+      "price": 449,
+      "category": "Burger Pizza",
+      "image": "BURGER_PIZZA__CLASSIC_NON_VEG_3.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "cw1",
+      "name": "ROASTED CHICKEN WINGS PERI-PERI",
+      "description": "",
+      "price": 449,
+      "category": "Chicken Wings",
+      "image": "ROASTED_CHICKEN_WINGS_PERI_PERI_1.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "cw2",
+      "name": "ROASTED CHICKEN WINGS CLASSIC HOT SAUCE",
+      "description": "",
+      "price": 449,
+      "category": "Chicken Wings",
+      "image": "ROASTED_CHICKEN_WINGS_CLASSIC_HOT_SAUCE_2.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "cw3",
+      "name": "CHICKEN MEATBALLS PERI-PERI",
+      "description": "",
+      "price": 449,
+      "category": "Chicken Wings",
+      "image": "CHICKEN_MEATBALLS_PERI_PERI_3.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "cw4",
+      "name": "BONELESS CHICKEN WINGS PERI-PERI",
+      "description": "",
+      "price": 449,
+      "category": "Chicken Wings",
+      "image": "BONELESS_CHICKEN_WINGS_PERI_PERI_4.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "cc1",
+      "name": "Cheese Burst",
+      "description": "Crust with oodles of yummy liquid Dairy cheese sauce filled inside.",
+      "price": 449,
+      "category": "Choice of Crusts",
+      "image": "Cheese_Burst_1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "cc2",
+      "name": "Classic Hand Tossed",
+      "description": "Dominos traditional hand stretched crust, crisp on outside, soft & light inside.",
+      "price": 449,
+      "category": "Choice of Crusts",
+      "image": "Classic_Hand_Tossed_2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "cc3",
+      "name": "Wheat Thin Crust",
+      "description": "Presenting the light healthier and delicious light wheat thin crust from Dominos.",
+      "price": 449,
+      "category": "Choice of Crusts",
+      "image": "Wheat_Thin_Crust_3.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "cc4",
+      "name": "Fresh Pan Pizza",
+      "description": "",
+      "price": 449,
+      "category": "Choice of Crusts",
+      "image": "Fresh_Pan_Pizza_4.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "cc5",
+      "name": "New Hand Tossed",
+      "description": "",
+      "price": 449,
+      "category": "Choice of Crusts",
+      "image": "New_Hand_Tossed_5.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "ct1",
+      "name": "veg toppings",
+      "description": "Black Olives, Crisp Capsicum, Paneer, Mushroom, Golden Corn, Fresh Tomato, Jalapeno, Red Pepper & Babycorn.",
+      "price": 449,
+      "category": "Choice of Toppings",
+      "image": "veg_toppings_1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "ct2",
+      "name": "Extra Cheese",
+      "description": "",
+      "price": 449,
+      "category": "Choice of Toppings",
+      "image": "Extra_Cheese_2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "ct3",
+      "name": "Non Veg Toppings",
+      "description": "Barbeque Chicken, Hot 'n' Spicy Chicken,Chunky Chicken and Chicken Salami.",
+      "price": 449,
+      "category": "Choice of Toppings",
+      "image": "Non_Veg_Toppings_3.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "clp1",
+      "name": "The 5 Chicken Feast Pizza",
+      "description": "",
+      "price": 449,
+      "category": "Chicken Lovers Pizza",
+      "image": "The_5_Chicken_Feast_Pizza_1.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "clp2",
+      "name": "Spiced Double Chicken",
+      "description": "",
+      "price": 449,
+      "category": "Chicken Lovers Pizza",
+      "image": "Spiced_Double_Chicken_2.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "clp3",
+      "name": "Chicken Maximus",
+      "description": "",
+      "price": 449,
+      "category": "Chicken Lovers Pizza",
+      "image": "Chicken_Maximus_3.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "clp4",
+      "name": "Indo Fusion Chicken Pizza",
+      "description": "",
+      "price": 449,
+      "category": "Chicken Lovers Pizza",
+      "image": "Indo_Fusion_Chicken_Pizza_4.jpg",
+      "isVeg": false
+    },
+    {
+      "id": "pp1",
+      "name": "Corn n Cheese Paratha Pizza",
+      "description": "",
+      "price": 449,
+      "category": "Paratha Pizza",
+      "image": "Corn_n_Cheese_Paratha_Pizza_1.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pp2",
+      "name": "Paneer Paratha Pizza",
+      "description": "",
+      "price": 449,
+      "category": "Paratha Pizza",
+      "image": "Paneer_Paratha_Pizza_2.jpg",
+      "isVeg": true
+    },
+    {
+      "id": "pp3",
+      "name": "Chicken Keema Paratha Pizza",
+      "description": "",
+      "price": 449,
+      "category": "Paratha Pizza",
+      "image": "Chicken_Keema_Paratha_Pizza_3.jpg",
+      "isVeg": false
+    }
+  ]
+}

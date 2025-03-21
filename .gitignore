@@ -1,0 +1,41 @@
+# OS specific files
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# Editor directories and files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# Local environment files
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Dependency directories
+frontend/node_modules/
+
+jspm_packages/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/ 
+
+real-estate-voiceagent-main/
