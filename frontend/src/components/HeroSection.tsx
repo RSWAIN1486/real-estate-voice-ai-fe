@@ -4,6 +4,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useState } from "react";
 import VoiceAgent from "./VoiceAgent/VoiceAgent";
 import VoiceAssistantIcon from "./VoiceAgent/VoiceAssistantIcon";
+import heroBgImage from "../assets/images/hero-bg.jpg";
 
 // Interface for voice search criteria
 export interface VoiceFilterCriteria {
@@ -46,6 +47,9 @@ const HeroSection = ({ onVoiceSearch }: HeroSectionProps) => {
         height: "70vh",
         display: "flex",
         alignItems: "center",
+        backgroundImage: `url(${heroBgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
         "&::before": {
           content: '""',
           position: "absolute",
@@ -53,10 +57,7 @@ const HeroSection = ({ onVoiceSearch }: HeroSectionProps) => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "brightness(0.7)",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
           zIndex: -1,
         },
       }}
@@ -74,18 +75,26 @@ const HeroSection = ({ onVoiceSearch }: HeroSectionProps) => {
             <Paper
               elevation={3}
               sx={{
-                p: "4px",
+                p: "2px",
                 display: "flex",
                 alignItems: "center",
                 flexGrow: 1,
-                borderRadius: 3,
+                borderRadius: 50,
+                boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
               }}
             >
-              <IconButton sx={{ p: "10px" }}>
+              <IconButton sx={{ p: "10px", ml: 1, color: "text.secondary" }}>
                 <LocationOnIcon />
               </IconButton>
               <InputBase
-                sx={{ ml: 1, flex: 1 }}
+                sx={{ 
+                  ml: 1, 
+                  flex: 1,
+                  py: 1,
+                  fontSize: "1rem",
+                }}
                 placeholder="Enter a location, property type, or keyword"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -98,11 +107,12 @@ const HeroSection = ({ onVoiceSearch }: HeroSectionProps) => {
               <Button
                 variant="contained"
                 sx={{
-                  px: 4,
-                  py: 1,
-                  borderRadius: 2,
+                  px: 3,
+                  py: 1.2,
+                  borderRadius: "0 50px 50px 0",
                   textTransform: "none",
                   fontSize: "1rem",
+                  boxShadow: "none",
                 }}
                 startIcon={<SearchIcon />}
                 onClick={handleSearch}
@@ -117,20 +127,21 @@ const HeroSection = ({ onVoiceSearch }: HeroSectionProps) => {
                 display: "flex", 
                 alignItems: "center",
                 position: "relative",
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
-                borderRadius: "50%"
               }}
             >
               <VoiceAssistantIcon onClick={handleVoiceIconClick} size={64} />
             </Box>
           </Box>
 
-          <Box sx={{ mt: 4, display: "flex", gap: 2, flexWrap: "wrap" }}>
+          <Box sx={{ mt: 5, display: "flex", gap: 2, flexWrap: "wrap" }}>
             {["Dubai", "New York", "London", "Abu Dhabi", "Manchester"].map((city) => (
               <Button
                 key={city}
                 variant="outlined"
                 sx={{
+                  borderRadius: 30,
+                  px: 3,
+                  py: 0.75,
                   color: "white",
                   borderColor: "rgba(255,255,255,0.5)",
                   "&:hover": {
