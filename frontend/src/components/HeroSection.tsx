@@ -13,6 +13,13 @@ export interface VoiceFilterCriteria {
   propertyType?: string;
   listingType?: string;
   priceRange?: [number, number];
+  features?: string[];
+  viewType?: string;
+  isPetFriendly?: boolean;
+  isFurnished?: boolean;
+  yearBuilt?: string;
+  areaRange?: [number, number];
+  nearbyAmenities?: string[];
 }
 
 interface HeroSectionProps {

@@ -1,5 +1,23 @@
 import { useState } from "react";
-import { Box, TextField, Button, Grid, MenuItem, Slider, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  TextField,
+  MenuItem,
+  Button,
+  Slider,
+  Typography,
+  Paper,
+  InputAdornment,
+  Chip,
+  FormControlLabel,
+  Checkbox,
+  Autocomplete,
+  Divider,
+} from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 // Define Filters interface
 export interface Filters {
@@ -10,6 +28,14 @@ export interface Filters {
   bathrooms: string;
   propertyType: string;
   listingType: string;
+  minArea: number;
+  maxArea: number;
+  selectedFeatures: string[];
+  viewType: string;
+  nearbyAmenities: string[];
+  yearBuilt: string;
+  isPetFriendly: boolean;
+  isFurnished: boolean;
 }
 
 const initialFilters: Filters = {
@@ -20,7 +46,81 @@ const initialFilters: Filters = {
   bathrooms: "",
   propertyType: "",
   listingType: "",
+  minArea: 0,
+  maxArea: 10000,
+  selectedFeatures: [],
+  viewType: "",
+  nearbyAmenities: [],
+  yearBuilt: "",
+  isPetFriendly: false,
+  isFurnished: false,
 };
+
+const propertyTypes = [
+  "Apartment",
+  "Villa",
+  "Townhouse",
+  "Penthouse",
+  "Office",
+  "Retail",
+  "Duplex",
+  "Land",
+  "House",
+  "Condo",
+];
+
+const listingTypes = ["For Sale", "For Rent", "New Development"];
+
+const features = [
+  "Balcony",
+  "Private Pool",
+  "Garden",
+  "Gym",
+  "Smart Home",
+  "Walk-in Closet",
+  "Parking",
+  "Concierge",
+  "24/7 Security",
+  "Elevator",
+  "Storage Room",
+  "Maid's Room",
+  "Study Room",
+];
+
+const viewTypes = [
+  "Sea View",
+  "City View",
+  "Garden View",
+  "Mountain View",
+  "Pool View",
+  "Lake View",
+  "Golf Course View",
+  "Park View",
+];
+
+const nearbyAmenities = [
+  "Supermarket",
+  "Metro Station",
+  "School",
+  "Hospital",
+  "Shopping Mall",
+  "Beach",
+  "Restaurant",
+  "Pharmacy",
+  "Gym",
+  "Park",
+  "Airport",
+  "Bus Station",
+];
+
+const yearBuiltOptions = [
+  "2023 or newer",
+  "2020 - 2022",
+  "2015 - 2019",
+  "2010 - 2014",
+  "2000 - 2009",
+  "Before 2000",
+];
 
 interface SearchFiltersProps {
   onFilterChange?: (filters: Filters) => void;
@@ -29,11 +129,24 @@ interface SearchFiltersProps {
 const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000000]);
+  const [areaRange, setAreaRange] = useState<number[]>([0, 10000]);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const updatedFilters = { ...filters, [name]: value };
+    setFilters(updatedFilters);
+    if (onFilterChange) {
+      onFilterChange(updatedFilters);
+    }
+  };
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    const updatedFilters = {
+      ...filters,
+      [name]: checked,
+    };
     setFilters(updatedFilters);
     if (onFilterChange) {
       onFilterChange(updatedFilters);
@@ -54,32 +167,49 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
     }
   };
 
+  const handleAreaChange = (event: Event, newValue: number | number[]) => {
+    const newValueArray = newValue as number[];
+    setAreaRange(newValueArray);
+    const updatedFilters = {
+      ...filters,
+      minArea: newValueArray[0],
+      maxArea: newValueArray[1],
+    };
+    setFilters(updatedFilters);
+    if (onFilterChange) {
+      onFilterChange(updatedFilters);
+    }
+  };
+
   const handleReset = () => {
     setFilters(initialFilters);
     setPriceRange([0, 10000000]);
+    setAreaRange([0, 10000]);
     if (onFilterChange) {
       onFilterChange(initialFilters);
     }
   };
 
   return (
-    <Box sx={{ mt: 2, p: 3, bgcolor: "background.paper", borderRadius: 2, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-            <Typography variant="h6" fontWeight="600">
-              Filters
-            </Typography>
-            <Button 
-              variant="text" 
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              sx={{ textTransform: "none" }}
-            >
-              {showAdvanced ? "Hide Advanced Filters" : "Show Advanced Filters"}
-            </Button>
-          </Box>
-        </Grid>
+    <Paper elevation={0} sx={{ p: 3, borderRadius: 2, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+      <Box sx={{ mb: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <FilterListIcon /> Filters
+          </Typography>
+          <Button 
+            variant="text" 
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            endIcon={<ExpandMoreIcon />}
+            sx={{ textTransform: "none" }}
+          >
+            {showAdvanced ? "Hide Advanced Filters" : "Show Advanced Filters"}
+          </Button>
+        </Box>
+      </Box>
 
+      <Grid container spacing={3}>
+        {/* Basic Filters */}
         <Grid item xs={12} md={4}>
           <TextField
             fullWidth
@@ -87,120 +217,283 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
             name="location"
             value={filters.location}
             onChange={handleInputChange}
-            placeholder="City, neighborhood, or address"
+            placeholder="Enter city, area or landmark"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
           />
         </Grid>
 
         <Grid item xs={12} md={8}>
           <Typography gutterBottom>Price Range ($)</Typography>
-          <Box sx={{ px: 2 }}>
-            <Slider
-              value={priceRange}
-              onChange={handlePriceChange}
-              valueLabelDisplay="auto"
-              min={0}
-              max={10000000}
-              step={50000}
-              valueLabelFormat={(value) => `$${value.toLocaleString()}`}
-            />
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="body2" color="text.secondary">$0</Typography>
-              <Typography variant="body2" color="text.secondary">$10,000,000</Typography>
-            </Box>
+          <Slider
+            value={priceRange}
+            onChange={handlePriceChange}
+            valueLabelDisplay="auto"
+            min={0}
+            max={10000000}
+            step={50000}
+            valueLabelFormat={(value) => `$${value.toLocaleString()}`}
+          />
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              ${priceRange[0].toLocaleString()}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              ${priceRange[1].toLocaleString()}
+            </Typography>
           </Box>
         </Grid>
 
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            select
+            fullWidth
+            label="Bedrooms"
+            name="bedrooms"
+            value={filters.bedrooms}
+            onChange={handleInputChange}
+          >
+            <MenuItem value="">Any</MenuItem>
+            {[1, 2, 3, 4, 5, "5+"].map((num) => (
+              <MenuItem key={num} value={num}>
+                {num} {typeof num === "number" ? (num === 1 ? "Bedroom" : "Bedrooms") : "Bedrooms"}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            select
+            fullWidth
+            label="Bathrooms"
+            name="bathrooms"
+            value={filters.bathrooms}
+            onChange={handleInputChange}
+          >
+            <MenuItem value="">Any</MenuItem>
+            {[1, 2, 3, 4, "4+"].map((num) => (
+              <MenuItem key={num} value={num}>
+                {num} {typeof num === "number" ? (num === 1 ? "Bathroom" : "Bathrooms") : "Bathrooms"}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            select
+            fullWidth
+            label="Property Type"
+            name="propertyType"
+            value={filters.propertyType}
+            onChange={handleInputChange}
+          >
+            <MenuItem value="">Any</MenuItem>
+            {propertyTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            select
+            fullWidth
+            label="Listing Type"
+            name="listingType"
+            value={filters.listingType}
+            onChange={handleInputChange}
+          >
+            <MenuItem value="">Any</MenuItem>
+            {listingTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        {/* Advanced Filters (Collapsible) */}
         {showAdvanced && (
           <>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle1" gutterBottom>
+                Advanced Filters
+              </Typography>
+            </Grid>
+
+            {/* Area Range */}
+            <Grid item xs={12} md={6}>
+              <Typography gutterBottom>Area Range (sq ft)</Typography>
+              <Slider
+                value={areaRange}
+                onChange={handleAreaChange}
+                valueLabelDisplay="auto"
+                min={0}
+                max={10000}
+                step={100}
+                valueLabelFormat={(value) => `${value.toLocaleString()} sqft`}
+              />
+              <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {areaRange[0].toLocaleString()} sqft
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {areaRange[1].toLocaleString()} sqft
+                </Typography>
+              </Box>
+            </Grid>
+
+            {/* Year Built */}
+            <Grid item xs={12} md={6}>
               <TextField
                 select
                 fullWidth
-                label="Bedrooms"
-                name="bedrooms"
-                value={filters.bedrooms}
+                label="Year Built"
+                name="yearBuilt"
+                value={filters.yearBuilt}
                 onChange={handleInputChange}
               >
                 <MenuItem value="">Any</MenuItem>
-                <MenuItem value="1">1+</MenuItem>
-                <MenuItem value="2">2+</MenuItem>
-                <MenuItem value="3">3+</MenuItem>
-                <MenuItem value="4">4+</MenuItem>
-                <MenuItem value="5">5+</MenuItem>
+                {yearBuiltOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
               </TextField>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            {/* View Type */}
+            <Grid item xs={12} md={6}>
               <TextField
                 select
                 fullWidth
-                label="Bathrooms"
-                name="bathrooms"
-                value={filters.bathrooms}
+                label="View"
+                name="viewType"
+                value={filters.viewType}
                 onChange={handleInputChange}
               >
                 <MenuItem value="">Any</MenuItem>
-                <MenuItem value="1">1+</MenuItem>
-                <MenuItem value="2">2+</MenuItem>
-                <MenuItem value="3">3+</MenuItem>
-                <MenuItem value="4">4+</MenuItem>
+                {viewTypes.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
               </TextField>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                select
-                fullWidth
-                label="Property Type"
-                name="propertyType"
-                value={filters.propertyType}
-                onChange={handleInputChange}
-              >
-                <MenuItem value="">Any</MenuItem>
-                <MenuItem value="House">House</MenuItem>
-                <MenuItem value="Apartment">Apartment</MenuItem>
-                <MenuItem value="Condo">Condo</MenuItem>
-                <MenuItem value="Villa">Villa</MenuItem>
-                <MenuItem value="Townhouse">Townhouse</MenuItem>
-                <MenuItem value="Penthouse">Penthouse</MenuItem>
-              </TextField>
+            {/* Checkboxes */}
+            <Grid item xs={12} md={6}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={filters.isPetFriendly}
+                      onChange={handleCheckboxChange}
+                      name="isPetFriendly"
+                    />
+                  }
+                  label="Pet Friendly"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={filters.isFurnished}
+                      onChange={handleCheckboxChange}
+                      name="isFurnished"
+                    />
+                  }
+                  label="Furnished"
+                />
+              </Box>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                select
-                fullWidth
-                label="Listing Type"
-                name="listingType"
-                value={filters.listingType}
-                onChange={handleInputChange}
-              >
-                <MenuItem value="">Any</MenuItem>
-                <MenuItem value="Buy">For Sale</MenuItem>
-                <MenuItem value="Rent">For Rent</MenuItem>
-                <MenuItem value="New Development">New Development</MenuItem>
-              </TextField>
+            {/* Property Features */}
+            <Grid item xs={12} md={6}>
+              <Autocomplete
+                multiple
+                id="property-features"
+                options={features}
+                value={filters.selectedFeatures}
+                onChange={(event, newValue) => {
+                  const updatedFilters = { ...filters, selectedFeatures: newValue };
+                  setFilters(updatedFilters);
+                  if (onFilterChange) {
+                    onFilterChange(updatedFilters);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" label="Property Features" placeholder="Select features" />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                  ))
+                }
+              />
+            </Grid>
+
+            {/* Nearby Amenities */}
+            <Grid item xs={12} md={6}>
+              <Autocomplete
+                multiple
+                id="nearby-amenities"
+                options={nearbyAmenities}
+                value={filters.nearbyAmenities}
+                onChange={(event, newValue) => {
+                  const updatedFilters = { ...filters, nearbyAmenities: newValue };
+                  setFilters(updatedFilters);
+                  if (onFilterChange) {
+                    onFilterChange(updatedFilters);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" label="Nearby Amenities" placeholder="Select amenities" />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                  ))
+                }
+              />
             </Grid>
           </>
         )}
 
-        <Grid item xs={12} sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
-          <Button variant="outlined" onClick={handleReset}>
-            Reset
-          </Button>
-          <Button 
-            variant="contained"
-            onClick={() => {
-              if (onFilterChange) {
-                onFilterChange(filters);
-              }
-            }}
-          >
-            Search
-          </Button>
+        <Grid item xs={12}>
+          <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
+            <Button
+              variant="outlined"
+              onClick={handleReset}
+              sx={{ minWidth: 100 }}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<SearchIcon />}
+              sx={{ minWidth: 100 }}
+              onClick={() => {
+                if (onFilterChange) {
+                  onFilterChange(filters);
+                }
+              }}
+            >
+              Search
+            </Button>
+          </Box>
         </Grid>
       </Grid>
-    </Box>
+    </Paper>
   );
 };
 

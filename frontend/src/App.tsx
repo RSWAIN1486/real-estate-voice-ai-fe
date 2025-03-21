@@ -27,6 +27,14 @@ function App() {
     bathrooms: "",
     propertyType: "",
     listingType: "",
+    minArea: 0,
+    maxArea: 10000,
+    selectedFeatures: [],
+    viewType: "",
+    nearbyAmenities: [],
+    yearBuilt: "",
+    isPetFriendly: false,
+    isFurnished: false,
   });
 
   useEffect(() => {
@@ -75,6 +83,32 @@ function App() {
     if (criteria.priceRange) {
       updatedFilters.minPrice = criteria.priceRange[0];
       updatedFilters.maxPrice = criteria.priceRange[1];
+    }
+
+    // Handle advanced filters if provided by voice
+    if (criteria.features && criteria.features.length > 0) {
+      updatedFilters.selectedFeatures = criteria.features;
+    }
+
+    if (criteria.viewType) {
+      updatedFilters.viewType = criteria.viewType;
+    }
+
+    if (criteria.isPetFriendly !== undefined) {
+      updatedFilters.isPetFriendly = criteria.isPetFriendly;
+    }
+
+    if (criteria.isFurnished !== undefined) {
+      updatedFilters.isFurnished = criteria.isFurnished;
+    }
+
+    if (criteria.yearBuilt) {
+      updatedFilters.yearBuilt = criteria.yearBuilt;
+    }
+
+    if (criteria.areaRange) {
+      updatedFilters.minArea = criteria.areaRange[0];
+      updatedFilters.maxArea = criteria.areaRange[1];
     }
 
     setFilters(updatedFilters);
@@ -254,42 +288,9 @@ function App() {
                 <Cart />
               </Container>
             } />
-            <Route path="/login" element={
-              <Container 
-                component="main" 
-                sx={{ 
-                  flex: 1,
-                  py: 4,
-                  maxWidth: { xs: 'lg', lg: 'xl' },
-                }}
-              >
-                <Login />
-              </Container>
-            } />
-            <Route path="/register" element={
-              <Container 
-                component="main" 
-                sx={{ 
-                  flex: 1,
-                  py: 4,
-                  maxWidth: { xs: 'lg', lg: 'xl' },
-                }}
-              >
-                <Register />
-              </Container>
-            } />
-            <Route path="/profile" element={
-              <Container 
-                component="main" 
-                sx={{ 
-                  flex: 1,
-                  py: 4,
-                  maxWidth: { xs: 'lg', lg: 'xl' },
-                }}
-              >
-                <Profile />
-              </Container>
-            } />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
           <Footer />
         </Box>
