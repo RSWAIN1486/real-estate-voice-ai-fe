@@ -123,6 +123,8 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       dispatch(resetAgent());
       dispatch(clearTranscripts());
       
+      // Comment out previous conversation loading
+      /*
       // Check if we have a previous conversation to load
       const lastCallId = window.lastCallId || sessionStorage.getItem('lastVoiceAgentCallId') || localStorage.getItem('lastVoiceAgentCallId');
       const savedTranscripts = window.savedTranscripts || JSON.parse(localStorage.getItem('savedTranscripts') || '[]');
@@ -140,6 +142,12 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
         console.log('No previous conversation found, starting new conversation');
         initializeAgent();
       }
+      */
+      
+      // Always start a new conversation
+      console.log('Starting a new conversation (ignoring previous conversations)');
+      initializeAgent();
+      
     } else {
       // Clean up if the dialog closes
       if (status === VoiceAgentStatus.ACTIVE) {
@@ -180,6 +188,8 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       // Create a new call (with past transcripts if provided)
       let callData;
       
+      // Comment out previous call ID usage for now, as requested
+      /*
       // Check if we have a previous call ID in session or local storage
       const lastCallId = window.lastCallId || sessionStorage.getItem('lastVoiceAgentCallId') || localStorage.getItem('lastVoiceAgentCallId');
       
@@ -196,12 +206,21 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
         console.log('Starting new conversation');
         callData = await voiceAgentService.createVoiceAgentCall();
       }
+      */
       
-      // Store the new call ID for future use
+      // Always start a completely new conversation for now
+      console.log('Starting new conversation (ignoring previous call IDs as requested)');
+      callData = await voiceAgentService.createVoiceAgentCall();
+      
+      // Store the new call ID for future use (commented out, but keep generated ID in Redux)
       const newCallId = callData.callId;
+      
+      // Comment out localStorage/sessionStorage usage
+      /*
       window.lastCallId = newCallId;
       sessionStorage.setItem('lastVoiceAgentCallId', newCallId);
       localStorage.setItem('lastVoiceAgentCallId', newCallId);
+      */
       
       // Store call info in Redux
       dispatch(setCallInfo({
@@ -221,6 +240,8 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       // Set active state
       dispatch(setActive(true));
       
+      // Comment out message about resuming previous conversation
+      /*
       // If we don't have past transcripts but used a callId, we need to show a message
       // that we're continuing a previous conversation
       if (lastCallId && (!pastTranscripts || pastTranscripts.length === 0)) {
@@ -232,6 +253,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
           medium: Medium.TEXT
         }));
       }
+      */
       
       setIsInitializing(false);
     } catch (error) {
@@ -1017,7 +1039,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     };
   }, [transcripts]);
 
-  // Get the latest transcript being spoken
+  // When transcripts change, check for property listings in text
   useEffect(() => {
     if (transcripts.length > 0) {
       const latestAgentTranscript = [...transcripts]
@@ -1027,19 +1049,21 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       if (latestAgentTranscript) {
         setCurrentText(latestAgentTranscript.text);
         
-        // NEW: Check if the AI is trying to list properties and intercept
+        // Check if the AI is trying to list properties and intercept
         const text = latestAgentTranscript.text.toLowerCase();
+        
+        // Only intercept when text clearly indicates property listing
+        // Modified to be more specific to avoid false positives on greetings
         const propertyListingIndicators = [
           "i've found some properties",
           "i have found some properties",
           "here are some properties",
           "here are a few options",
-          "i found a",
-          "bedroom apartment",
-          "bedroom villa",
-          "bedroom penthouse",
-          "with a price of",
-          "with a rent of"
+          "bedroom apartment in",
+          "bedroom villa in",
+          "bedroom penthouse in",
+          "with a price of $",
+          "with a rent of $"
         ];
         
         const isListingProperties = propertyListingIndicators.some(indicator => 
@@ -1071,6 +1095,9 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
             speaker: "agent",
             medium: Medium.TEXT
           }));
+          
+          // Don't automatically close the dialog here
+          // The handleSearchProperties function will determine if closing is appropriate
         }
       }
     }
@@ -1118,6 +1145,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     }
   };
 
+  // Function to handle search properties request
   const handleSearchProperties = (searchData: any) => {
     try {
       console.log('Search properties event received:', searchData);
@@ -1126,6 +1154,10 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       const criteria = searchData.criteria || searchData;
       console.log('Extracted search criteria:', criteria);
       
+      // IMPORTANT: Add a debugging log to track all calls to this function
+      console.log('handleSearchProperties called with:', JSON.stringify(criteria), 
+                  'from caller:', new Error().stack);
+      
       // Trigger property search with the given criteria
       window.dispatchEvent(new CustomEvent('executeSearch', { 
         detail: { criteria }
@@ -1133,13 +1165,37 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       
       // Display user feedback that search is being performed
       dispatch(addTranscript({
-        text: "Searching for properties matching your criteria...",
+        text: "Searching for properties matching your criteria now.",
         isFinal: true,
         speaker: "agent",
         medium: Medium.TEXT
       }));
       
-      // DO NOT close the voice agent dialog
+      // Only close the dialog if this is an actual property search (not just a greeting)
+      // Check if the criteria has meaningful search parameters with stricter conditions
+      const hasSearchCriteria = criteria && (
+        (criteria.location && criteria.location.length > 0) || 
+        (criteria.propertyType && criteria.propertyType.length > 0) || 
+        (criteria.bedrooms && criteria.bedrooms.length > 0) || 
+        (criteria.bathrooms && criteria.bathrooms.length > 0) ||
+        (typeof criteria.minPrice === 'number' && criteria.minPrice > 0) || 
+        (typeof criteria.maxPrice === 'number' && criteria.maxPrice > 0) ||
+        criteria.showAll === true
+      );
+      
+      console.log('Has search criteria:', hasSearchCriteria, 'Criteria:', criteria);
+      
+      if (hasSearchCriteria) {
+        // Close the voice agent dialog after a short delay
+        // This gives time for the event to be processed and the transcript to be seen
+        console.log('Will close dialog in 1.5 seconds due to property search');
+        setTimeout(() => {
+          console.log('Closing voice agent dialog after search execution');
+          onClose();
+        }, 1500);
+      } else {
+        console.log('Not closing dialog - no search criteria detected or insufficient criteria');
+      }
       
     } catch (error) {
       console.error('Error handling property search:', error);

@@ -5,15 +5,23 @@ import { addItem } from '../store/slices/orderSlice';
 export const updatePreferencesTool: ClientToolImplementation = (parameters) => {
   const { preferences } = parameters;
   
+  console.log('UPDATE PREFERENCES TOOL CALLED with parameters:', parameters);
+  
   // Process and format the preferences
   const formattedPreferences = formatPreferences(preferences);
+  console.log('Formatted preferences:', formattedPreferences);
+  
+  // Convert preferences to the filter format expected by the UI
+  const convertedFilters = convertPreferencesToFilters(formattedPreferences);
+  console.log('Converted to filter format:', convertedFilters);
   
   if (typeof window !== "undefined") {
     // Use updateFilters event for consistency with App.tsx event listeners
     const event = new CustomEvent("updateFilters", {
-      detail: { filters: formattedPreferences },
+      detail: { filters: convertedFilters },
     });
     window.dispatchEvent(event);
+    console.log('updateFilters event dispatched');
   }
 
   return "Updated your property preferences.";
@@ -77,6 +85,53 @@ function convertPriceStringToNumber(priceStr: string): number {
   return 0; // Default fallback
 }
 
+// Convert from the preferences format to the filters format used by the UI
+function convertPreferencesToFilters(preferences: any) {
+  if (!preferences) return preferences;
+  
+  const filters: any = { ...preferences };
+  
+  // Handle priceRange conversion to minPrice/maxPrice
+  if (preferences.priceRange) {
+    if (preferences.priceRange.min !== undefined) {
+      filters.minPrice = preferences.priceRange.min;
+    }
+    if (preferences.priceRange.max !== undefined) {
+      filters.maxPrice = preferences.priceRange.max;
+    }
+    delete filters.priceRange;
+  }
+  
+  // Handle areaRange conversion to minArea/maxArea
+  if (preferences.areaRange) {
+    if (preferences.areaRange.min !== undefined) {
+      filters.minArea = preferences.areaRange.min;
+    }
+    if (preferences.areaRange.max !== undefined) {
+      filters.maxArea = preferences.areaRange.max;
+    }
+    delete filters.areaRange;
+  }
+  
+  // Handle features conversion to selectedFeatures
+  if (preferences.features && Array.isArray(preferences.features)) {
+    filters.selectedFeatures = preferences.features;
+    delete filters.features;
+  }
+  
+  // Ensure location is processed correctly
+  if (preferences.location && typeof preferences.location === 'string') {
+    filters.location = preferences.location;
+  }
+  
+  // Ensure property type is processed correctly
+  if (preferences.propertyType && typeof preferences.propertyType === 'string') {
+    filters.propertyType = preferences.propertyType;
+  }
+  
+  return filters;
+}
+
 export const searchPropertiesTool: ClientToolImplementation = (parameters) => {
   console.log('SEARCH PROPERTIES TOOL CALLED with parameters:', parameters);
   const { searchCriteria } = parameters;
@@ -105,6 +160,9 @@ export const searchPropertiesTool: ClientToolImplementation = (parameters) => {
     
     // Format the criteria, especially prices
     parsedCriteria = formatPreferences(parsedCriteria);
+    
+    // Convert to the filters format expected by the UI
+    parsedCriteria = convertPreferencesToFilters(parsedCriteria);
     
     // Ensure we always have a valid object
     if (!parsedCriteria || typeof parsedCriteria !== 'object') {

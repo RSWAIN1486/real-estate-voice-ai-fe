@@ -125,18 +125,11 @@ const yearBuiltOptions = [
 // Define component props
 interface SearchFiltersProps {
   onFilterChange: (filters: Filters) => void;
-  initialFilters?: Partial<Filters>;
+  initialFilters?: Filters;
 }
 
-const SearchFilters: React.FC<SearchFiltersProps> = ({ 
-  onFilterChange,
-  initialFilters: propInitialFilters
-}) => {
-  // Local filter state
-  const [filters, setFilters] = useState<Filters>({
-    ...initialFilters,
-    ...propInitialFilters // Override with any provided initial filters
-  });
+const SearchFilters = ({ onFilterChange, initialFilters = initialFilters }: SearchFiltersProps) => {
+  const [filters, setFilters] = useState<Filters>(initialFilters || initialFilters);
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000000]);
   const [areaRange, setAreaRange] = useState<number[]>([0, 10000]);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -200,7 +193,11 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   };
 
   return (
-    <Paper elevation={0} sx={{ p: 3, borderRadius: 2, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+    <Paper
+      elevation={3}
+      sx={{ p: 3, mb: 4 }}
+      className="search-filters-container"
+    >
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1 }}>

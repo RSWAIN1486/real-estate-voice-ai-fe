@@ -114,10 +114,27 @@ function MainContent() {
     
     // Listen for property preference updates from voice agent
     const handlePropertyPreferences = (event: CustomEvent) => {
+      console.log('App received updateFilters event:', event.detail);
+      
       if (event.detail && event.detail.filters) {
         console.log('Received property preferences update:', event.detail.filters);
-        const newFilters = { ...filters, ...event.detail.filters };
+        
+        // Properly merge the existing filters with the new ones
+        const newFilters = { 
+          ...filters, 
+          ...event.detail.filters 
+        };
+        
+        console.log('Updated filters state:', newFilters);
         setFilters(newFilters);
+        
+        // Scroll to the filter section
+        setTimeout(() => {
+          const filtersElement = document.querySelector('.search-filters-container');
+          if (filtersElement) {
+            filtersElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 300);
       }
     };
     
