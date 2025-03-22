@@ -64,8 +64,45 @@ function App() {
   const handleVoiceSearch = (criteria: VoiceFilterCriteria) => {
     const updatedFilters = { ...filters };
 
-    if (criteria.location) {
-      updatedFilters.location = criteria.location;
+    // If resetAll flag is set, reset all filters to initial values
+    if (criteria.resetAll) {
+      setFilters({
+        location: "",
+        minPrice: 0,
+        maxPrice: 10000000,
+        bedrooms: "",
+        bathrooms: "",
+        propertyType: "",
+        listingType: "",
+        minArea: 0,
+        maxArea: 10000,
+        selectedFeatures: [],
+        viewType: "",
+        nearbyAmenities: [],
+        yearBuilt: "",
+        isPetFriendly: false,
+        isFurnished: false,
+      });
+      return;
+    }
+
+    if (criteria.location !== undefined) {
+      updatedFilters.location = criteria.location.trim();
+      
+      // Reset other filters when searching by location only
+      if (Object.keys(criteria).length === 1 && criteria.location !== undefined) {
+        // Only update location and keep price range, but reset other filters
+        updatedFilters.bedrooms = "";
+        updatedFilters.bathrooms = "";
+        updatedFilters.propertyType = "";
+        updatedFilters.listingType = "";
+        updatedFilters.selectedFeatures = [];
+        updatedFilters.viewType = "";
+        updatedFilters.nearbyAmenities = [];
+        updatedFilters.yearBuilt = "";
+        updatedFilters.isPetFriendly = false;
+        updatedFilters.isFurnished = false;
+      }
     }
 
     if (criteria.bedrooms) {
