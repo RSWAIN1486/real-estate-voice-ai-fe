@@ -295,33 +295,74 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
               medium = Medium.TEXT;
             }
             
-            dispatch(addTranscript({
-              text: transcript.text,
-              isFinal: transcript.isFinal,
-              speaker: transcript.speaker,
-              medium: medium
-            }));
+            // Only add if the transcript has text content
+            if (transcript.text && transcript.text.trim()) {
+              dispatch(addTranscript({
+                text: transcript.text,
+                isFinal: transcript.isFinal,
+                speaker: transcript.speaker,
+                medium: medium
+              }));
+            }
           });
           
-        // Then, add the latest non-final transcript from the user (if it exists)
-        const latestUserNonFinal = [...ultravoxTranscripts]
+        // For user transcripts, only show the most recent final transcript or a high-confidence non-final
+        // This helps prevent showing random incomplete sentences
+        const userTranscripts = ultravoxTranscripts.filter(t => t.speaker === 'user');
+        
+        // First try to find the most recent final user transcript
+        const latestUserFinal = [...userTranscripts]
           .reverse()
-          .find(transcript => transcript.speaker === 'user' && !transcript.isFinal);
-          
-        if (latestUserNonFinal) {
+          .find(transcript => transcript.isFinal);
+        
+        // If we have a final transcript, show it
+        if (latestUserFinal && latestUserFinal.text && latestUserFinal.text.trim()) {
           let medium: Medium;
-          if (latestUserNonFinal.medium === 'voice') {
+          if (latestUserFinal.medium === 'voice') {
             medium = Medium.VOICE;
           } else {
             medium = Medium.TEXT;
           }
           
-          dispatch(addTranscript({
-            text: latestUserNonFinal.text,
-            isFinal: latestUserNonFinal.isFinal,
-            speaker: latestUserNonFinal.speaker,
-            medium: medium
-          }));
+          // Only add if not already added (avoid duplication)
+          const alreadyAdded = ultravoxTranscripts
+            .filter(t => t.isFinal)
+            .some(t => t.speaker === 'user' && t.text === latestUserFinal.text);
+            
+          if (!alreadyAdded) {
+            dispatch(addTranscript({
+              text: latestUserFinal.text,
+              isFinal: true,
+              speaker: 'user',
+              medium: medium
+            }));
+          }
+        } 
+        // Otherwise, only show non-final transcripts if they seem complete enough
+        else {
+          const latestUserNonFinal = [...userTranscripts]
+            .reverse()
+            .find(transcript => !transcript.isFinal);
+            
+          if (latestUserNonFinal && 
+              latestUserNonFinal.text && 
+              latestUserNonFinal.text.trim() && 
+              latestUserNonFinal.text.trim().length > 10) { // Only show if it's substantial
+            
+            let medium: Medium;
+            if (latestUserNonFinal.medium === 'voice') {
+              medium = Medium.VOICE;
+            } else {
+              medium = Medium.TEXT;
+            }
+            
+            dispatch(addTranscript({
+              text: latestUserNonFinal.text,
+              isFinal: false,
+              speaker: 'user',
+              medium: medium
+            }));
+          }
         }
         
         // Finally, add the latest non-final transcript from the agent (if it exists)
@@ -329,7 +370,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
           .reverse()
           .find(transcript => transcript.speaker === 'agent' && !transcript.isFinal);
         
-        if (latestAgentNonFinal) {
+        if (latestAgentNonFinal && latestAgentNonFinal.text && latestAgentNonFinal.text.trim()) {
           let medium: Medium;
           if (latestAgentNonFinal.medium === 'voice') {
             medium = Medium.VOICE;
@@ -352,7 +393,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
             .reverse()
             .find(transcript => transcript.speaker === 'agent' && transcript.isFinal);
             
-          if (latestAgentFinal) {
+          if (latestAgentFinal && latestAgentFinal.text) {
             setCurrentText(latestAgentFinal.text);
           }
         }
@@ -492,12 +533,12 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       session.addEventListener('status', handleSessionStatus);
       session.addEventListener('transcripts', handleTranscripts);
       
-      // Add event listener for property search tools
-      window.addEventListener('propertyPreferencesUpdated', ((event: CustomEvent) => {
+      // Add event listener for property search tools - using the CORRECT event names
+      window.addEventListener('updateFilters', ((event: CustomEvent) => {
         handlePropertyPreferencesUpdate(event.detail);
       }) as EventListener);
       
-      window.addEventListener('searchPropertiesRequested', ((event: CustomEvent) => {
+      window.addEventListener('executeSearch', ((event: CustomEvent) => {
         handleSearchProperties(event.detail);
       }) as EventListener);
       
@@ -510,10 +551,10 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       return () => {
         session.removeEventListener('status', handleSessionStatus);
         session.removeEventListener('transcripts', handleTranscripts);
-        window.removeEventListener('propertyPreferencesUpdated', ((event: CustomEvent) => {
+        window.removeEventListener('updateFilters', ((event: CustomEvent) => {
           handlePropertyPreferencesUpdate(event.detail);
         }) as EventListener);
-        window.removeEventListener('searchPropertiesRequested', ((event: CustomEvent) => {
+        window.removeEventListener('executeSearch', ((event: CustomEvent) => {
           handleSearchProperties(event.detail);
         }) as EventListener);
         window.removeEventListener('orderCheckout', ((event: CustomEvent) => {
@@ -985,9 +1026,55 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       
       if (latestAgentTranscript) {
         setCurrentText(latestAgentTranscript.text);
+        
+        // NEW: Check if the AI is trying to list properties and intercept
+        const text = latestAgentTranscript.text.toLowerCase();
+        const propertyListingIndicators = [
+          "i've found some properties",
+          "i have found some properties",
+          "here are some properties",
+          "here are a few options",
+          "i found a",
+          "bedroom apartment",
+          "bedroom villa",
+          "bedroom penthouse",
+          "with a price of",
+          "with a rent of"
+        ];
+        
+        const isListingProperties = propertyListingIndicators.some(indicator => 
+          text.includes(indicator.toLowerCase())
+        );
+        
+        if (isListingProperties) {
+          console.log('INTERCEPTED: AI tried to list properties in text. Triggering SearchProperties tool instead.');
+          
+          // Extract location if possible
+          let location = '';
+          const locationMatch = text.match(/in\s+([A-Za-z\s]+)\b/);
+          if (locationMatch && locationMatch[1]) {
+            location = locationMatch[1].trim();
+          }
+          
+          // Force trigger the search properties tool
+          const searchCriteria = location ? { location } : { showAll: true };
+          
+          // Dispatch the executeSearch event directly
+          window.dispatchEvent(new CustomEvent("executeSearch", { 
+            detail: { criteria: searchCriteria }
+          }));
+          
+          // Add a transcript showing we're searching
+          dispatch(addTranscript({
+            text: "I'm showing you properties that match your criteria now.",
+            isFinal: true,
+            speaker: "agent",
+            medium: Medium.TEXT
+          }));
+        }
       }
     }
-  }, [transcripts]);
+  }, [transcripts, dispatch]);
   
   // Add event listener for agent-requested hangup
   useEffect(() => {
@@ -1015,12 +1102,15 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
   // Add the handlers for the property search tools
   const handlePropertyPreferencesUpdate = (preferences: any) => {
     try {
-      console.log('Property preferences updated:', preferences);
+      console.log('Property preferences update received:', preferences);
       
-      // Update Redux state with property preferences
-      // This will be implemented in another component
+      // Extract the filters object from event.detail.filters
+      const filters = preferences.filters || preferences;
+      console.log('Extracted filters:', filters);
+      
+      // Update Redux state with property preferences by dispatching updateFilters event
       window.dispatchEvent(new CustomEvent('updateFilters', { 
-        detail: { filters: preferences }
+        detail: { filters }
       }));
       
     } catch (error) {
@@ -1028,18 +1118,28 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     }
   };
 
-  const handleSearchProperties = (searchCriteria: any) => {
+  const handleSearchProperties = (searchData: any) => {
     try {
-      console.log('Search properties requested:', searchCriteria);
+      console.log('Search properties event received:', searchData);
+      
+      // Extract the criteria from event.detail.criteria
+      const criteria = searchData.criteria || searchData;
+      console.log('Extracted search criteria:', criteria);
       
       // Trigger property search with the given criteria
       window.dispatchEvent(new CustomEvent('executeSearch', { 
-        detail: { criteria: searchCriteria }
+        detail: { criteria }
       }));
       
-      // Optionally close the voice agent dialog and navigate to properties page
-      // onClose();
-      // navigate('/properties');
+      // Display user feedback that search is being performed
+      dispatch(addTranscript({
+        text: "Searching for properties matching your criteria...",
+        isFinal: true,
+        speaker: "agent",
+        medium: Medium.TEXT
+      }));
+      
+      // DO NOT close the voice agent dialog
       
     } catch (error) {
       console.error('Error handling property search:', error);

@@ -123,20 +123,36 @@ function MainContent() {
     
     // Listen for search execution requests from voice agent
     const handleSearchExecution = (event: CustomEvent) => {
-      if (event.detail && event.detail.criteria) {
-        console.log('Executing property search:', event.detail.criteria);
+      console.log('App received executeSearch event:', event.detail);
+      if (event.detail) {
+        console.log('Executing property search with criteria:', event.detail.criteria);
         
-        // Update filters with the search criteria
-        const criteria = event.detail.criteria;
-        setFilters(prev => ({
-          ...prev,
-          ...criteria
-        }));
+        // Extract the criteria from the event detail
+        const criteria = event.detail.criteria || {};
         
-        // Navigate to properties page
-        if (location.pathname !== '/properties') {
-          navigate('/properties');
+        // Check if this is a "show all" request with no specific filters
+        if (criteria.showAll) {
+          console.log('Showing all properties (no filters)');
+          // Reset filters to show all properties
+          setFilters({} as Filters);
+        } else {
+          // Update filters with the search criteria 
+          console.log('Updating filters with criteria:', criteria);
+          setFilters(prev => ({
+            ...prev,
+            ...criteria
+          }));
         }
+        
+        // Scroll to the property list section to show results
+        setTimeout(() => {
+          const propertyListElement = document.querySelector('.property-list-container');
+          if (propertyListElement) {
+            propertyListElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 300);
+        
+        // Don't navigate away from the home page
       }
     };
     

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { UltravoxSession, Medium } from 'ultravox-client';
 import { API_BASE_URL } from '../utils/CONSTANTS';
-import { updateOrderTool, orderCheckoutTool, hangUpTool, updatePreferencesTool, searchPropertiesTool } from './clientTools';
+import { hangUpTool, updatePreferencesTool, searchPropertiesTool } from './clientTools';
 import { store } from '../store/store';
 
 // Default voice options with preselected female voice
@@ -31,12 +31,40 @@ export const DEFAULT_VOICE_OPTIONS: VoiceOption[] = [
 export const SYSTEM_PROMPT = `
 You are an AI voice agent for Global Estates. Your job is to help customers find properties that match their criteria.
 
+CRITICAL INSTRUCTION: YOU MUST ALWAYS USE THE SearchProperties TOOL when showing properties. 
+NEVER list or describe properties verbally in the conversation! ALWAYS use the tool!
+
+## Tool Usage Rules
+- Call "hangUp" when:
+  - The user asks to end the call
+  - The user says goodbye or indicates they're done
+  - You're about to end the call yourself
+- Call "UpdatePreferences" when the user specifies property search preferences (do this silently without mentioning it)
+- ALWAYS CALL "SearchProperties" when:
+  - The user asks to see or show properties
+  - The user asks "what properties do you have"
+  - The user asks to search or find properties
+  - The user provides any search criteria
+  - You need to display property listings
+  - The conversation reaches a point where showing properties would be helpful
+
+IMPORTANT BEHAVIOR RULES:
+- NEVER VERBALLY DESCRIBE PROPERTY LISTINGS - this is strictly forbidden
+- NEVER say "I've found some properties" and then list them in chat
+- If asked to show properties, ONLY use the SearchProperties tool
+- DO NOT respond with numbered lists of properties
+- If you find yourself about to list properties in chat, STOP and use SearchProperties tool
+- Always convert price mentions to the correct numerical format
+- For price ranges: "5 million" = $5,000,000 and "200 thousand" = $200,000
+
 Here are some guidelines:
 1. Greet the customer with the voice name assigned warmly and ask what they would like to search for
 2. Ask for specific details about their property search such as location, bedrooms, price range, etc.
-3. Recommend properties based on their criteria and suggest alternatives if needed
+3. When asked to show properties, ONLY use the SearchProperties tool
 4. Answer any questions about properties, neighborhood amenities, or the buying/renting process
-5. Be helpful, professional, and enthusiastic about finding them their perfect property
+5. Be helpful, professional, and enthusiastic about finding them their perfect property.
+6. Do not mention that you're updating preferences in the backend.
+7. Keep your greetings and responses short and concise.
 
 You have access to the following real estate information:
 
@@ -70,14 +98,6 @@ Features:
 - Garden: Private or communal garden areas
 - Smart Home: Property equipped with smart technology features
 - Furnished: Property comes with furniture and basic appliances
-
-## Tool Usage Rules
-- Call "hangUp" when:
-  - The user asks to end the call
-  - The user says goodbye or indicates they're done
-  - You're about to end the call yourself
-- Call "UpdatePreferences" when the user specifies property search preferences
-- Call "SearchProperties" after collecting user preferences to search for matching properties. Call this whenever user asks to search or shortlist or show properties during the conversation.
 `;
 
 /**
@@ -261,8 +281,72 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
                 name: "searchCriteria",
                 location: "PARAMETER_LOCATION_BODY",
                 schema: {
-                  type: "string",
-                  description: "JSON string of the search criteria containing all relevant preferences"
+                  type: "object",
+                  properties: {
+                    location: { 
+                      type: "string", 
+                      description: "The location to search in, e.g., 'Dubai Marina', 'Downtown Dubai'" 
+                    },
+                    propertyType: { 
+                      type: "string", 
+                      description: "Type of property, e.g., 'Apartment', 'Villa', 'Penthouse'" 
+                    },
+                    bedrooms: { 
+                      type: "string", 
+                      description: "Number of bedrooms required" 
+                    },
+                    bathrooms: { 
+                      type: "string", 
+                      description: "Number of bathrooms required" 
+                    },
+                    minPrice: { 
+                      type: "number", 
+                      description: "Minimum price in the search range" 
+                    },
+                    maxPrice: { 
+                      type: "number", 
+                      description: "Maximum price in the search range" 
+                    },
+                    listingType: { 
+                      type: "string", 
+                      description: "Type of listing, e.g., 'For Sale', 'For Rent'" 
+                    },
+                    selectedFeatures: { 
+                      type: "array", 
+                      description: "List of desired features",
+                      items: { type: "string" }
+                    },
+                    viewType: { 
+                      type: "string", 
+                      description: "Preferred view type, e.g., 'Sea View', 'City View'" 
+                    },
+                    minArea: { 
+                      type: "number", 
+                      description: "Minimum area in square feet" 
+                    },
+                    maxArea: { 
+                      type: "number", 
+                      description: "Maximum area in square feet" 
+                    },
+                    nearbyAmenities: { 
+                      type: "array", 
+                      description: "List of desired nearby amenities",
+                      items: { type: "string" }
+                    },
+                    isPetFriendly: { 
+                      type: "boolean", 
+                      description: "Whether the property needs to be pet-friendly" 
+                    },
+                    isFurnished: { 
+                      type: "boolean", 
+                      description: "Whether the property needs to be furnished" 
+                    },
+                    yearBuilt: { 
+                      type: "string", 
+                      description: "Preferred construction year range" 
+                    }
+                  },
+                  description: "A complete object containing search criteria properties. Must include at least one property."
                 },
                 required: true
               }
