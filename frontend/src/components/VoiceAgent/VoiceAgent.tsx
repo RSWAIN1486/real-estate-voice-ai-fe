@@ -492,7 +492,16 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       session.addEventListener('status', handleSessionStatus);
       session.addEventListener('transcripts', handleTranscripts);
       
-      // Add event listener for orderCheckout
+      // Add event listener for property search tools
+      window.addEventListener('propertyPreferencesUpdated', ((event: CustomEvent) => {
+        handlePropertyPreferencesUpdate(event.detail);
+      }) as EventListener);
+      
+      window.addEventListener('searchPropertiesRequested', ((event: CustomEvent) => {
+        handleSearchProperties(event.detail);
+      }) as EventListener);
+      
+      // Add event listener for orderCheckout (kept for backward compatibility)
       window.addEventListener('orderCheckout', ((event: CustomEvent) => {
         handleCheckout(event.detail);
       }) as EventListener);
@@ -501,6 +510,12 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       return () => {
         session.removeEventListener('status', handleSessionStatus);
         session.removeEventListener('transcripts', handleTranscripts);
+        window.removeEventListener('propertyPreferencesUpdated', ((event: CustomEvent) => {
+          handlePropertyPreferencesUpdate(event.detail);
+        }) as EventListener);
+        window.removeEventListener('searchPropertiesRequested', ((event: CustomEvent) => {
+          handleSearchProperties(event.detail);
+        }) as EventListener);
         window.removeEventListener('orderCheckout', ((event: CustomEvent) => {
           handleCheckout(event.detail);
         }) as EventListener);
@@ -989,13 +1004,47 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     };
 
     // Add event listener
-    window.addEventListener('agentRequestedHangup', handleAgentHangup);
+    window.addEventListener('agentRequestedHangup', handleAgentHangup as EventListener);
 
     // Cleanup
     return () => {
-      window.removeEventListener('agentRequestedHangup', handleAgentHangup);
+      window.removeEventListener('agentRequestedHangup', handleAgentHangup as EventListener);
     };
-  }, []);  // Empty dependency array since we don't need any props/state
+  }, [handleExitCall]);  // Include handleExitCall in dependencies
+  
+  // Add the handlers for the property search tools
+  const handlePropertyPreferencesUpdate = (preferences: any) => {
+    try {
+      console.log('Property preferences updated:', preferences);
+      
+      // Update Redux state with property preferences
+      // This will be implemented in another component
+      window.dispatchEvent(new CustomEvent('updateFilters', { 
+        detail: { filters: preferences }
+      }));
+      
+    } catch (error) {
+      console.error('Error handling property preferences update:', error);
+    }
+  };
+
+  const handleSearchProperties = (searchCriteria: any) => {
+    try {
+      console.log('Search properties requested:', searchCriteria);
+      
+      // Trigger property search with the given criteria
+      window.dispatchEvent(new CustomEvent('executeSearch', { 
+        detail: { criteria: searchCriteria }
+      }));
+      
+      // Optionally close the voice agent dialog and navigate to properties page
+      // onClose();
+      // navigate('/properties');
+      
+    } catch (error) {
+      console.error('Error handling property search:', error);
+    }
+  };
   
   return (
     <Dialog 

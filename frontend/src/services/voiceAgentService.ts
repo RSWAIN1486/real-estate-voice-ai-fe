@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { UltravoxSession, Medium } from 'ultravox-client';
 import { API_BASE_URL } from '../utils/CONSTANTS';
-import { updateOrderTool, orderCheckoutTool, hangUpTool } from './clientTools';
+import { updateOrderTool, orderCheckoutTool, hangUpTool, updatePreferencesTool, searchPropertiesTool } from './clientTools';
 import { store } from '../store/store';
 
 // Default voice options with preselected female voice
@@ -29,81 +29,55 @@ export const DEFAULT_VOICE_OPTIONS: VoiceOption[] = [
 
 // Pizza ordering system prompt 
 export const SYSTEM_PROMPT = `
-You are an AI voice agent for Dontminos Pizza Restaurant. Your job is to help customers place pizza orders.
+You are an AI voice agent for Global Estates. Your job is to help customers find properties that match their criteria.
 
 Here are some guidelines:
-1. Greet the customer with the voice name assigned warmly and ask what they would like to order
-2. Guide them through ordering pizza, sides, drinks, and desserts
-3. Ask for their preferences on pizza size, crust type, and toppings
-4. Suggest popular items or pairings when appropriate
-5. Explain menu items if the customer has questions
-6. Keep track of their order and confirm items
-7. When they're done ordering, ask if they want to proceed to checkout
-8. Be friendly, helpful, and conversational
-9. You are in India and the customer is in India and the currency is INR. However, when you bill the total, say it as "your total bill is X Rupees".
-10. When the customer asks to end the call or hang up, or when you're about to hang up:
-    - Call the "hangUp" tool
-    - Wait for confirmation that the call has ended
-    - Do not start a new conversation after hanging up
+1. Greet the customer with the voice name assigned warmly and ask what they would like to search for
+2. Ask for specific details about their property search such as location, bedrooms, price range, etc.
+3. Recommend properties based on their criteria and suggest alternatives if needed
+4. Answer any questions about properties, neighborhood amenities, or the buying/renting process
+5. Be helpful, professional, and enthusiastic about finding them their perfect property
 
-You have access to the following menu information:
+You have access to the following real estate information:
 
-Pizza Options:
-- Sizes: Small (8"), Medium (12"), Large (14")
-- Crust Types: Cheese Burst, Classic Hand Tossed, Wheat Thin Crust, Fresh Pan Pizza, New Hand Tossed
-- Veg Toppings: Black Olives, Crisp Capsicum, Paneer, Mushroom, Golden Corn, Fresh Tomato, Jalapeno, Red Pepper, Babycorn, Extra Cheese
-- Non-Veg Toppings: Barbeque Chicken, Hot 'n' Spicy Chicken, Chunky Chicken, Chicken Salami
+Property Types:
+- Apartment: Residential units within a building with shared common areas
+- Villa: Detached houses with private gardens and often high-end amenities
+- Penthouse: Top-floor luxury apartments with premium views and features
+- Townhouse: Multi-floor homes sharing walls with adjacent properties
+- Duplex: Two-story homes with separate entrances for each floor
 
-Popular Veg Pizzas:
-- The 4 Cheese Pizza: Cheese Overloaded pizza with 4 different varieties of cheese
-- Margherita: A hugely popular margherita, with a deliciously tangy single cheese topping
-- Double Cheese Margherita: The ever-popular Margherita - loaded with extra cheese
-- Farm House: A pizza with crunchy capsicum, succulent mushrooms and fresh tomatoes
-- Peppy Paneer: Chunky paneer with crisp capsicum and spicy red pepper
-- Mexican Green Wave: Loaded with crunchy onions, crisp capsicum, juicy tomatoes and jalapeno
-- Deluxe Veggie: Onions, capsicum, mushrooms with paneer and golden corn
-- Veg Extravaganza: Golden corn, black olives, onions, capsicum, mushrooms, tomatoes and jalapeno with extra cheese
+Locations:
+- Dubai Marina: Waterfront community with high-rise towers and marina views
+- Downtown Dubai: Central district featuring Burj Khalifa and Dubai Mall
+- Palm Jumeirah: Iconic palm-shaped artificial island with luxury properties
+- Arabian Ranches: Family-friendly villa community with golf course
+- Jumeirah Lake Towers (JLT): Mixed-use development with residential towers
+- Business Bay: Commercial and residential area near Dubai Canal
+- Jumeirah Beach Residence (JBR): Beachfront community with apartments
+- Dubai Hills Estate: New development with luxury villas and apartments
+- Mirdif: Affordable family-friendly area with villas and townhouses
+- Damac Hills: Integrated community with Trump International Golf Club
 
-Popular Non-Veg Pizzas:
-- Chicken Golden Delight: Barbeque chicken with golden corn and extra cheese
-- Non Veg Supreme: Black olives, onions, mushrooms, pepper BBQ chicken, peri-peri chicken, grilled chicken rashers
-- Chicken Dominator: Double pepper barbecue chicken, peri-peri chicken, chicken tikka & grilled chicken rashers
-- Pepper Barbecue Chicken: Pepper Barbecue Chicken with Cheese
-- Chicken Sausage: Chicken Sausage & Cheese
-- Indi Chicken Tikka: Tandoori masala with Chicken tikka, onion, red paprika & mint mayo
-
-Sides:
-- Garlic Breadsticks: Freshly baked breadsticks with garlic butter and herbs
-- Stuffed Garlic Bread: Freshly baked garlic bread with cheese, onion and herbs
-- Paneer Tikka Stuffed Garlic Bread: Garlic bread with cheese, onion, paneer tikka and herbs
-- Chicken Pepperoni Stuffed Garlic Bread: Garlic bread with chicken pepperoni, cheese and basil parsley
-- Potato Cheese Shots: Crisp and golden outside, flavorful burst of cheese, potato & spice inside
-- Crinkle Fries
-
-Beverages:
-- Pepsi
-- 7Up
-- Mountain Dew
-- Tropicana Orange Juice
-- Bottled Water
-
-Desserts:
-- Lava Cake: Chocolate cake with a gooey molten chocolate center
-- Red Velvet Lava Cake: Rich red velvet cake on a creamy cheese flavoured base
-- Butterscotch Mousse Cake: Butterscotch flavored mousse
-- Brownie Fantasy
+Features:
+- Balcony/Terrace: Outdoor space directly accessible from the property
+- Swimming Pool: Private or communal swimming facility
+- Gym: Private or communal fitness facility
+- Parking: Dedicated parking space(s) for residents
+- Security: 24/7 security service, CCTV, or gated community
+- Sea View: Property offers views of the sea
+- City View: Property offers views of the city skyline
+- Garden: Private or communal garden areas
+- Smart Home: Property equipped with smart technology features
+- Furnished: Property comes with furniture and basic appliances
 
 ## Tool Usage Rules
-- You must call the tool "updateOrder" immediately when:
-  - User confirms an item
-  - User requests item removal
-  - User modifies quantity
-- Call "orderCheckout" when the user wants to finalize their order and proceed to checkout
 - Call "hangUp" when:
   - The user asks to end the call
   - The user says goodbye or indicates they're done
   - You're about to end the call yourself
-- Validate menu items before calling updateOrder
+- Call "UpdatePreferences" when the user specifies property search preferences
+- Call "SearchProperties" after collecting user preferences to search for matching properties. Call this whenever user asks to search or shortlist or show properties during the conversation.
 `;
 
 /**
@@ -199,24 +173,77 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
         },
         {
           temporaryTool: {
-            modelToolName: "updateOrder",
-            description: "Update order details. Used any time items are added or removed or when the order is finalized. Call this any time the user updates their order.",
+            modelToolName: "UpdatePreferences",
+            description: "Update user preferences for property search. Call this any time the user specifies or changes their property requirements.",
             dynamicParameters: [
               {
-                name: "orderDetailsData",
+                name: "preferences",
                 location: "PARAMETER_LOCATION_BODY",
                 schema: {
-                  description: "An array of objects contain order items.",
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      name: { type: "string", description: "The name of the item to be added to the order." },
-                      quantity: { type: "number", description: "The quantity of the item for the order." },
-                      specialInstructions: { type: "string", description: "Any special instructions that pertain to the item." },
-                      price: { type: "number", description: "The unit price for the item." }
+                  type: "object",
+                  properties: {
+                    location: { 
+                      type: "string", 
+                      description: "The preferred location or area for the property search." 
                     },
-                    required: ["name", "quantity", "price"]
+                    propertyType: { 
+                      type: "string", 
+                      description: "The type of property, such as Apartment, Villa, Penthouse, etc." 
+                    },
+                    bedrooms: { 
+                      type: "string", 
+                      description: "Number of bedrooms required, can be a specific number or range like '2-3' or '3+'" 
+                    },
+                    bathrooms: { 
+                      type: "string", 
+                      description: "Number of bathrooms required, can be a specific number or range like '2-3' or '2+'" 
+                    },
+                    priceRange: { 
+                      type: "object", 
+                      description: "The minimum and maximum price range",
+                      properties: {
+                        min: { type: "number", description: "Minimum price in the range" },
+                        max: { type: "number", description: "Maximum price in the range" }
+                      }
+                    },
+                    listingType: { 
+                      type: "string", 
+                      description: "Type of listing, such as 'For Sale', 'For Rent', or 'New Development'" 
+                    },
+                    features: { 
+                      type: "array", 
+                      description: "List of desired property features",
+                      items: { type: "string" }
+                    },
+                    viewType: { 
+                      type: "string", 
+                      description: "Preferred view type, such as 'Sea View', 'City View', etc." 
+                    },
+                    areaRange: { 
+                      type: "object", 
+                      description: "The minimum and maximum area size in square feet",
+                      properties: {
+                        min: { type: "number", description: "Minimum area in square feet" },
+                        max: { type: "number", description: "Maximum area in square feet" }
+                      }
+                    },
+                    nearbyAmenities: { 
+                      type: "array", 
+                      description: "List of desired nearby amenities",
+                      items: { type: "string" }
+                    },
+                    isPetFriendly: { 
+                      type: "boolean", 
+                      description: "Whether the property needs to be pet-friendly" 
+                    },
+                    isFurnished: { 
+                      type: "boolean", 
+                      description: "Whether the property needs to be furnished" 
+                    },
+                    yearBuilt: { 
+                      type: "string", 
+                      description: "Preferred construction year range, such as '2020-2023' or 'After 2015'" 
+                    }
                   }
                 },
                 required: true
@@ -227,15 +254,15 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
         },
         {
           temporaryTool: {
-            modelToolName: "orderCheckout",
-            description: "Go to checkout with the current order",
+            modelToolName: "SearchProperties",
+            description: "Search for properties based on the collected user preferences. Call this after gathering sufficient preferences to find matching properties.",
             dynamicParameters: [
               {
-                name: "order",
+                name: "searchCriteria",
                 location: "PARAMETER_LOCATION_BODY",
                 schema: {
                   type: "string",
-                  description: "JSON string of the order items"
+                  description: "JSON string of the search criteria containing all relevant preferences"
                 },
                 required: true
               }
@@ -248,7 +275,7 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
       inactivity_messages: [
         {
           "duration": "30s",
-          "message": "Are you still there? I can help you place an order or answer questions about our menu."
+          "message": "Are you still there? I can help you find real estate properties that match your preferences."
         },
         {
           "duration": "15s",
@@ -256,7 +283,7 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
         },
         {
           "duration": "10s",
-          "message": "Thank you for calling. Have a great day. Goodbye.",
+          "message": "Thank you for calling Global Estates. Have a great day. Goodbye.",
           "endBehavior": "END_BEHAVIOR_HANG_UP_SOFT"
         }
       ]
@@ -442,8 +469,8 @@ export const initializeUltravoxSession = () => {
     uvSession = new UltravoxSession();
     
     // Register client tools
-    uvSession.registerToolImplementation('updateOrder', updateOrderTool);
-    uvSession.registerToolImplementation('orderCheckout', orderCheckoutTool);
+    uvSession.registerToolImplementation('UpdatePreferences', updatePreferencesTool);
+    uvSession.registerToolImplementation('SearchProperties', searchPropertiesTool);
     uvSession.registerToolImplementation('hangUp', hangUpTool);
     
     console.log('Ultravox session initialized with all tools registered');

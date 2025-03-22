@@ -2,6 +2,45 @@ import { ClientToolImplementation } from 'ultravox-client';
 import { store } from '../store/store';
 import { addItem } from '../store/slices/orderSlice';
 
+export const updatePreferencesTool: ClientToolImplementation = (parameters) => {
+  const { preferences } = parameters;
+  
+  if (typeof window !== "undefined") {
+    const event = new CustomEvent("propertyPreferencesUpdated", {
+      detail: preferences,
+    });
+    window.dispatchEvent(event);
+  }
+
+  return "Updated your property preferences.";
+};
+
+export const searchPropertiesTool: ClientToolImplementation = (parameters) => {
+  const { searchCriteria } = parameters;
+  
+  let parsedCriteria;
+  try {
+    // Try to parse if it's a string
+    if (typeof searchCriteria === 'string') {
+      parsedCriteria = JSON.parse(searchCriteria);
+    } else {
+      parsedCriteria = searchCriteria;
+    }
+  } catch (error) {
+    console.error('Error parsing search criteria:', error);
+    parsedCriteria = searchCriteria;
+  }
+  
+  if (typeof window !== "undefined") {
+    const event = new CustomEvent("searchPropertiesRequested", {
+      detail: parsedCriteria,
+    });
+    window.dispatchEvent(event);
+  }
+
+  return "Searching for properties based on your preferences.";
+};
+
 export const updateOrderTool: ClientToolImplementation = (parameters) => {
   const { orderDetailsData } = parameters;
   

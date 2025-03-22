@@ -39,16 +39,16 @@ const Footer = () => {
                 Your trusted partner in finding your dream property across the globe.
               </Typography>
               <Box className={styles.socialIcons}>
-                <IconButton color="inherit" aria-label="facebook" className={styles.socialIcon}>
+                <IconButton color="primary" aria-label="facebook" className={styles.socialIcon} sx={{ color: 'white' }}>
                   <FacebookIcon />
                 </IconButton>
-                <IconButton color="inherit" aria-label="instagram" className={styles.socialIcon}>
+                <IconButton color="primary" aria-label="instagram" className={styles.socialIcon} sx={{ color: 'white' }}>
                   <InstagramIcon />
                 </IconButton>
-                <IconButton color="inherit" aria-label="twitter" className={styles.socialIcon}>
+                <IconButton color="primary" aria-label="twitter" className={styles.socialIcon} sx={{ color: 'white' }}>
                   <TwitterIcon />
                 </IconButton>
-                <IconButton color="inherit" aria-label="youtube" className={styles.socialIcon}>
+                <IconButton color="primary" aria-label="youtube" className={styles.socialIcon} sx={{ color: 'white' }}>
                   <YouTubeIcon />
                 </IconButton>
               </Box>

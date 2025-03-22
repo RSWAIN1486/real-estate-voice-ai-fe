@@ -180,10 +180,10 @@ const PropertyList = ({ filters }: PropertyListProps) => {
       return;
     }
 
-    setLoading(true);
-    
+      setLoading(true);
+      
     // Simulate API call delay
-    setTimeout(() => {
+      setTimeout(() => {
       let filteredProps = [...mockProperties];
       
       // Filter by location
@@ -193,9 +193,9 @@ const PropertyList = ({ filters }: PropertyListProps) => {
           prop.location.toLowerCase().includes(locationQuery) ||
           prop.title.toLowerCase().includes(locationQuery)
         );
-      }
-      
-      // Filter by price range
+          }
+          
+          // Filter by price range
       if (filters.minPrice > 0 || filters.maxPrice < 10000000) {
         filteredProps = filteredProps.filter(prop => 
           prop.price >= filters.minPrice && prop.price <= filters.maxPrice
@@ -291,7 +291,7 @@ const PropertyList = ({ filters }: PropertyListProps) => {
       setProperties(filteredProps);
       setTotalItems(filteredProps.length);
       setPage(1); // Reset to first page when filters change
-      setLoading(false);
+        setLoading(false);
     }, 500); // Simulate loading delay
   };
 
@@ -344,9 +344,9 @@ const PropertyList = ({ filters }: PropertyListProps) => {
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
+        <Grid container spacing={3}>
         {getCurrentPageProperties().map((property) => (
-          <Grid item xs={12} sm={6} md={4} key={property.id}>
+            <Grid item xs={12} sm={6} md={4} key={property.id}>
             <Card 
               sx={{ 
                 height: '100%', 
@@ -360,11 +360,11 @@ const PropertyList = ({ filters }: PropertyListProps) => {
                 position: 'relative' 
               }}
             >
-              {property.tag && (
-                <Chip 
-                  label={property.tag} 
+                  {property.tag && (
+                    <Chip
+                      label={property.tag}
                   color={property.tag === 'Featured' ? 'primary' : 'secondary'}
-                  sx={{ 
+                      sx={{
                     position: 'absolute',
                     top: 10,
                     right: 10,
@@ -380,19 +380,19 @@ const PropertyList = ({ filters }: PropertyListProps) => {
                 alt={property.title}
                 sx={{ objectFit: 'cover' }}
               />
-              <CardContent sx={{ flexGrow: 1 }}>
+                <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" component="div" gutterBottom noWrap>
-                  {property.title}
-                </Typography>
+                    {property.title}
+                  </Typography>
                 <Typography variant="subtitle1" color="text.secondary" gutterBottom>
                   {property.listingType === "For Rent" 
                     ? `$${property.price.toLocaleString()}/month` 
                     : `$${property.price.toLocaleString()}`
                   }
-                </Typography>
+                  </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  {property.location}
-                </Typography>
+                    {property.location}
+                  </Typography>
                 <Box display="flex" alignItems="center" justifyContent="space-between" mt={2}>
                   {property.beds > 0 && (
                     <Box display="flex" alignItems="center">
@@ -407,10 +407,10 @@ const PropertyList = ({ filters }: PropertyListProps) => {
                     </Box>
                   )}
                   <Box display="flex" alignItems="center">
-                    <SquareFootIcon fontSize="small" sx={{ mr: 0.5 }} />
+                      <SquareFootIcon fontSize="small" sx={{ mr: 0.5 }} />
                     <Typography variant="body2">{property.sqft.toLocaleString()} sq ft</Typography>
                   </Box>
-                </Box>
+                    </Box>
                 {property.features && property.features.length > 0 && (
                   <Box mt={2}>
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
@@ -434,11 +434,11 @@ const PropertyList = ({ filters }: PropertyListProps) => {
                     </Stack>
                   </Box>
                 )}
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       
       {/* Pagination */}
       {totalItems > itemsPerPage && (

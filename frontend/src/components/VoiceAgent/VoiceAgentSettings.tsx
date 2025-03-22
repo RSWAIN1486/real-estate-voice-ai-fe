@@ -125,6 +125,11 @@ const VoiceAgentSettings: React.FC<VoiceAgentSettingsProps> = ({ open, onClose }
     onClose();
   };
 
+  const resetSystemPrompt = () => {
+    // This explicitly resets to the real estate prompt
+    dispatch(setCustomSystemPrompt(SYSTEM_PROMPT));
+  };
+
   return (
     <Dialog 
       open={open} 
@@ -258,7 +263,7 @@ const VoiceAgentSettings: React.FC<VoiceAgentSettingsProps> = ({ open, onClose }
             <Box display="flex" justifyContent="flex-end" mt={1}>
               <Button 
                 size="small" 
-                onClick={() => dispatch(setCustomSystemPrompt(SYSTEM_PROMPT))}
+                onClick={resetSystemPrompt}
                 color="secondary"
               >
                 Reset to Default

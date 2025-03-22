@@ -1,5 +1,5 @@
 .footer {
-  background-color: var(--primary-color);
+  background-color: var(--primary-color, #1a246a);
   color: white;
   padding: 3rem 0 1.5rem;
   margin-top: auto;
@@ -74,6 +74,7 @@
   text-decoration: none;
   transition: all 0.2s ease;
   display: inline-block;
+  color: white !important;
 }
 
 .footerLinks a:hover {
@@ -111,6 +112,7 @@
   text-decoration: none;
   font-size: 0.85rem;
   transition: color 0.2s ease;
+  color: white !important;
 }
 
 .footerPolicies a:hover {

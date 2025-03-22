@@ -1,6 +1,6 @@
 import { ThemeProvider, CssBaseline, createTheme, Container, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { RootState } from './store/store';
 import { setUser } from './store/slices/authSlice';
@@ -16,8 +16,16 @@ import HeroSection, { VoiceFilterCriteria } from './components/HeroSection';
 import SearchFilters, { Filters } from './components/SearchFilters';
 import PropertyList from './components/PropertyList';
 
-function App() {
+// Extend VoiceFilterCriteria to include searchParams
+interface ExtendedVoiceFilterCriteria extends VoiceFilterCriteria {
+  searchParams?: Partial<Filters>;
+}
+
+// Main content component to use the router hooks
+function MainContent() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const themeMode = useSelector((state: RootState) => state.theme.mode);
   const [filters, setFilters] = useState<Filters>({
     location: "",
@@ -48,223 +56,125 @@ function App() {
           dispatch(setUser(userData));
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
-        // If there's an error (like invalid/expired token), the getCurrentUser function
-        // will already handle clearing the token from localStorage
+        console.error('Failed to initialize auth:', error);
       }
     };
-
+    
     initializeAuth();
   }, [dispatch]);
+
+  useEffect(() => {
+    // Listen for voice search events
+    const handleVoiceSearch = (event: CustomEvent) => {
+      if (event.detail && typeof event.detail === 'object') {
+        const { location, resetAll, searchParams } = event.detail as ExtendedVoiceFilterCriteria;
+        
+        // Handle resetAll flag from clear button in hero section
+        if (resetAll) {
+          // Reset all filters to initial values
+          setFilters({
+            location: "",
+            minPrice: 0,
+            maxPrice: 10000000,
+            bedrooms: "",
+            bathrooms: "",
+            propertyType: "",
+            listingType: "",
+            minArea: 0,
+            maxArea: 10000,
+            selectedFeatures: [],
+            viewType: "",
+            nearbyAmenities: [],
+            yearBuilt: "",
+            isPetFriendly: false,
+            isFurnished: false,
+          });
+          return;
+        }
+        
+        // If we have location only, reset other filters and set location
+        if (location && !searchParams) {
+          // Create new filters object with just the location changed
+          const newFilters = {
+            ...filters,
+            location
+          };
+          setFilters(newFilters);
+        }
+        
+        // If we have searchParams, update the filters object
+        if (searchParams) {
+          setFilters(prev => ({
+            ...prev,
+            ...searchParams
+          }));
+        }
+      }
+    };
+    
+    // Listen for property preference updates from voice agent
+    const handlePropertyPreferences = (event: CustomEvent) => {
+      if (event.detail && event.detail.filters) {
+        console.log('Received property preferences update:', event.detail.filters);
+        const newFilters = { ...filters, ...event.detail.filters };
+        setFilters(newFilters);
+      }
+    };
+    
+    // Listen for search execution requests from voice agent
+    const handleSearchExecution = (event: CustomEvent) => {
+      if (event.detail && event.detail.criteria) {
+        console.log('Executing property search:', event.detail.criteria);
+        
+        // Update filters with the search criteria
+        const criteria = event.detail.criteria;
+        setFilters(prev => ({
+          ...prev,
+          ...criteria
+        }));
+        
+        // Navigate to properties page
+        if (location.pathname !== '/properties') {
+          navigate('/properties');
+        }
+      }
+    };
+    
+    window.addEventListener('voiceSearch', handleVoiceSearch as EventListener);
+    window.addEventListener('updateFilters', handlePropertyPreferences as EventListener);
+    window.addEventListener('executeSearch', handleSearchExecution as EventListener);
+    
+    return () => {
+      window.removeEventListener('voiceSearch', handleVoiceSearch as EventListener);
+      window.removeEventListener('updateFilters', handlePropertyPreferences as EventListener);
+      window.removeEventListener('executeSearch', handleSearchExecution as EventListener);
+    };
+  }, [navigate, location.pathname, filters]);
 
   const handleFilterChange = (newFilters: Filters) => {
     setFilters(newFilters);
   };
 
   const handleVoiceSearch = (criteria: VoiceFilterCriteria) => {
-    const updatedFilters = { ...filters };
-
-    // If resetAll flag is set, reset all filters to initial values
-    if (criteria.resetAll) {
-      setFilters({
-        location: "",
-        minPrice: 0,
-        maxPrice: 10000000,
-        bedrooms: "",
-        bathrooms: "",
-        propertyType: "",
-        listingType: "",
-        minArea: 0,
-        maxArea: 10000,
-        selectedFeatures: [],
-        viewType: "",
-        nearbyAmenities: [],
-        yearBuilt: "",
-        isPetFriendly: false,
-        isFurnished: false,
+    console.log('Voice search criteria:', criteria);
+    
+    // If criteria includes a location or other search params, update filters
+    if (criteria.location) {
+      const event = new CustomEvent('voiceSearch', {
+        detail: criteria
       });
-      return;
+      window.dispatchEvent(event);
     }
-
-    if (criteria.location !== undefined) {
-      updatedFilters.location = criteria.location.trim();
-      
-      // Reset other filters when searching by location only
-      if (Object.keys(criteria).length === 1 && criteria.location !== undefined) {
-        // Only update location and keep price range, but reset other filters
-        updatedFilters.bedrooms = "";
-        updatedFilters.bathrooms = "";
-        updatedFilters.propertyType = "";
-        updatedFilters.listingType = "";
-        updatedFilters.selectedFeatures = [];
-        updatedFilters.viewType = "";
-        updatedFilters.nearbyAmenities = [];
-        updatedFilters.yearBuilt = "";
-        updatedFilters.isPetFriendly = false;
-        updatedFilters.isFurnished = false;
-      }
-    }
-
-    if (criteria.bedrooms) {
-      updatedFilters.bedrooms = criteria.bedrooms;
-    }
-
-    if (criteria.propertyType) {
-      updatedFilters.propertyType = criteria.propertyType;
-    }
-
-    if (criteria.listingType) {
-      updatedFilters.listingType = criteria.listingType;
-    }
-
-    if (criteria.priceRange) {
-      updatedFilters.minPrice = criteria.priceRange[0];
-      updatedFilters.maxPrice = criteria.priceRange[1];
-    }
-
-    // Handle advanced filters if provided by voice
-    if (criteria.features && criteria.features.length > 0) {
-      updatedFilters.selectedFeatures = criteria.features;
-    }
-
-    if (criteria.viewType) {
-      updatedFilters.viewType = criteria.viewType;
-    }
-
-    if (criteria.isPetFriendly !== undefined) {
-      updatedFilters.isPetFriendly = criteria.isPetFriendly;
-    }
-
-    if (criteria.isFurnished !== undefined) {
-      updatedFilters.isFurnished = criteria.isFurnished;
-    }
-
-    if (criteria.yearBuilt) {
-      updatedFilters.yearBuilt = criteria.yearBuilt;
-    }
-
-    if (criteria.areaRange) {
-      updatedFilters.minArea = criteria.areaRange[0];
-      updatedFilters.maxArea = criteria.areaRange[1];
-    }
-
-    setFilters(updatedFilters);
   };
 
   const theme = createTheme({
     palette: {
       mode: themeMode,
       primary: {
-        main: '#2B4162', // Deep blue
-        light: '#385F71', // Light blue
-        dark: '#1B2845', // Dark blue
-        contrastText: '#ffffff',
+        main: '#1a246a',
       },
       secondary: {
-        main: '#F5853F', // Orange
-        light: '#FF9B54', // Light orange
-        dark: '#D65A31', // Dark orange
-        contrastText: '#000000',
-      },
-      background: {
-        default: themeMode === 'light' ? '#F5F5F5' : '#121212',
-        paper: themeMode === 'light' ? '#FFFFFF' : '#1e1e1e',
-      },
-      error: {
-        main: '#d50000',
-      },
-      success: {
-        main: '#2e7d32',
-      },
-    },
-    typography: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-      h1: {
-        fontWeight: 700,
-        letterSpacing: '-0.01em',
-      },
-      h2: {
-        fontWeight: 700,
-        letterSpacing: '-0.01em',
-      },
-      h3: {
-        fontWeight: 600,
-      },
-      h4: {
-        fontWeight: 600,
-      },
-      h5: {
-        fontWeight: 600,
-      },
-      h6: {
-        fontWeight: 600,
-      },
-      subtitle1: {
-        fontWeight: 500,
-      },
-      button: {
-        fontWeight: 600,
-        textTransform: 'none',
-      },
-    },
-    shape: {
-      borderRadius: 8,
-    },
-    components: {
-      MuiCssBaseline: {
-        styleOverrides: {
-          ':root': {
-            '--primary-color': '#2B4162',
-            '--secondary-color': '#F5853F',
-            '--background-light': '#F5F5F5',
-            '--card-hover-shadow': '0 8px 24px rgba(0, 0, 0, 0.12)',
-          },
-          body: {
-            scrollBehavior: 'smooth',
-          },
-          a: {
-            textDecoration: 'none',
-          },
-        },
-      },
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: '8px',
-            padding: '8px 24px',
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-              transform: 'translateY(-2px)',
-            },
-            transition: 'all 0.2s ease-in-out',
-          },
-          contained: {
-            '&:hover': {
-              boxShadow: '0 6px 12px rgba(43, 65, 98, 0.25)',
-            },
-          },
-        },
-      },
-      MuiCard: {
-        styleOverrides: {
-          root: {
-            borderRadius: 12,
-            overflow: 'hidden',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            '&:hover': {
-              transform: 'translateY(-8px)',
-              boxShadow: 'var(--card-hover-shadow)',
-            },
-          },
-        },
-      },
-      MuiAppBar: {
-        styleOverrides: {
-          root: {
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-          },
-        },
+        main: '#f50057',
       },
     },
   });
@@ -272,67 +182,43 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <Box
-          sx={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            bgcolor: 'background.default',
-          }}
-        >
-          <Header />
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Header />
+        <Box sx={{ flex: 1 }}>
           <Routes>
             <Route path="/" element={
-              <>
+              <Box>
                 <HeroSection onVoiceSearch={handleVoiceSearch} />
-                <Container 
-                  component="main" 
-                  sx={{ 
-                    flex: 1,
-                    py: 4,
-                    maxWidth: { xs: 'lg', lg: 'xl' },
-                  }}
-                >
-                  <SearchFilters onFilterChange={handleFilterChange} />
-                  <Box sx={{ mt: 4 }}>
-                    <PropertyList filters={filters} />
-                  </Box>
+                <Container maxWidth="lg" sx={{ mt: 4 }}>
+                  <SearchFilters onFilterChange={handleFilterChange} initialFilters={filters} />
+                  <PropertyList filters={filters} />
                 </Container>
-              </>
+              </Box>
             } />
-            <Route path="/menu" element={
-              <Container 
-                component="main" 
-                sx={{ 
-                  flex: 1,
-                  py: 4,
-                  maxWidth: { xs: 'lg', lg: 'xl' },
-                }}
-              >
-                <Menu />
+            <Route path="/properties" element={
+              <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <SearchFilters onFilterChange={handleFilterChange} initialFilters={filters} />
+                <PropertyList filters={filters} />
               </Container>
             } />
-            <Route path="/cart" element={
-              <Container 
-                component="main" 
-                sx={{ 
-                  flex: 1,
-                  py: 4,
-                  maxWidth: { xs: 'lg', lg: 'xl' },
-                }}
-              >
-                <Cart />
-              </Container>
-            } />
+            <Route path="/menu" element={<Menu />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
-          <Footer />
         </Box>
-      </BrowserRouter>
+        <Footer />
+      </Box>
     </ThemeProvider>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <MainContent />
+    </BrowserRouter>
   );
 }
 

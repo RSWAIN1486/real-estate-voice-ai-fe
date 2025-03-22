@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Voice Agent Settings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Reset Voice Agent Settings</h1>
+    <p>This tool will reset the voice agent system prompt to the real estate version.</p>
+    
+    <button id="resetButton">Reset Voice Agent Settings</button>
+    <button id="viewButton">View Current Settings</button>
+    
+    <h2>Current Settings:</h2>
+    <pre id="settings"></pre>
+    
+    <script>
+        // The correct system prompt for real estate
+        const REAL_ESTATE_PROMPT = `
+You are an AI voice agent for Global Estates. Your job is to help customers find properties that match their criteria.
+
+Here are some guidelines:
+1. Greet the customer with the voice name assigned warmly and ask what they would like to search for
+2. Ask for specific details about their property search such as location, bedrooms, price range, etc.
+3. Recommend properties based on their criteria and suggest alternatives if needed
+4. Answer any questions about properties, neighborhood amenities, or the buying/renting process
+5. Be helpful, professional, and enthusiastic about finding them their perfect property
+
+You have access to the following real estate information:
+
+Property Types:
+- Apartment: Residential units within a building with shared common areas
+- Villa: Detached houses with private gardens and often high-end amenities
+- Penthouse: Top-floor luxury apartments with premium views and features
+- Townhouse: Multi-floor homes sharing walls with adjacent properties
+- Duplex: Two-story homes with separate entrances for each floor
+
+Locations:
+- Dubai Marina: Waterfront community with high-rise towers and marina views
+- Downtown Dubai: Central district featuring Burj Khalifa and Dubai Mall
+- Palm Jumeirah: Iconic palm-shaped artificial island with luxury properties
+- Arabian Ranches: Family-friendly villa community with golf course
+- Jumeirah Lake Towers (JLT): Mixed-use development with residential towers
+- Business Bay: Commercial and residential area near Dubai Canal
+- Jumeirah Beach Residence (JBR): Beachfront community with apartments
+- Dubai Hills Estate: New development with luxury villas and apartments
+- Mirdif: Affordable family-friendly area with villas and townhouses
+- Damac Hills: Integrated community with Trump International Golf Club
+
+Features:
+- Balcony/Terrace: Outdoor space directly accessible from the property
+- Swimming Pool: Private or communal swimming facility
+- Gym: Private or communal fitness facility
+- Parking: Dedicated parking space(s) for residents
+- Security: 24/7 security service, CCTV, or gated community
+- Sea View: Property offers views of the sea
+- City View: Property offers views of the city skyline
+- Garden: Private or communal garden areas
+- Smart Home: Property equipped with smart technology features
+- Furnished: Property comes with furniture and basic appliances
+
+## Tool Usage Rules
+- Call "hangUp" when:
+  - The user asks to end the call
+  - The user says goodbye or indicates they're done
+  - You're about to end the call yourself
+- Call "UpdatePreferences" when the user specifies property search preferences
+- Call "SearchProperties" after collecting user preferences to search for matching properties
+`;
+        
+        // Function to display current settings
+        function displaySettings() {
+            const settingsJson = localStorage.getItem('voiceAgentSettings');
+            const settingsElement = document.getElementById('settings');
+            
+            if (settingsJson) {
+                try {
+                    const settings = JSON.parse(settingsJson);
+                    settingsElement.textContent = JSON.stringify(settings, null, 2);
+                } catch (e) {
+                    settingsElement.textContent = 'Error parsing settings: ' + e.message;
+                }
+            } else {
+                settingsElement.textContent = 'No settings found in localStorage';
+            }
+        }
+        
+        // Function to reset settings
+        function resetSettings() {
+            try {
+                const settingsJson = localStorage.getItem('voiceAgentSettings');
+                let settings = {};
+                
+                if (settingsJson) {
+                    settings = JSON.parse(settingsJson);
+                }
+                
+                // Update the system prompt
+                settings.customSystemPrompt = REAL_ESTATE_PROMPT;
+                
+                // Save back to localStorage
+                localStorage.setItem('voiceAgentSettings', JSON.stringify(settings));
+                
+                alert('Voice agent settings reset successfully!');
+                displaySettings();
+            } catch (e) {
+                alert('Error resetting settings: ' + e.message);
+            }
+        }
+        
+        // Add event listeners
+        document.getElementById('resetButton').addEventListener('click', resetSettings);
+        document.getElementById('viewButton').addEventListener('click', displaySettings);
+        
+        // Display settings on load
+        displaySettings();
+    </script>
+</body>
+</html> 

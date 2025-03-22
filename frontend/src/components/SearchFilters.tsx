@@ -122,12 +122,21 @@ const yearBuiltOptions = [
   "Before 2000",
 ];
 
+// Define component props
 interface SearchFiltersProps {
-  onFilterChange?: (filters: Filters) => void;
+  onFilterChange: (filters: Filters) => void;
+  initialFilters?: Partial<Filters>;
 }
 
-const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
-  const [filters, setFilters] = useState<Filters>(initialFilters);
+const SearchFilters: React.FC<SearchFiltersProps> = ({ 
+  onFilterChange,
+  initialFilters: propInitialFilters
+}) => {
+  // Local filter state
+  const [filters, setFilters] = useState<Filters>({
+    ...initialFilters,
+    ...propInitialFilters // Override with any provided initial filters
+  });
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000000]);
   const [areaRange, setAreaRange] = useState<number[]>([0, 10000]);
   const [showAdvanced, setShowAdvanced] = useState(false);
