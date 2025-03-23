@@ -6,7 +6,10 @@ A voice-powered real estate search application allowing users to find properties
 Check out the demo video to see the application in action.
 
 
-Uploading real_estate_voice_search_demo.mp4…
+
+https://github.com/user-attachments/assets/85c13659-de89-4497-bfe3-6c1be315d8da
+
+
 
 
 
