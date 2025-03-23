@@ -5,6 +5,9 @@ import BedIcon from '@mui/icons-material/Bed';
 import BathtubIcon from '@mui/icons-material/Bathtub';
 import SquareFootIcon from '@mui/icons-material/SquareFoot';
 
+// Import property image utilities
+import { getPropertyImageUrl } from "../utils/propertyImages";
+
 interface Property {
   id: number | string;
   title: string;
@@ -43,8 +46,7 @@ const generateMockProperties = (count: number): Property[] => {
   ];
   
   const propertyTypes = ["Apartment", "Villa", "Penthouse", "Townhouse", "Duplex", "House", "Office", "Retail", "Land"];
-  const listingTypes = ["For Sale", "For Rent", "New Development"];
-  const tags = ["Featured", "New Development", "For Rent", "For Sale", ""];
+  const listingTypes = ["For Rent", "For Sale", "New Development"];
   
   const features = [
     "Sea View", 
@@ -79,47 +81,6 @@ const generateMockProperties = (count: number): Property[] => {
     "Golf Course View",
   ];
   
-  const images = [
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600566753051-f0b4ae10f956?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600573472550-8090733a73c6?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600563438938-a9a27216b4f5?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1613977257592-4871e5fcd7c4?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1628744448840-55bdb2497bd4?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1523217582562-09d0def993a6?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1633114073945-ccefa7237461?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1628745277862-fde2c19b3ab3?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1592928302636-c83cf1e1c887?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1630699144867-37acec97df5a?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1599427303058-f04cbcf4756f?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1558036117-15d82a90b9b1?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1560518883-7d82c5767c25?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1560448204-61dc36dc98c8?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1560749003-f4b1e17e2dff?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1621551122354-e96737d64b21?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600047508967-c9cd77d2d492?ixlib=rb-4.0.3",
-    "https://images.unsplash.com/photo-1600047508788-26df7b3599f4?ixlib=rb-4.0.3",
-  ];
-
   return Array.from({ length: count }, (_, index) => {
     const propType = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
     const location = locations[Math.floor(Math.random() * locations.length)];
@@ -138,8 +99,8 @@ const generateMockProperties = (count: number): Property[] => {
       .sort(() => 0.5 - Math.random())
       .slice(0, Math.floor(Math.random() * 6) + 3);
     
-    // Ensure each property gets a unique image by using index to select from the images array
-    const imageIndex = index % images.length;
+    // Get property image URL
+    const propertyImage = getPropertyImageUrl(index + 1);
     
     return {
       id: `property-${index + 1}`,
@@ -149,8 +110,8 @@ const generateMockProperties = (count: number): Property[] => {
       beds: propType === "Office" || propType === "Retail" || propType === "Land" ? 0 : bedroomCount,
       baths: propType === "Land" ? 0 : bathroomCount,
       sqft: squareFeet,
-      image: images[imageIndex],
-      tag: tags[Math.floor(Math.random() * tags.length)],
+      image: propertyImage,
+      tag: listingType,
       propertyType: propType,
       listingType: listingType,
       features: randomFeatures
@@ -161,9 +122,29 @@ const generateMockProperties = (count: number): Property[] => {
 // Generate 100 random properties
 const mockProperties = generateMockProperties(100);
 
+// For debugging - log distribution by listing type
+const listingTypeCounts = mockProperties.reduce((counts: Record<string, number>, property) => {
+  counts[property.listingType] = (counts[property.listingType] || 0) + 1;
+  return counts;
+}, {});
+console.log('Listing Type Distribution in mockProperties:', listingTypeCounts);
+
 interface PropertyListProps {
   filters?: Filters;
 }
+
+// Util function to check and log listing type matching
+const deepCheckListingTypeMatch = (propertyListingType: string, filterListingType: string) => {
+  console.log(`Comparing: "${propertyListingType}" (${typeof propertyListingType}) with "${filterListingType}" (${typeof filterListingType})`);
+  console.log('Exact match?', propertyListingType === filterListingType);
+  console.log('Case insensitive match?', propertyListingType.toLowerCase() === filterListingType.toLowerCase());
+  console.log('Includes?', propertyListingType.includes(filterListingType));
+  console.log('CharCodes:', Array.from(propertyListingType).map(c => c.charCodeAt(0)));
+  console.log('Filter CharCodes:', Array.from(filterListingType).map(c => c.charCodeAt(0)));
+  
+  // Return if there's a match (case insensitive)
+  return propertyListingType.toLowerCase() === filterListingType.toLowerCase();
+};
 
 const PropertyList = ({ filters }: PropertyListProps) => {
   const [properties, setProperties] = useState<Property[]>(mockProperties);
@@ -174,17 +155,21 @@ const PropertyList = ({ filters }: PropertyListProps) => {
 
   // Function to filter properties based on the filters passed
   const filterProperties = (filters?: Filters) => {
+    console.log('Filtering with filters:', filters);
+    
     if (!filters) {
       setProperties(mockProperties);
       setTotalItems(mockProperties.length);
+      console.log('No filters provided, showing all properties');
       return;
     }
 
-      setLoading(true);
-      
+    setLoading(true);
+    
     // Simulate API call delay
-      setTimeout(() => {
+    setTimeout(() => {
       let filteredProps = [...mockProperties];
+      console.log(`Starting with ${filteredProps.length} properties`);
       
       // Filter by location
       if (filters.location && filters.location.trim() !== '') {
@@ -231,9 +216,25 @@ const PropertyList = ({ filters }: PropertyListProps) => {
       
       // Filter by listing type
       if (filters.listingType && filters.listingType !== '') {
-        filteredProps = filteredProps.filter(prop => 
-          prop.listingType === filters.listingType
-        );
+        console.log('Filtering by listing type:', filters.listingType);
+        
+        // Check how many properties we have of each listing type
+        const typeCounts = filteredProps.reduce((acc: Record<string, number>, prop) => {
+          acc[prop.listingType] = (acc[prop.listingType] || 0) + 1;
+          return acc;
+        }, {});
+        console.log('Properties by listing type before filtering:', typeCounts);
+
+        // Simple, direct filter - no complex comparison
+        filteredProps = filteredProps.filter(prop => prop.listingType === filters.listingType);
+        
+        console.log(`After filtering by listing type "${filters.listingType}": ${filteredProps.length} properties remain`);
+
+        // Double-check what listing types remain
+        if (filteredProps.length > 0) {
+          const remainingTypes = [...new Set(filteredProps.map(p => p.listingType))];
+          console.log('Remaining listing types after filtering:', remainingTypes);
+        }
       }
       
       // Filter by area range
@@ -288,10 +289,12 @@ const PropertyList = ({ filters }: PropertyListProps) => {
         );
       }
       
+      // Final result
+      console.log(`Final result: ${filteredProps.length} properties after all filters`);
       setProperties(filteredProps);
       setTotalItems(filteredProps.length);
       setPage(1); // Reset to first page when filters change
-        setLoading(false);
+      setLoading(false);
     }, 500); // Simulate loading delay
   };
 
@@ -363,16 +366,22 @@ const PropertyList = ({ filters }: PropertyListProps) => {
                   {property.tag && (
                     <Chip
                       label={property.tag}
-                  color={property.tag === 'Featured' ? 'primary' : 'secondary'}
+                      color={
+                        property.tag === 'For Rent' 
+                          ? 'secondary' 
+                          : property.tag === 'New Development' 
+                            ? 'info' 
+                            : 'primary'
+                      }
                       sx={{
-                    position: 'absolute',
-                    top: 10,
-                    right: 10,
-                    zIndex: 1,
-                    fontWeight: 'bold'
-                  }} 
-                />
-              )}
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        zIndex: 1,
+                        fontWeight: 'bold'
+                      }} 
+                    />
+                  )}
               <CardMedia
                 component="img"
                 height="200"

@@ -155,10 +155,21 @@ function MainContent() {
         } else {
           // Update filters with the search criteria 
           console.log('Updating filters with criteria:', criteria);
-          setFilters(prev => ({
-            ...prev,
-            ...criteria
-          }));
+          
+          // Create a new filters object rather than updating partially
+          const newFilters = {
+            ...filters,  // Start with existing filters
+            ...criteria  // Override with new criteria
+          };
+          
+          // Ensure listingType is properly set if provided
+          if (criteria.listingType) {
+            console.log(`Setting listing type to "${criteria.listingType}"`);
+            newFilters.listingType = criteria.listingType;
+          }
+          
+          console.log('New filters:', newFilters);
+          setFilters(newFilters);
         }
         
         // Scroll to the property list section to show results
@@ -185,6 +196,7 @@ function MainContent() {
   }, [navigate, location.pathname, filters]);
 
   const handleFilterChange = (newFilters: Filters) => {
+    console.log('Filter change handler called with:', newFilters);
     setFilters(newFilters);
   };
 

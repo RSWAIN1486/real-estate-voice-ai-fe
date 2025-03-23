@@ -69,7 +69,7 @@ const propertyTypes = [
   "Condo",
 ];
 
-const listingTypes = ["For Sale", "For Rent", "New Development"];
+const listingTypes = ["For Rent", "For Sale", "New Development"];
 
 const features = [
   "Balcony",
@@ -128,8 +128,8 @@ interface SearchFiltersProps {
   initialFilters?: Filters;
 }
 
-const SearchFilters = ({ onFilterChange, initialFilters = initialFilters }: SearchFiltersProps) => {
-  const [filters, setFilters] = useState<Filters>(initialFilters || initialFilters);
+const SearchFilters = ({ onFilterChange, initialFilters: providedInitialFilters }: SearchFiltersProps) => {
+  const [filters, setFilters] = useState<Filters>(providedInitialFilters || initialFilters);
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000000]);
   const [areaRange, setAreaRange] = useState<number[]>([0, 10000]);
   const [showAdvanced, setShowAdvanced] = useState(false);
