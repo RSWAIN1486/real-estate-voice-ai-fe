@@ -35,6 +35,7 @@ import { toggleTheme } from '../../store/slices/themeSlice';
 import UserMenu from '../Auth/UserMenu';
 import VoiceAgentSettings from '../VoiceAgent/VoiceAgentSettings';
 import styles from './Header.module.css';
+import { logout } from '../../store/slices/authSlice';
 
 const Header = () => {
   const dispatch = useDispatch();

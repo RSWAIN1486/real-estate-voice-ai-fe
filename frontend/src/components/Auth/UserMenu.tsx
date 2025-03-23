@@ -20,7 +20,7 @@ import {
   PersonAdd as RegisterIcon,
   Logout as LogoutIcon,
   Person as ProfileIcon,
-  LocalPizza as PizzaIcon,
+  Home as PropertyIcon,
 } from '@mui/icons-material';
 import { RootState } from '../../store/store';
 import { logout } from '../../store/slices/authSlice';
@@ -44,9 +44,20 @@ const UserMenu: React.FC = () => {
   };
   
   const handleLogout = () => {
+    console.log('Logging out user...');
+    
+    // Dispatch logout action
     dispatch(logout());
+    
+    // Force clear any remaining tokens
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    console.log('User logged out, auth state cleared');
+    
+    // Close the menu and navigate to login page
     handleClose();
-    navigate('/');
+    navigate('/login', { replace: true });
   };
   
   const handleLogin = () => {
@@ -213,9 +224,9 @@ const UserMenu: React.FC = () => {
               gap: 1
             }}
           >
-            <PizzaIcon sx={{ color: 'white' }} />
+            <PropertyIcon sx={{ color: 'white' }} />
             <Typography variant="body2" sx={{ color: 'white', fontWeight: 'medium' }}>
-              Dontminos Rewards
+              My Saved Properties
             </Typography>
           </Paper>
         </Box>

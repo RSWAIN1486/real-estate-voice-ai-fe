@@ -12,6 +12,7 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
+  Divider,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { RootState } from '../../store/store';
@@ -87,6 +88,48 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    try {
+      dispatch(loginStart());
+      
+      // Use demo credentials
+      const demoCredentials = {
+        username: 'demo@example.com',
+        password: 'password',
+      };
+      
+      console.log('Using demo login with:', demoCredentials.username);
+      
+      // Call login API with demo credentials
+      const tokenData = await login(demoCredentials);
+      
+      console.log('Demo login successful, token received');
+      
+      try {
+        // Get user data
+        const userData = await getCurrentUser();
+        
+        dispatch(loginSuccess({ 
+          token: tokenData.access_token,
+          user: userData
+        }));
+        
+        navigate('/');
+      } catch (userError) {
+        console.error('Error fetching user data after demo login:', userError);
+        dispatch(loginSuccess({ 
+          token: tokenData.access_token,
+          user: null
+        }));
+        
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Demo login error:', error);
+      dispatch(loginFailure(error instanceof Error ? error.message : 'Demo login failed'));
+    }
+  };
+
   const toggleShowPassword = () => {
     setShowPassword((prev) => !prev);
   };
@@ -155,6 +198,21 @@ const Login: React.FC = () => {
             disabled={loading}
           >
             {loading ? <CircularProgress size={24} /> : 'Login'}
+          </Button>
+          
+          <Divider sx={{ my: 2 }}>
+            <Typography variant="body2" color="text.secondary">or</Typography>
+          </Divider>
+          
+          <Button
+            fullWidth
+            variant="outlined"
+            color="secondary"
+            onClick={handleDemoLogin}
+            disabled={loading}
+            sx={{ mb: 2 }}
+          >
+            {loading ? <CircularProgress size={24} /> : 'Demo Login'}
           </Button>
           
           <Box textAlign="center">

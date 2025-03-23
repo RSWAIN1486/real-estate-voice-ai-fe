@@ -34,7 +34,48 @@ export interface LoginData {
   password: string;
 }
 
+// Mock user data for dummy login
+const DEMO_USERS = [
+  {
+    id: "user-123",
+    email: "demo@example.com",
+    name: "Demo User",
+    password: "password",
+  },
+  {
+    id: "admin-456",
+    email: "admin@example.com",
+    name: "Admin User",
+    password: "admin",
+  }
+];
+
+// Flag to use dummy login instead of API
+const USE_DUMMY_AUTH = true;
+
 export const register = async (userData: RegisterData) => {
+  if (USE_DUMMY_AUTH) {
+    console.log('Using dummy register:', userData);
+    
+    // Check if email already exists
+    if (DEMO_USERS.some(user => user.email === userData.email)) {
+      throw new Error('Email already registered');
+    }
+    
+    // Create a new dummy user
+    const newUser = {
+      id: `user-${Date.now()}`,
+      email: userData.email,
+      name: userData.name,
+      password: userData.password
+    };
+    
+    // Add to mock users (would be persisted in a real app)
+    DEMO_USERS.push(newUser);
+    
+    return { message: 'Registration successful' };
+  }
+  
   try {
     const response = await api.post('/api/auth/register/', userData);
     return response.data;
@@ -54,9 +95,37 @@ export const register = async (userData: RegisterData) => {
 };
 
 export const login = async (credentials: LoginData) => {
-  try {
-    console.log('Attempting login for:', credentials.username);
+  console.log('Attempting login for:', credentials.username);
+  
+  if (USE_DUMMY_AUTH) {
+    console.log('Using dummy login instead of API');
     
+    // Find user by email/username
+    const user = DEMO_USERS.find(u => 
+      u.email === credentials.username && u.password === credentials.password
+    );
+    
+    if (!user) {
+      console.error('Invalid credentials for dummy login');
+      throw new Error('Invalid email or password');
+    }
+    
+    // Create mock token
+    const dummyToken = `dummy_token_${Date.now()}_${user.id}`;
+    
+    // Save token to localStorage
+    localStorage.setItem('token', dummyToken);
+    console.log('Dummy token saved to localStorage');
+    
+    // Return mock response
+    return {
+      access_token: dummyToken,
+      token_type: "bearer",
+      expires_in: 3600,
+    };
+  }
+  
+  try {
     // Convert to URLSearchParams as required by OAuth2
     const params = new URLSearchParams();
     params.append('username', credentials.username);
@@ -99,6 +168,39 @@ export const login = async (credentials: LoginData) => {
 };
 
 export const getCurrentUser = async () => {
+  if (USE_DUMMY_AUTH) {
+    console.log('Using dummy getCurrentUser');
+    
+    // Get token from localStorage
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      console.warn('No dummy token found');
+      throw new Error('No authentication token found');
+    }
+    
+    // Extract user ID from token (in real app, this would be decoded from JWT)
+    const userIdMatch = token.match(/dummy_token_\d+_(.+)/);
+    if (!userIdMatch) {
+      console.warn('Invalid dummy token format');
+      throw new Error('Invalid token');
+    }
+    
+    const userId = userIdMatch[1];
+    
+    // Find user by ID
+    const user = DEMO_USERS.find(u => u.id === userId);
+    
+    if (!user) {
+      console.warn('User not found for dummy token');
+      throw new Error('User not found');
+    }
+    
+    // Return user without password
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+  
   try {
     // Get token directly from localStorage to ensure it's the latest
     const token = localStorage.getItem('token');
