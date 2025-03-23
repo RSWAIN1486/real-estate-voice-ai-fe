@@ -1,87 +1,108 @@
-# Real Estate Voice Agent
+# Real Estate Voice AI
 
-A voice-powered real estate search platform that allows users to search for properties using natural language voice commands.
+A voice-powered real estate search application allowing users to find properties using natural language voice commands.
+
+## Demo
+Check out our [demo video](https://github.com/yourusername/real-estate-voiceiai/raw/main/frontend/src/assets/demo/real_estate_voice_search_demo.mp4) to see the application in action.
 
 ## Project Overview
 
-This project converts a restaurant voice agent into a real estate property search application. It uses a voice-powered AI assistant to help users search for properties across multiple locations and with various criteria.
+Real Estate Voice AI is a modern web application that allows users to search for properties using both traditional UI controls and natural language voice commands. Users can filter properties by location, price range, number of bedrooms/bathrooms, property type, and listing type (For Sale, For Rent, New Development).
 
-The frontend is built using React, TypeScript, and Material-UI. The voice agent functionality is maintained from the original project while the user interface has been updated to reflect a real estate property search application.
+### Key Features
 
-## Key Features
-
-- Modern real estate search interface
-- Voice-powered property search assistant
-- Property filtering by location, price, bedrooms, and more
-- Mock property listings with images and details
-- Responsive design for desktop and mobile devices
+- **Voice-powered search**: Search properties using natural language voice commands
+- **Comprehensive filtering**: Filter properties by location, price, rooms, property type, and more
+- **Modern UI**: Clean, responsive design with property cards and filter controls
+- **Property listings**: Browse through property cards with images, details, and features
+- **Demo login**: Test the application with demo credentials
 
 ## Project Structure
 
 ```
-├── frontend/          # Frontend React application
-│   ├── src/
-│   │   ├── components/  # React components
-│   │   │   ├── HeroSection.tsx      # Hero section with search
-│   │   │   ├── PropertyList.tsx     # Property listing component
-│   │   │   ├── SearchFilters.tsx    # Search filters component
-│   │   │   ├── VoiceAgent/          # Voice agent components
-│   │   │   ├── Header/              # Header components
-│   │   │   └── Footer/              # Footer components
-│   │   ├── store/      # Redux store and slices
-│   │   ├── services/   # API services
-│   │   └── utils/      # Utility functions
-│   ├── public/         # Static assets
-├── backend/            # Backend API server
-│   └── ...
-└── docs/              # Documentation files
+real-estate-voiceiai/
+├── frontend/                # React frontend application
+│   ├── public/              # Public assets including property images
+│   ├── src/                 # Source code
+│   │   ├── assets/          # Images, icons, and other static assets
+│   │   ├── components/      # React components
+│   │   ├── redux/           # Redux state management
+│   │   ├── services/        # API services and utilities
+│   │   ├── styles/          # Global styles and themes
+│   │   └── utils/           # Utility functions
+├── backend/                 # Optional backend (for future development)
+└── docs/                    # Project documentation
+    └── cursor/              # Development documentation
 ```
 
-## Setup Instructions
+## Setup
 
-### Prerequisites
+### Requirements
 
-- Node.js (v14 or later)
+- Node.js (v16 or later)
 - npm or yarn
 
-### Installation
+### Frontend Installation
 
-1. Clone the repository
-2. Install frontend dependencies:
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/real-estate-voiceiai.git
+   cd real-estate-voiceiai
+   ```
+
+2. Install dependencies:
    ```
    cd frontend
    npm install
    ```
-3. Install backend dependencies:
+
+3. Start the development server:
    ```
-   cd backend
-   npm install
+   npm run dev
    ```
 
-### Running the Application
+4. Open your browser and navigate to `http://localhost:3000`
 
-1. Start the backend:
-   ```
-   cd backend
-   npm start
-   ```
-2. Start the frontend:
-   ```
-   cd frontend
-   npm start
-   ```
+### Backend Installation (Optional)
 
-## Voice Commands
+Currently, the application uses mock data and does not require a backend. A backend may be implemented in future versions for real property data integration.
 
-The voice agent can understand and process requests like:
+## Using the Voice Agent
 
-- "Find properties in New York"
-- "Show me apartments with 2 bedrooms"
-- "Search for houses in London under $2 million"
-- "Find properties with a pool in Dubai"
+1. Click the microphone button in the hero section
+2. Speak a natural language query such as:
+   - "Show me apartments for rent in Dubai"
+   - "Find villas in New York with at least 3 bedrooms"
+   - "I'm looking for properties under $500,000 in Los Angeles"
+   - "Show me new developments with a pool in Miami"
+
+## Demo Login
+
+For demonstration purposes, you can use the following credentials:
+- Email: demo@example.com
+- Password: password123
 
 ## Technologies Used
 
-- **Frontend**: React, TypeScript, Material-UI, Redux
-- **Voice Processing**: Integration with existing voice agent system
-- **APIs**: RESTful API with Express.js backend 
+- React
+- TypeScript
+- Material-UI (MUI)
+- Redux Toolkit
+- Vite
+- React Router
+
+## Recent Updates
+
+- Added demo login functionality
+- Implemented 100 local property images
+- Enhanced filter synchronization between voice search and UI
+- Fixed listing type filter issues
+- Added demo video
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details. 

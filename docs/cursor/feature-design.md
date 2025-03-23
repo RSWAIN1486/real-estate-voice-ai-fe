@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the design and architecture for converting the existing restaurant voice agent into a real estate property search voice agent. The conversion focuses primarily on the frontend components while maintaining the existing voice agent functionality.
+This document outlines the design and architecture of the real estate property search voice agent. The application provides a voice-powered interface for searching properties, along with traditional UI controls for filtering and browsing real estate listings.
 
 ## Core Components
 
@@ -18,132 +18,162 @@ This document outlines the design and architecture for converting the existing r
   - Location search
   - Price range slider
   - Bedrooms/bathrooms filters
-  - Property type selection
-  - Listing type filter (Buy/Rent/New Development)
-  - Advanced filter options (toggle-able)
+  - Property type selection (Apartment, Villa, etc.)
+  - Listing type filter (For Rent, For Sale, New Development)
+  - Advanced filters with toggle display:
+    - Area range
+    - Property features (Balcony, Pool, etc.)
+    - Nearby amenities (Supermarket, Metro, etc.)
+    - View type (Sea View, City View, etc.)
+    - Pet-friendly and furnished options
 
 - **PropertyList**: Display of property listings
-  - Property cards with images
+  - Property cards with images from local assets
   - Property details (price, location, beds, baths, sqft)
-  - Status tags (For Rent, New Development, etc.)
+  - Status tags (For Rent, For Sale, New Development)
+  - Property features displayed as chips
   - Loading states with skeletons
   - Empty state messaging
+  - Pagination for browsing large result sets
 
 - **Header/Footer**: Site navigation and branding
   - Global Estates branding
   - Navigation links (Buy, Rent, Sell, About, Contact)
   - Theme toggle functionality
   - Voice agent settings access
+  - User menu with authentication options
+
+- **Auth Components**: User authentication system
+  - Login form with demo login option
+  - User profile display
+  - Logout functionality
+  - User menu with dropdown options
 
 ### 2. Voice Agent Integration
 
-We'll maintain the core voice agent functionality while adapting it to understand and respond to real estate queries:
+The voice agent understands and processes real estate queries:
 
-- Keep the existing voice recognition and synthesis technology
-- Adapt the interface to match the real estate aesthetic
-- Update voice agent responses to be contextually appropriate for real estate
-- Enable the voice agent to understand property search criteria:
-  - Locations
-  - Price ranges
-  - Number of bedrooms/bathrooms
-  - Property types
-  - Specific amenities
+- Natural language understanding for property search criteria
+- Support for complex queries combining multiple criteria
+- Context-aware responses related to real estate
+- Ability to update UI filters based on voice commands
+- Bidirectional sync between voice commands and UI filters
+
+The voice agent can understand criteria such as:
+- Locations (cities, neighborhoods, regions)
+- Price ranges ("under $2 million", "between $1,000 and $3,000 per month")
+- Property characteristics (bedrooms, bathrooms, area)
+- Property types (apartment, villa, townhouse)
+- Listing types (for rent, for sale, new development)
+- Amenities and features (pool, gym, balcony)
+- Nearby points of interest (near supermarket, near metro)
 
 ### 3. Data Flow
 
 1. User initiates voice search via the voice agent
 2. Voice input is processed and converted to structured filter criteria
-3. Filter criteria are passed to the search system
-4. Results are displayed in the PropertyList component
-5. User can further refine results using the SearchFilters component
+3. Filter criteria are passed to the search system via custom events
+4. UI filter components are updated to reflect voice search criteria
+5. Results are displayed in the PropertyList component
+6. User can further refine results using the SearchFilters component
+
+### 4. Authentication System
+
+- Simple mock authentication system for demonstration
+- Demo login functionality with predefined credentials
+- User state management with Redux
+- Profile and logout functionality
 
 ## Design Choices
 
-- **Colors**: Blue and orange color scheme (primary: #2B4162, secondary: #F5853F)
+- **Colors**: Blue and orange color scheme (primary: #1a246a, secondary: #f50057)
   - Blue conveys trust and professionalism
-  - Orange adds warmth and approachability
   - High contrast for accessibility
+  - Dark/light theme support
 
 - **Typography**: 
-  - Clean, modern sans-serif (Inter) for readability
+  - Clean, modern sans-serif for readability
   - Bold headings for emphasis
   - Consistent type scale for hierarchy
 
 - **Layout**:
   - Hero section with search prominently featured
-  - Filters panel at top of results
+  - Filters panel above property listings
   - 3-column grid of property cards on desktop
   - Responsive design that adapts to mobile devices
 
-## Implementation Strategy
+## Technical Implementation
 
-Rather than rebuilding the entire application, we're taking an incremental approach:
+### State Management
 
-1. Update the theme and styling to match real estate branding
-2. Create new React components for property search UI
-3. Implement the components in the existing app structure
-4. Maintain existing voice agent functionality but adapt the UI
+- **Redux Store**: Central state management for application
+  - Auth state (user, token, authentication status)
+  - Voice agent state (status, transcripts)
+  - Theme state (light/dark mode)
+  - Filter state (controlled via App.tsx and passed to components)
 
-This approach allows us to leverage the robust voice agent technology while providing a new user experience focused on real estate property search.
+### Event System
 
-## Core Features
+- Custom events for communication between voice agent and UI
+  - `voiceSearch`: Basic search criteria from hero section
+  - `updateFilters`: Filter updates from voice agent
+  - `executeSearch`: Execute a search with specific criteria
 
-### 1. Voice Conversations
-- Natural language voice recognition for customer input
-- Text-to-speech capabilities for agent responses
-- Real-time audio level visualization for microphone activity
-- Support for muting/unmuting microphone and speaker
+### Filter Synchronization
 
-### 2. Conversation History
-- Maintains a transcript of the entire conversation
-- Supports loading previous conversations
-- Automatically saves conversation history for future reference
-- Provides a visual distinction between user and agent messages
+- Bidirectional sync between voice commands and UI
+  - Voice commands update UI filter controls
+  - UI filter changes are reflected in search results
+  - Case-sensitive matching for accurate filtering
 
-### 3. Order Processing
-- Integrates with the existing order management system
-- Recognizes food items, quantities, and special instructions
-- Confirms orders with the customer
-- Manages the checkout process
+### Image Management
 
-### 4. Voice Customization
-- Allows selection of different voices for the agent
-- Supports configuration of voice settings (temperature, model)
-- Provides a settings interface for customization
+- Local storage of property images for consistent display
+- Utility functions for mapping property IDs to image paths
+- Fallback images for error handling
 
-## Technical Architecture
+## Future Enhancements
 
-### Frontend Components
-- `VoiceAgent.tsx`: Main component managing the agent UI
-- `VoiceAgentSettings.tsx`: Settings dialog for customizing the agent
-- `voiceAgentService.ts`: Service layer for API communication
+### Planned Features
 
-### Backend Components 
-- `voice_agent.py`: API endpoints for Ultravox proxy
-- Message transformation for proper API formatting
+1. **Property Detail Pages**:
+   - Detailed property information
+   - Multiple property images
+   - Floor plans and specifications
+   - Contact forms for inquiries
 
-### External APIs
-- Ultravox API for voice recognition and synthesis
+2. **Map Integration**:
+   - Interactive map for property locations
+   - Geographic search functionality
+   - Neighborhood information
 
-## Optimization Features
+3. **Enhanced User Accounts**:
+   - Saved searches
+   - Favorite properties
+   - Viewing history
+   - Personalized recommendations
 
-### Image Loading Optimization
-- Efficient image loading with proper caching
-- Error handling for missing images with fallbacks
-- Memory caching system to reduce redundant requests
+4. **Advanced Voice Capabilities**:
+   - More complex query understanding
+   - Conversational refinement of search criteria
+   - Property comparisons via voice
 
-### Message Format Handling
-- Robust validation and transformation of message formats
-- Support for backward compatibility with different versions
-- Error handling for malformed messages
+5. **Real Data Integration**:
+   - Connection to real property database API
+   - Real-time property availability
+   - Price history and market trends
 
 ## User Experience Considerations
-- Microphone access permission handling
-- Clear status indicators
-- Error recovery mechanisms
-- Audio level visualization for feedback
+
+- **Progressive Disclosure**: Advanced filters hidden until needed
+- **Voice Feedback**: Clear system responses to voice commands
+- **Visual Indicators**: Status tags and property features clearly visible
+- **Accessibility**: Color contrast, keyboard navigation, screen reader support
+- **Responsive Design**: Works across device sizes and orientations
 
 ## Security Considerations
-- Secure API key management
-- Proper error handling without exposing sensitive information
-- Content validation before sending to external services 
+
+- Secure authentication (currently mocked)
+- Content validation before processing
+- Error handling without exposing sensitive information
+- Proper API key management for future external integrations 

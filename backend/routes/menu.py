@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 
 # Get logger
-logger = logging.getLogger("dontminos")
+logger = logging.getLogger("global_estates")
 
 router = APIRouter()
 

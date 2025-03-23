@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Set up logging
-logger = logging.getLogger("dontminos.voice_agent")
+logger = logging.getLogger("GlobalEstates.voice_agent")
 
 # Create router
 router = APIRouter()

@@ -7,7 +7,7 @@ export const CLIENT_PORT = 5173; // Default Vite dev server port
 export const CLIENT_URL = `http://localhost:${CLIENT_PORT}`;
 
 // Log API and client information to console
-console.info('%c🍕 Dontminos Restaurant App 🍕', 'font-size: 16px; font-weight: bold; color: #d32f2f;');
+console.info('%c🏡 Global Estates 🏡', 'font-size: 16px; font-weight: bold; color: #1a246a;');
 console.info(`Frontend running at: ${CLIENT_URL}`);
 console.info(`API server expected at: ${API_BASE_URL}`);
 

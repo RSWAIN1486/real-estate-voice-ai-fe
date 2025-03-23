@@ -8,7 +8,7 @@ from utils.auth import get_current_active_user
 from database import get_database
 
 # Get logger
-logger = logging.getLogger("dontminos")
+logger = logging.getLogger("global_estates")
 
 router = APIRouter()
 

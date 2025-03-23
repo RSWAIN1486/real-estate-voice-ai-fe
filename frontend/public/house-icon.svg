@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
+   fill="none"
+   xmlns="http://www.w3.org/2000/svg">
+  <path
+     d="M16 3L3 13.5L5 16L7 14.5V27H25V14.5L27 16L29 13.5L16 3Z"
+     fill="#1a246a" />
+  <rect
+     x="11"
+     y="18"
+     width="10"
+     height="9"
+     fill="#ffffff" />
+</svg> 

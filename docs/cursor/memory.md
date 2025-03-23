@@ -556,4 +556,58 @@ When converting a domain-specific application (like a restaurant ordering system
 3. **Modular CSS**: Component-specific styles helped maintain styling isolation.
 4. **Interface Definitions**: TypeScript interfaces for data structures ensured type safety throughout the application.
 
-These insights will guide future development of the Real Estate Voice Agent and provide valuable guidance for similar domain conversion projects. 
+These insights will guide future development of the Real Estate Voice Agent and provide valuable guidance for similar domain conversion projects.
+
+# Development Learnings
+
+This document captures technical learnings from the development of the Real Estate Voice Agent to avoid repeating mistakes.
+
+## Voice Agent Learnings
+
+### Issue: Voice agent continued running in background after call ended
+**Root Cause**: Server-side call wasn't properly terminated, leading to resource leakage and inconsistent behavior.
+**Solution**: Implemented multi-layered cleanup approach
+- Proper server-side call termination
+- Enhanced client-side cleanup
+- Better component lifecycle management
+
+## UI/UX Learnings
+
+### Issue: Filter synchronization between voice search and UI controls
+**Root Cause**: Filters were being partially updated instead of properly reset and rebuilt when new search criteria were received.
+**Solution**: 
+- Created a proper filter reset mechanism
+- Implemented a structured approach to only update explicitly mentioned filters
+- Added logging to track filter changes through the application lifecycle
+
+### Issue: Property images loading inefficiently
+**Root Cause**: Direct imports of all images caused bundle bloat and performance issues.
+**Solution**:
+- Implemented a utility function to dynamically load images from public directory
+- Added fallback image handling for error cases
+- Created a mapping system to connect property IDs with appropriate images
+
+## State Management Learnings
+
+### Issue: Redux state updates causing UI inconsistencies
+**Root Cause**: Multiple components updating the same state slice in different ways.
+**Solution**:
+- Centralized filter state management in App.tsx
+- Implemented proper event handling pattern for search execution
+- Used reducer pattern for predictable state updates
+
+## Filter Implementation Learnings
+
+### Issue: Case sensitivity in property filtering
+**Root Cause**: String comparison for property attributes was case-sensitive, causing incorrect filtering.
+**Solution**:
+- Implemented case-insensitive string comparison for text filters
+- Added more robust type checking for filter values
+- Enhanced logging to capture filter application results
+
+### Issue: Listing type filter inconsistencies
+**Root Cause**: Listing types had inconsistent formatting between the UI selection and data model.
+**Solution**:
+- Standardized listing type format across the application
+- Implemented direct filter matching for listing types
+- Added console logs for debugging filter application 

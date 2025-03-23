@@ -20,7 +20,7 @@ from utils.auth import (
 from database import get_database
 
 # Get logger
-logger = logging.getLogger("dontminos")
+logger = logging.getLogger("global_estates")
 
 router = APIRouter()
 

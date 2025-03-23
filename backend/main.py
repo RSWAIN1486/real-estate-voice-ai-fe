@@ -18,7 +18,7 @@ load_dotenv()
 from database import connect_to_mongodb, close_mongodb_connection
 
 # Configure logging
-logger = logging.getLogger("dontminos")
+logger = logging.getLogger("global_estates")
 coloredlogs.install(level='INFO', logger=logger, 
                    fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -64,7 +64,7 @@ def generate_default_origins() -> List[str]:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Connect to MongoDB
-    logger.info("Starting Dontminos API server...")
+    logger.info("Starting Global Estates API server...")
     await connect_to_mongodb()
     
     # Log server information
@@ -106,10 +106,10 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown: Close MongoDB connection
-    logger.info("Shutting down Dontminos API server...")
+    logger.info("Shutting down Global Estates API server...")
     await close_mongodb_connection()
 
-app = FastAPI(title="Dontminos API", lifespan=lifespan)
+app = FastAPI(title="Global Estates API", lifespan=lifespan)
 
 # Configure CORS using origins from environment
 origins = get_cors_origins()
@@ -179,7 +179,7 @@ app.include_router(voice_agent.router, prefix="/api/voice-agent", tags=["voice-a
 async def root():
     return {
         "status": "online",
-        "api": "Dontminos API",
+        "api": "Global Estates API",
         "version": "1.0.0",
         "docs": "/docs",
         "endpoints": {

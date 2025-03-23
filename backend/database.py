@@ -9,7 +9,7 @@ load_dotenv()
 
 # MongoDB connection
 MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
-DATABASE_NAME = os.getenv("DATABASE_NAME", "dontminos")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "global_estates")
 client = None
 db = None
 

@@ -12,7 +12,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from database import get_database
 
 # Get logger
-logger = logging.getLogger("dontminos")
+logger = logging.getLogger("global_estates")
 
 # Load environment variables
 load_dotenv()
