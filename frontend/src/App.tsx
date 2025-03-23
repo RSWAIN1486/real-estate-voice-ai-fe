@@ -150,17 +150,35 @@ function MainContent() {
         // Check if this is a "show all" request with no specific filters
         if (criteria.showAll) {
           console.log('Showing all properties (no filters)');
-          // Reset filters to show all properties
-          setFilters({} as Filters);
+          // Create a fresh copy of empty filters
+          const emptyFilters = {
+            location: "",
+            minPrice: 0,
+            maxPrice: 10000000,
+            bedrooms: "",
+            bathrooms: "",
+            propertyType: "",
+            listingType: "",
+            minArea: 0,
+            maxArea: 10000,
+            selectedFeatures: [],
+            viewType: "",
+            nearbyAmenities: [],
+            yearBuilt: "",
+            isPetFriendly: false,
+            isFurnished: false,
+          };
+          
+          setFilters(emptyFilters);
         } else {
           // Update filters with the search criteria 
           console.log('Updating filters with criteria:', criteria);
           
-          // Create a new filters object rather than updating partially
-          const newFilters = {
+          // Create a fresh object by copying the current filters and then applying the new criteria
+          const newFilters = JSON.parse(JSON.stringify({
             ...filters,  // Start with existing filters
             ...criteria  // Override with new criteria
-          };
+          }));
           
           // Ensure listingType is properly set if provided
           if (criteria.listingType) {
@@ -168,7 +186,19 @@ function MainContent() {
             newFilters.listingType = criteria.listingType;
           }
           
-          console.log('New filters:', newFilters);
+          // Ensure location is properly set if provided
+          if (criteria.location) {
+            console.log(`Setting location to "${criteria.location}"`);
+            newFilters.location = criteria.location;
+          }
+          
+          // If we have nearby amenities, ensure they're formatted correctly
+          if (criteria.nearbyAmenities && Array.isArray(criteria.nearbyAmenities)) {
+            console.log(`Setting nearby amenities:`, criteria.nearbyAmenities);
+            newFilters.nearbyAmenities = [...criteria.nearbyAmenities];
+          }
+          
+          console.log('Setting filters to:', newFilters);
           setFilters(newFilters);
         }
         
@@ -179,8 +209,6 @@ function MainContent() {
             propertyListElement.scrollIntoView({ behavior: 'smooth' });
           }
         }, 300);
-        
-        // Don't navigate away from the home page
       }
     };
     

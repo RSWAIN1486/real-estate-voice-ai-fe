@@ -23,8 +23,23 @@ interface Property {
   features?: string[];
 }
 
-// Generate 100 random properties
+// Use a consistent seed for random number generation to ensure deterministic results
+const seededRandom = (seed: number) => {
+  const m = 2**35 - 31;
+  const a = 185852;
+  let s = seed % m;
+  
+  return function() {
+    s = (s * a) % m;
+    return s / m;
+  };
+};
+
+// Generate 100 deterministic properties
 const generateMockProperties = (count: number): Property[] => {
+  // Initialize seeded random function
+  const random = seededRandom(12345);
+
   const locations = [
     "Dubai Marina, Dubai",
     "Downtown Dubai, Dubai",
@@ -82,22 +97,41 @@ const generateMockProperties = (count: number): Property[] => {
   ];
   
   return Array.from({ length: count }, (_, index) => {
-    const propType = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
-    const location = locations[Math.floor(Math.random() * locations.length)];
-    const listingType = listingTypes[Math.floor(Math.random() * listingTypes.length)];
-    const bedroomCount = Math.floor(Math.random() * 6) + 1;
-    const bathroomCount = Math.max(1, bedroomCount - Math.floor(Math.random() * 2));
-    const squareFeet = Math.floor(Math.random() * (5000 - 800)) + 800;
-    const price = propType === "Land" 
-      ? Math.floor(Math.random() * 5000000) + 1000000
-      : listingType === "For Rent" 
-        ? Math.floor(Math.random() * 15000) + 3000
-        : Math.floor(Math.random() * 9000000) + 500000;
+    // Use seeded random for deterministic selection
+    const propTypeIndex = Math.floor(random() * propertyTypes.length);
+    const propType = propertyTypes[propTypeIndex];
     
-    // Generate random features
-    const randomFeatures = [...features]
-      .sort(() => 0.5 - Math.random())
-      .slice(0, Math.floor(Math.random() * 6) + 3);
+    const locationIndex = Math.floor(random() * locations.length);
+    const location = locations[locationIndex];
+    
+    const listingTypeIndex = Math.floor(random() * listingTypes.length);
+    const listingType = listingTypes[listingTypeIndex];
+    
+    const bedroomCount = Math.floor(random() * 6) + 1;
+    const bathroomCount = Math.max(1, bedroomCount - Math.floor(random() * 2));
+    const squareFeet = Math.floor(random() * (5000 - 800)) + 800;
+    const price = propType === "Land" 
+      ? Math.floor(random() * 5000000) + 1000000
+      : listingType === "For Rent" 
+        ? Math.floor(random() * 15000) + 3000
+        : Math.floor(random() * 9000000) + 500000;
+    
+    // Generate deterministic features for each property
+    const propertyFeatures = [];
+    for (let i = 0; i < features.length; i++) {
+      if (random() > 0.7) { // 30% chance to have each feature
+        propertyFeatures.push(features[i]);
+      }
+    }
+    
+    // Ensure a property has at least 3 features
+    while (propertyFeatures.length < 3) {
+      const featureIndex = Math.floor(random() * features.length);
+      const feature = features[featureIndex];
+      if (!propertyFeatures.includes(feature)) {
+        propertyFeatures.push(feature);
+      }
+    }
     
     // Get property image URL
     const propertyImage = getPropertyImageUrl(index + 1);
@@ -114,12 +148,12 @@ const generateMockProperties = (count: number): Property[] => {
       tag: listingType,
       propertyType: propType,
       listingType: listingType,
-      features: randomFeatures
+      features: propertyFeatures
     };
   });
 };
 
-// Generate 100 random properties
+// Generate 100 deterministic properties
 const mockProperties = generateMockProperties(100);
 
 // For debugging - log distribution by listing type
@@ -133,31 +167,25 @@ interface PropertyListProps {
   filters?: Filters;
 }
 
-// Util function to check and log listing type matching
-const deepCheckListingTypeMatch = (propertyListingType: string, filterListingType: string) => {
-  console.log(`Comparing: "${propertyListingType}" (${typeof propertyListingType}) with "${filterListingType}" (${typeof filterListingType})`);
-  console.log('Exact match?', propertyListingType === filterListingType);
-  console.log('Case insensitive match?', propertyListingType.toLowerCase() === filterListingType.toLowerCase());
-  console.log('Includes?', propertyListingType.includes(filterListingType));
-  console.log('CharCodes:', Array.from(propertyListingType).map(c => c.charCodeAt(0)));
-  console.log('Filter CharCodes:', Array.from(filterListingType).map(c => c.charCodeAt(0)));
-  
-  // Return if there's a match (case insensitive)
-  return propertyListingType.toLowerCase() === filterListingType.toLowerCase();
-};
-
 const PropertyList = ({ filters }: PropertyListProps) => {
   const [properties, setProperties] = useState<Property[]>(mockProperties);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const itemsPerPage = 9; // Show 9 properties per page
   const [totalItems, setTotalItems] = useState(mockProperties.length);
+  
+  // Create a snapshot of the current filter state to use during filtering
+  const [currentFilterSnapshot, setCurrentFilterSnapshot] = useState<Filters | undefined>();
 
   // Function to filter properties based on the filters passed
   const filterProperties = (filters?: Filters) => {
-    console.log('Filtering with filters:', filters);
+    // Create a snapshot of the filters for consistent application
+    const filterSnapshot = filters ? {...filters} : undefined;
+    setCurrentFilterSnapshot(filterSnapshot);
     
-    if (!filters) {
+    console.log('Filtering with filters:', filterSnapshot);
+    
+    if (!filterSnapshot) {
       setProperties(mockProperties);
       setTotalItems(mockProperties.length);
       console.log('No filters provided, showing all properties');
@@ -168,139 +196,161 @@ const PropertyList = ({ filters }: PropertyListProps) => {
     
     // Simulate API call delay
     setTimeout(() => {
-      let filteredProps = [...mockProperties];
-      console.log(`Starting with ${filteredProps.length} properties`);
-      
-      // Filter by location
-      if (filters.location && filters.location.trim() !== '') {
-        const locationQuery = filters.location.toLowerCase().trim();
-        filteredProps = filteredProps.filter(prop => 
-          prop.location.toLowerCase().includes(locationQuery) ||
-          prop.title.toLowerCase().includes(locationQuery)
-        );
-          }
-          
-          // Filter by price range
-      if (filters.minPrice > 0 || filters.maxPrice < 10000000) {
-        filteredProps = filteredProps.filter(prop => 
-          prop.price >= filters.minPrice && prop.price <= filters.maxPrice
-        );
-      }
-      
-      // Filter by bedrooms
-      if (filters.bedrooms && filters.bedrooms !== '') {
-        if (filters.bedrooms === '5+') {
-          filteredProps = filteredProps.filter(prop => prop.beds >= 5);
-        } else {
-          const bedroomCount = parseInt(filters.bedrooms);
-          filteredProps = filteredProps.filter(prop => prop.beds === bedroomCount);
-        }
-      }
-      
-      // Filter by bathrooms
-      if (filters.bathrooms && filters.bathrooms !== '') {
-        if (filters.bathrooms === '4+') {
-          filteredProps = filteredProps.filter(prop => prop.baths >= 4);
-        } else {
-          const bathroomCount = parseInt(filters.bathrooms);
-          filteredProps = filteredProps.filter(prop => prop.baths === bathroomCount);
-        }
-      }
-      
-      // Filter by property type
-      if (filters.propertyType && filters.propertyType !== '') {
-        filteredProps = filteredProps.filter(prop => 
-          prop.propertyType === filters.propertyType
-        );
-      }
-      
-      // Filter by listing type
-      if (filters.listingType && filters.listingType !== '') {
-        console.log('Filtering by listing type:', filters.listingType);
+      try {
+        // Start with a fresh copy of all properties
+        let filteredProps = [...mockProperties];
+        console.log(`Starting filtering with ${filteredProps.length} properties`);
         
-        // Check how many properties we have of each listing type
-        const typeCounts = filteredProps.reduce((acc: Record<string, number>, prop) => {
-          acc[prop.listingType] = (acc[prop.listingType] || 0) + 1;
-          return acc;
-        }, {});
-        console.log('Properties by listing type before filtering:', typeCounts);
-
-        // Simple, direct filter - no complex comparison
-        filteredProps = filteredProps.filter(prop => prop.listingType === filters.listingType);
-        
-        console.log(`After filtering by listing type "${filters.listingType}": ${filteredProps.length} properties remain`);
-
-        // Double-check what listing types remain
-        if (filteredProps.length > 0) {
-          const remainingTypes = [...new Set(filteredProps.map(p => p.listingType))];
-          console.log('Remaining listing types after filtering:', remainingTypes);
-        }
-      }
-      
-      // Filter by area range
-      if (filters.minArea > 0 || filters.maxArea < 10000) {
-        filteredProps = filteredProps.filter(prop => 
-          prop.sqft >= filters.minArea && prop.sqft <= filters.maxArea
-        );
-      }
-      
-      // Filter by selected features
-      if (filters.selectedFeatures && filters.selectedFeatures.length > 0) {
-        filteredProps = filteredProps.filter(prop => {
-          if (!prop.features) return false;
-          return filters.selectedFeatures.every(feature => 
-            prop.features?.includes(feature)
+        // Apply location filter first if specified
+        if (filterSnapshot.location && filterSnapshot.location.trim() !== '') {
+          const locationQuery = filterSnapshot.location.toLowerCase().trim();
+          filteredProps = filteredProps.filter(prop => 
+            prop.location.toLowerCase().includes(locationQuery) ||
+            prop.title.toLowerCase().includes(locationQuery)
           );
-        });
-      }
-      
-      // Filter by view type
-      if (filters.viewType && filters.viewType !== '') {
-        filteredProps = filteredProps.filter(prop => {
-          if (!prop.features) return false;
-          return prop.features.includes(filters.viewType);
-        });
-      }
-      
-      // Filter by nearby amenities
-      if (filters.nearbyAmenities && filters.nearbyAmenities.length > 0) {
-        filteredProps = filteredProps.filter(prop => {
-          if (!prop.features) return false;
-          return filters.nearbyAmenities.some(amenity => {
-            const amenityTerm = amenity.toLowerCase();
-            return prop.features?.some(feature => 
-              feature.toLowerCase().includes('near') && feature.toLowerCase().includes(amenityTerm)
+          console.log(`After location filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply price range filter
+        if (filterSnapshot.minPrice > 0 || filterSnapshot.maxPrice < 10000000) {
+          filteredProps = filteredProps.filter(prop => 
+            prop.price >= filterSnapshot.minPrice && prop.price <= filterSnapshot.maxPrice
+          );
+          console.log(`After price filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply bedrooms filter
+        if (filterSnapshot.bedrooms && filterSnapshot.bedrooms !== '') {
+          if (filterSnapshot.bedrooms === '5+') {
+            filteredProps = filteredProps.filter(prop => prop.beds >= 5);
+          } else {
+            const bedroomCount = parseInt(filterSnapshot.bedrooms);
+            filteredProps = filteredProps.filter(prop => prop.beds === bedroomCount);
+          }
+          console.log(`After bedrooms filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply bathrooms filter
+        if (filterSnapshot.bathrooms && filterSnapshot.bathrooms !== '') {
+          if (filterSnapshot.bathrooms === '4+') {
+            filteredProps = filteredProps.filter(prop => prop.baths >= 4);
+          } else {
+            const bathroomCount = parseInt(filterSnapshot.bathrooms);
+            filteredProps = filteredProps.filter(prop => prop.baths === bathroomCount);
+          }
+          console.log(`After bathrooms filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply property type filter
+        if (filterSnapshot.propertyType && filterSnapshot.propertyType !== '') {
+          filteredProps = filteredProps.filter(prop => 
+            prop.propertyType === filterSnapshot.propertyType
+          );
+          console.log(`After property type filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply listing type filter - this is crucial to fix
+        if (filterSnapshot.listingType && filterSnapshot.listingType !== '') {
+          console.log(`Applying listing type filter: "${filterSnapshot.listingType}"`);
+          
+          // Check current listing types before filtering
+          const typesBeforeFilter = [...new Set(filteredProps.map(p => p.listingType))];
+          console.log('Listing types before filtering:', typesBeforeFilter);
+          
+          // Use direct string comparison
+          filteredProps = filteredProps.filter(prop => 
+            prop.listingType === filterSnapshot.listingType
+          );
+          
+          console.log(`After listing type filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply area range filter
+        if (filterSnapshot.minArea > 0 || filterSnapshot.maxArea < 10000) {
+          filteredProps = filteredProps.filter(prop => 
+            prop.sqft >= filterSnapshot.minArea && prop.sqft <= filterSnapshot.maxArea
+          );
+          console.log(`After area filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply selected features filter
+        if (filterSnapshot.selectedFeatures && filterSnapshot.selectedFeatures.length > 0) {
+          filteredProps = filteredProps.filter(prop => {
+            if (!prop.features) return false;
+            return filterSnapshot.selectedFeatures.every(feature => 
+              prop.features?.includes(feature)
             );
           });
-        });
+          console.log(`After features filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply view type filter
+        if (filterSnapshot.viewType && filterSnapshot.viewType !== '') {
+          filteredProps = filteredProps.filter(prop => {
+            if (!prop.features) return false;
+            return prop.features.includes(filterSnapshot.viewType);
+          });
+          console.log(`After view type filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply nearby amenities filter
+        if (filterSnapshot.nearbyAmenities && filterSnapshot.nearbyAmenities.length > 0) {
+          filteredProps = filteredProps.filter(prop => {
+            if (!prop.features) return false;
+            
+            // For each required amenity, check if the property has a matching feature
+            return filterSnapshot.nearbyAmenities.every(amenity => {
+              // Create the exact "Near X" string to match
+              const nearbyFeatureName = `Near ${amenity}`;
+              return prop.features?.some(feature => feature === nearbyFeatureName);
+            });
+          });
+          console.log(`After nearby amenities filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply pet friendly filter
+        if (filterSnapshot.isPetFriendly) {
+          filteredProps = filteredProps.filter(prop => 
+            prop.features?.includes('Pet Friendly')
+          );
+          console.log(`After pet friendly filter: ${filteredProps.length} properties`);
+        }
+        
+        // Apply furnished filter
+        if (filterSnapshot.isFurnished) {
+          filteredProps = filteredProps.filter(prop => 
+            prop.features?.includes('Furnished')
+          );
+          console.log(`After furnished filter: ${filteredProps.length} properties`);
+        }
+        
+        // Final result
+        console.log(`Final result: ${filteredProps.length} properties after all filters`);
+        setProperties(filteredProps);
+        setTotalItems(filteredProps.length);
+        setPage(1); // Reset to first page when filters change
+      } catch (error) {
+        console.error('Error during filtering:', error);
+        // If there's an error, show all properties
+        setProperties(mockProperties);
+        setTotalItems(mockProperties.length);
+      } finally {
+        setLoading(false);
       }
-      
-      // Filter by pet friendly
-      if (filters.isPetFriendly) {
-        filteredProps = filteredProps.filter(prop => 
-          prop.features?.includes('Pet Friendly')
-        );
-      }
-      
-      // Filter by furnished
-      if (filters.isFurnished) {
-        filteredProps = filteredProps.filter(prop => 
-          prop.features?.includes('Furnished')
-        );
-      }
-      
-      // Final result
-      console.log(`Final result: ${filteredProps.length} properties after all filters`);
-      setProperties(filteredProps);
-      setTotalItems(filteredProps.length);
-      setPage(1); // Reset to first page when filters change
-      setLoading(false);
     }, 500); // Simulate loading delay
   };
 
   // Apply filters when they change
   useEffect(() => {
-    filterProperties(filters);
+    // Compare current filters with the snapshot to prevent redundant filtering
+    const filtersChanged = JSON.stringify(filters) !== JSON.stringify(currentFilterSnapshot);
+    
+    if (filtersChanged) {
+      console.log('Filters changed, applying filters');
+      filterProperties(filters);
+    } else {
+      console.log('Filters unchanged, skipping filter application');
+    }
   }, [filters]);
 
   // Get current page properties

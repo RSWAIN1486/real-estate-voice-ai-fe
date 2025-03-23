@@ -184,11 +184,19 @@ const SearchFilters = ({ onFilterChange, initialFilters: providedInitialFilters 
   };
 
   const handleReset = () => {
-    setFilters(initialFilters);
+    // Create a fresh copy of initialFilters to avoid reference issues
+    const resetFilters = JSON.parse(JSON.stringify(initialFilters));
+    
+    // Update local state
+    setFilters(resetFilters);
     setPriceRange([0, 10000000]);
     setAreaRange([0, 10000]);
+    
+    console.log('Filters reset to initial state:', resetFilters);
+    
+    // Dispatch to parent with clean reset filters
     if (onFilterChange) {
-      onFilterChange(initialFilters);
+      onFilterChange(resetFilters);
     }
   };
 
