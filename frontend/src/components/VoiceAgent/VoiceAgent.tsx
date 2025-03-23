@@ -1158,9 +1158,112 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       console.log('handleSearchProperties called with:', JSON.stringify(criteria), 
                   'from caller:', new Error().stack);
       
-      // Trigger property search with the given criteria
+      // Format the criteria to ensure it matches the filter UI expectations
+      const formattedCriteria = { ...criteria };
+      
+      // Import the reference arrays from SearchFilters component 
+      // Need to hardcode these since we can't import directly
+      const nearbyAmenitiesOptions = [
+        "Supermarket", "Metro Station", "School", "Hospital", "Shopping Mall", 
+        "Beach", "Restaurant", "Pharmacy", "Gym", "Park", "Airport", "Bus Station"
+      ];
+      
+      const featuresOptions = [
+        "Balcony", "Private Pool", "Garden", "Gym", "Smart Home", "Walk-in Closet",
+        "Parking", "Concierge", "24/7 Security", "Elevator", "Storage Room", 
+        "Maid's Room", "Study Room"
+      ];
+      
+      const propertyTypesOptions = [
+        "Apartment", "Villa", "Townhouse", "Penthouse", "Office", 
+        "Retail", "Duplex", "Land", "House", "Condo"
+      ];
+      
+      const viewTypesOptions = [
+        "Sea View", "City View", "Garden View", "Mountain View", 
+        "Pool View", "Lake View", "Golf Course View", "Park View"
+      ];
+      
+      // Format nearbyAmenities to match the exact case of the options in the dropdown
+      if (criteria.nearbyAmenities && Array.isArray(criteria.nearbyAmenities)) {
+        formattedCriteria.nearbyAmenities = criteria.nearbyAmenities.map((amenity: string) => {
+          // Remove "Near " prefix if it exists
+          const cleanAmenity = amenity.replace(/^Near\s+/i, '');
+          
+          // Find matching amenity with correct case from the reference array
+          const exactMatchAmenity = nearbyAmenitiesOptions.find(option => 
+            option.toLowerCase() === cleanAmenity.toLowerCase()
+          );
+          
+          // Use the exact match if found, otherwise keep the original (but cleaned)
+          return exactMatchAmenity || cleanAmenity;
+        });
+        console.log('Formatted nearbyAmenities for UI with exact case:', formattedCriteria.nearbyAmenities);
+      }
+      
+      // Format selectedFeatures to match the exact case of the options in the dropdown
+      if (criteria.selectedFeatures && Array.isArray(criteria.selectedFeatures)) {
+        formattedCriteria.selectedFeatures = criteria.selectedFeatures.map((feature: string) => {
+          // Find matching feature with correct case from the reference array
+          const exactMatchFeature = featuresOptions.find(option => 
+            option.toLowerCase() === feature.toLowerCase()
+          );
+          
+          // Use the exact match if found, otherwise keep the original
+          return exactMatchFeature || feature;
+        });
+        console.log('Formatted selectedFeatures for UI with exact case:', formattedCriteria.selectedFeatures);
+      }
+      
+      // Format listingType to exactly match one of the options in the dropdown
+      if (criteria.listingType) {
+        // Ensure listing type is properly capitalized
+        const listingTypeMap: { [key: string]: string } = {
+          'for rent': 'For Rent',
+          'for sale': 'For Sale',
+          'new development': 'New Development',
+          'rent': 'For Rent',
+          'sale': 'For Sale'
+        };
+        
+        const normalizedType = criteria.listingType.toLowerCase();
+        formattedCriteria.listingType = listingTypeMap[normalizedType] || criteria.listingType;
+        console.log('Formatted listingType:', formattedCriteria.listingType);
+      }
+      
+      // Format propertyType to match dropdown options exactly
+      if (criteria.propertyType) {
+        // Find matching property type with correct case from the reference array
+        const exactMatchPropertyType = propertyTypesOptions.find(option => 
+          option.toLowerCase() === criteria.propertyType.toLowerCase()
+        );
+        
+        // Use the exact match if found, otherwise capitalize first letter
+        formattedCriteria.propertyType = exactMatchPropertyType || 
+                                         (criteria.propertyType.charAt(0).toUpperCase() + 
+                                         criteria.propertyType.slice(1).toLowerCase());
+        
+        console.log('Formatted propertyType:', formattedCriteria.propertyType);
+      }
+      
+      // Format viewType to match dropdown options exactly
+      if (criteria.viewType) {
+        // Find matching view type with correct case from the reference array
+        const exactMatchViewType = viewTypesOptions.find(option => 
+          option.toLowerCase() === criteria.viewType.toLowerCase()
+        );
+        
+        // Use the exact match if found, otherwise keep as is
+        formattedCriteria.viewType = exactMatchViewType || criteria.viewType;
+        console.log('Formatted viewType:', formattedCriteria.viewType);
+      }
+      
+      // Flag to indicate this is coming from voice search and should update UI
+      formattedCriteria.updateUIFilters = true;
+      
+      // Trigger property search with the formatted criteria
       window.dispatchEvent(new CustomEvent('executeSearch', { 
-        detail: { criteria }
+        detail: { criteria: formattedCriteria }
       }));
       
       // Display user feedback that search is being performed
@@ -1183,7 +1286,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
         criteria.showAll === true
       );
       
-      console.log('Has search criteria:', hasSearchCriteria, 'Criteria:', criteria);
+      console.log('Has search criteria:', hasSearchCriteria, 'Criteria:', formattedCriteria);
       
       if (hasSearchCriteria) {
         // Close the voice agent dialog after a short delay

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -130,9 +130,42 @@ interface SearchFiltersProps {
 
 const SearchFilters = ({ onFilterChange, initialFilters: providedInitialFilters }: SearchFiltersProps) => {
   const [filters, setFilters] = useState<Filters>(providedInitialFilters || initialFilters);
-  const [priceRange, setPriceRange] = useState<number[]>([0, 10000000]);
-  const [areaRange, setAreaRange] = useState<number[]>([0, 10000]);
+  const [priceRange, setPriceRange] = useState<number[]>([filters.minPrice || 0, filters.maxPrice || 10000000]);
+  const [areaRange, setAreaRange] = useState<number[]>([filters.minArea || 0, filters.maxArea || 10000]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Synchronize state with props when initialFilters changes
+  useEffect(() => {
+    if (providedInitialFilters) {
+      console.log('SearchFilters: Updating filter state from props:', providedInitialFilters);
+      
+      // Update main filters state
+      setFilters(providedInitialFilters);
+      
+      // Update UI control states
+      setPriceRange([
+        providedInitialFilters.minPrice || 0, 
+        providedInitialFilters.maxPrice || 10000000
+      ]);
+      
+      setAreaRange([
+        providedInitialFilters.minArea || 0, 
+        providedInitialFilters.maxArea || 10000
+      ]);
+      
+      // If we have special filters like amenities or features, auto-show advanced filters
+      const hasAdvancedFilters = 
+        (providedInitialFilters.nearbyAmenities && providedInitialFilters.nearbyAmenities.length > 0) ||
+        (providedInitialFilters.selectedFeatures && providedInitialFilters.selectedFeatures.length > 0) ||
+        providedInitialFilters.isPetFriendly || 
+        providedInitialFilters.isFurnished ||
+        providedInitialFilters.viewType;
+        
+      if (hasAdvancedFilters && !showAdvanced) {
+        setShowAdvanced(true);
+      }
+    }
+  }, [providedInitialFilters]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

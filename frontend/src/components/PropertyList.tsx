@@ -302,7 +302,14 @@ const PropertyList = ({ filters }: PropertyListProps) => {
             return filterSnapshot.nearbyAmenities.every(amenity => {
               // Create the exact "Near X" string to match
               const nearbyFeatureName = `Near ${amenity}`;
-              return prop.features?.some(feature => feature === nearbyFeatureName);
+              
+              // Case-insensitive matching for better results
+              return prop.features?.some(feature => 
+                feature.toLowerCase() === nearbyFeatureName.toLowerCase() ||
+                // Also try matching with just the amenity name for flexibility
+                feature.toLowerCase().includes(amenity.toLowerCase()) &&
+                feature.toLowerCase().includes('near')
+              );
             });
           });
           console.log(`After nearby amenities filter: ${filteredProps.length} properties`);
@@ -390,7 +397,7 @@ const PropertyList = ({ filters }: PropertyListProps) => {
   }
 
   return (
-    <Box>
+    <Box className="property-list-container">
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Typography variant="h5" fontWeight="bold">
           Properties {totalItems > 0 ? `(${totalItems})` : ""}

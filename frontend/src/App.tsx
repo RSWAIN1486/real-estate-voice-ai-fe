@@ -147,55 +147,64 @@ function MainContent() {
         // Extract the criteria from the event detail
         const criteria = event.detail.criteria || {};
         
+        // Determine if UI filters should be updated (coming from voice search)
+        const shouldUpdateUIFilters = criteria.updateUIFilters === true;
+        
+        // Define default empty filters
+        const emptyFilters: Filters = {
+          location: "",
+          minPrice: 0,
+          maxPrice: 10000000,
+          bedrooms: "",
+          bathrooms: "",
+          propertyType: "",
+          listingType: "",
+          minArea: 0,
+          maxArea: 10000,
+          selectedFeatures: [],
+          viewType: "",
+          nearbyAmenities: [],
+          yearBuilt: "",
+          isPetFriendly: false,
+          isFurnished: false,
+        };
+        
         // Check if this is a "show all" request with no specific filters
         if (criteria.showAll) {
           console.log('Showing all properties (no filters)');
           // Create a fresh copy of empty filters
-          const emptyFilters = {
-            location: "",
-            minPrice: 0,
-            maxPrice: 10000000,
-            bedrooms: "",
-            bathrooms: "",
-            propertyType: "",
-            listingType: "",
-            minArea: 0,
-            maxArea: 10000,
-            selectedFeatures: [],
-            viewType: "",
-            nearbyAmenities: [],
-            yearBuilt: "",
-            isPetFriendly: false,
-            isFurnished: false,
-          };
-          
           setFilters(emptyFilters);
         } else {
           // Update filters with the search criteria 
           console.log('Updating filters with criteria:', criteria);
           
-          // Create a fresh object by copying the current filters and then applying the new criteria
-          const newFilters = JSON.parse(JSON.stringify({
-            ...filters,  // Start with existing filters
-            ...criteria  // Override with new criteria
-          }));
+          // For voice search, start with empty filters and only add what was explicitly mentioned
+          // This ensures we don't carry over unmentioned filters
+          let newFilters: Filters;
           
-          // Ensure listingType is properly set if provided
-          if (criteria.listingType) {
-            console.log(`Setting listing type to "${criteria.listingType}"`);
-            newFilters.listingType = criteria.listingType;
-          }
-          
-          // Ensure location is properly set if provided
-          if (criteria.location) {
-            console.log(`Setting location to "${criteria.location}"`);
-            newFilters.location = criteria.location;
-          }
-          
-          // If we have nearby amenities, ensure they're formatted correctly
-          if (criteria.nearbyAmenities && Array.isArray(criteria.nearbyAmenities)) {
-            console.log(`Setting nearby amenities:`, criteria.nearbyAmenities);
-            newFilters.nearbyAmenities = [...criteria.nearbyAmenities];
+          if (shouldUpdateUIFilters) {
+            // Start with empty filters and only add what's in the criteria
+            newFilters = { ...emptyFilters };
+            
+            // Only set properties that are explicitly defined in the criteria
+            // This ensures we don't set any filters the user didn't ask for
+            Object.keys(criteria).forEach(key => {
+              if (key !== 'updateUIFilters' && criteria[key] !== undefined && key in emptyFilters) {
+                // @ts-ignore - dynamically setting properties
+                newFilters[key] = criteria[key];
+              }
+            });
+            
+            console.log('Created filters from voice search with only specified criteria:', newFilters);
+          } else {
+            // For manual UI interactions, merge with existing filters
+            // Create a copy of criteria without the updateUIFilters property
+            const { updateUIFilters, ...filteredCriteria } = criteria;
+            
+            newFilters = {
+              ...filters,
+              ...filteredCriteria
+            };
           }
           
           console.log('Setting filters to:', newFilters);
