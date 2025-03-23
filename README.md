@@ -3,7 +3,7 @@
 A voice-powered real estate search application allowing users to find properties using natural language voice commands.
 
 ## Demo
-Check out our [demo video](https://github.com/yourusername/real-estate-voiceiai/raw/main/frontend/src/assets/demo/real_estate_voice_search_demo.mp4) to see the application in action.
+Check out our [demo video](https://github.com/ZeroGradAI/real-estate-voice-ai/blob/main/frontend/src/assets/demo/real_estate_voice_search_demo.mp4) to see the application in action.
 
 ## Project Overview
 
