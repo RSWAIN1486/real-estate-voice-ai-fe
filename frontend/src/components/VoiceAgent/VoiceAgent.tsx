@@ -1088,9 +1088,28 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
             detail: { criteria: searchCriteria }
           }));
           
+          // Generate a dynamic response based on the location
+          const getDynamicResponse = (loc?: string) => {
+            const responses = [
+              "I'm showing you properties",
+              "Here are some properties",
+              "I've found properties",
+              "Let me show you properties",
+              "Take a look at these properties"
+            ];
+            
+            const baseResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            if (loc) {
+              return `${baseResponse} in ${loc} that match your criteria.`;
+            } else {
+              return `${baseResponse} that match your criteria.`;
+            }
+          };
+          
           // Add a transcript showing we're searching
           dispatch(addTranscript({
-            text: "I'm showing you properties that match your criteria now.",
+            text: getDynamicResponse(location),
             isFinal: true,
             speaker: "agent",
             medium: Medium.TEXT

@@ -194,7 +194,77 @@ export const searchPropertiesTool: ClientToolImplementation = (parameters) => {
     console.log('%c 🏠 SEARCH PROPERTIES TOOL EXECUTED 🏠 ', 'background: #4CAF50; color: white; padding: 4px; border-radius: 4px;');
   }
 
-  return "I'm showing you properties that match your criteria now.";
+  // Generate a dynamic response based on the search criteria
+  const getSearchResponse = (criteria: any) => {
+    const responses = [
+      "Here are the properties I found that match what you're looking for.",
+      "I've found some properties that might interest you based on your criteria.",
+      "Take a look at these properties that match your search.",
+      "Based on what you're looking for, I've found these properties for you.",
+      "I think you'll like these properties that match your requirements."
+    ];
+    
+    // Choose a random base response
+    const baseResponse = responses[Math.floor(Math.random() * responses.length)];
+    
+    // Build a more detailed response if we have specific criteria
+    let detailedResponse = baseResponse;
+    
+    if (criteria) {
+      const details = [];
+      
+      if (criteria.location) {
+        details.push(`in ${criteria.location}`);
+      }
+      
+      if (criteria.listingType) {
+        const listingTypeMap: {[key: string]: string} = {
+          'For Rent': 'for rent',
+          'For Sale': 'for sale',
+          'New Development': 'in new developments'
+        };
+        details.push(listingTypeMap[criteria.listingType] || criteria.listingType.toLowerCase());
+      }
+      
+      if (criteria.minBedrooms || criteria.maxBedrooms) {
+        if (criteria.minBedrooms && criteria.maxBedrooms) {
+          details.push(`with ${criteria.minBedrooms}-${criteria.maxBedrooms} bedrooms`);
+        } else if (criteria.minBedrooms) {
+          details.push(`with at least ${criteria.minBedrooms} ${criteria.minBedrooms === 1 ? 'bedroom' : 'bedrooms'}`);
+        } else if (criteria.maxBedrooms) {
+          details.push(`with up to ${criteria.maxBedrooms} ${criteria.maxBedrooms === 1 ? 'bedroom' : 'bedrooms'}`);
+        }
+      }
+      
+      if (criteria.minPrice || criteria.maxPrice) {
+        if (criteria.minPrice && criteria.maxPrice) {
+          details.push(`priced between $${criteria.minPrice.toLocaleString()} and $${criteria.maxPrice.toLocaleString()}`);
+        } else if (criteria.minPrice) {
+          details.push(`starting from $${criteria.minPrice.toLocaleString()}`);
+        } else if (criteria.maxPrice) {
+          details.push(`under $${criteria.maxPrice.toLocaleString()}`);
+        }
+      }
+      
+      if (criteria.propertyType) {
+        details.push(`of type ${criteria.propertyType.toLowerCase()}`);
+      }
+      
+      // Add amenities if present
+      if (criteria.features && criteria.features.length > 0) {
+        details.push(`featuring ${criteria.features.join(', ')}`);
+      }
+      
+      // Combine all details into a natural language sentence
+      if (details.length > 0) {
+        detailedResponse = `${baseResponse.replace(/\.$/, '')} ${details.join(', ')}.`;
+      }
+    }
+    
+    return detailedResponse;
+  };
+
+  return getSearchResponse(parsedCriteria);
 };
 
 export const updateOrderTool: ClientToolImplementation = (parameters) => {
