@@ -1395,7 +1395,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
                 {transcripts.length === 0 ? (
                   <Box className={styles.emptyTranscriptContainer}>
                     <Typography variant="body1" color="textSecondary">
-                      Say something like "I want to order a pizza" to start your order.
+                      Say something like "I am looking for a 3 bedroom apartment in Dubai" to start your search.
                     </Typography>
                   </Box>
                 ) : (
