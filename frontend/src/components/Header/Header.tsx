@@ -83,183 +83,97 @@ const Header = () => {
   ];
 
   return (
-    <AppBar position="sticky" className={styles.header}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters className={styles.toolbar}>
-          {/* Mobile Menu Button */}
-          {isMobile && (
+    <AppBar 
+      position="fixed" 
+      sx={{ 
+        background: 'transparent',
+        boxShadow: 'none',
+        backdropFilter: 'blur(8px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      }}
+    >
+      <Container maxWidth="lg">
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+          {/* Logo/Home Section */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <IconButton
-              color="inherit"
-              aria-label="open menu"
-              edge="start"
-              onClick={toggleMobileMenu}
-              sx={{ mr: 1 }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-
-          {/* Logo */}
-          <Box 
-            className={styles.logoContainer}
-            onClick={handleHomeClick}
-            sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}
-          >
-            <BuildingIcon sx={{ mr: 1, fontSize: '2rem' }} />
-            <Typography
-              variant="h5"
-              component="div"
-              className={styles.logoText}
+              onClick={() => navigate('/')}
               sx={{ 
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 800,
-                letterSpacing: '.1rem',
-                cursor: 'pointer'
+                color: 'white',
+                mr: 1,
+                '&:hover': {
+                  background: 'rgba(255, 255, 255, 0.1)',
+                }
               }}
             >
-              Global Estates
+              <HomeIcon />
+            </IconButton>
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{
+                fontWeight: 700,
+                letterSpacing: '.02em',
+                color: 'white',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                '&:hover': { opacity: 0.9 },
+              }}
+              onClick={() => navigate('/')}
+            >
+              DUBAI ESTATES
             </Typography>
           </Box>
 
-          {/* Desktop Navigation */}
-          {!isMobile && (
-            <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-              <Button 
-                color="inherit" 
-                component={Link} 
-                to="/"
-                className={location.pathname === '/' ? styles.activeLink : ''}
-              >
-                Buy
-              </Button>
-              <Button 
-                color="inherit" 
-                component={Link} 
-                to="/menu"
-                className={location.pathname === '/menu' ? styles.activeLink : ''}
-              >
-                Rent
-              </Button>
-              <Button 
-                color="inherit" 
-                component={Link} 
-                to="/cart"
-                className={location.pathname === '/cart' ? styles.activeLink : ''}
-              >
-                Sell
-              </Button>
-              <Button 
-                color="inherit" 
-                component={Link} 
-                to="/profile"
-                className={location.pathname === '/profile' ? styles.activeLink : ''}
-              >
-                About
-              </Button>
-              <Button 
-                color="inherit" 
-                component={Link} 
-                to="/contact"
-                className={location.pathname === '/contact' ? styles.activeLink : ''}
-              >
-                Contact
-              </Button>
-            </Box>
-          )}
-
-          {/* Right Side Actions */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            {/* Voice Agent Settings */}
-            <Tooltip title="Voice Agent Settings">
-              <IconButton
-                color="inherit"
-                onClick={handleOpenSettings}
-                className={styles.actionButton}
-                sx={{ backgroundColor: 'rgba(245, 133, 63, 0.3)', '&:hover': { backgroundColor: 'rgba(245, 133, 63, 0.5)' } }}
-              >
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
-
-            {/* Theme Toggle */}
-            <IconButton 
-              color="inherit"
-              onClick={() => dispatch(toggleTheme())}
-              className={styles.actionButton}
+          {/* Navigation Links */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              sx={{
+                color: 'white',
+                '&:hover': {
+                  background: 'rgba(255, 255, 255, 0.1)',
+                },
+                textTransform: 'none',
+                fontSize: '1rem',
+              }}
+              onClick={() => navigate('/buy')}
             >
-              {theme.palette.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
-            
-            {/* User Menu */}
-            <UserMenu />
+              Buy
+            </Button>
+            <Button
+              sx={{
+                color: 'white',
+                '&:hover': {
+                  background: 'rgba(255, 255, 255, 0.1)',
+                },
+                textTransform: 'none',
+                fontSize: '1rem',
+              }}
+              onClick={() => navigate('/rent')}
+            >
+              Rent
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                color: 'white',
+                borderColor: 'rgba(255, 255, 255, 0.5)',
+                '&:hover': {
+                  borderColor: 'white',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                },
+                textTransform: 'none',
+                fontSize: '1rem',
+                ml: 2,
+              }}
+              onClick={() => navigate('/contact')}
+            >
+              Contact Us
+            </Button>
           </Box>
         </Toolbar>
       </Container>
-
-      {/* Mobile Menu Drawer */}
-      <Drawer
-        anchor="left"
-        open={mobileMenuOpen}
-        onClose={toggleMobileMenu}
-        sx={{
-          '& .MuiDrawer-paper': {
-            width: '80%',
-            maxWidth: '300px',
-            boxSizing: 'border-box',
-            backgroundColor: theme.palette.background.paper,
-          },
-        }}
-      >
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <BuildingIcon sx={{ mr: 1, color: 'primary.main' }} />
-            <Typography variant="h6" color="primary.main" fontWeight="bold">Global Estates</Typography>
-          </Box>
-          <IconButton onClick={toggleMobileMenu}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Divider />
-        <List>
-          <ListItem button onClick={handleHomeClick} selected={location.pathname === '/'}>
-            <ListItemIcon><HomeIcon color={location.pathname === '/' ? 'primary' : 'inherit'} /></ListItemIcon>
-            <ListItemText primary="Buy" />
-          </ListItem>
-          <ListItem button onClick={() => { navigate('/menu'); setMobileMenuOpen(false); }} selected={location.pathname === '/menu'}>
-            <ListItemIcon><HomeIcon color={location.pathname === '/menu' ? 'primary' : 'inherit'} /></ListItemIcon>
-            <ListItemText primary="Rent" />
-          </ListItem>
-          <ListItem button onClick={handleCartClick} selected={location.pathname === '/cart'}>
-            <ListItemIcon>
-              <BuildingIcon color={location.pathname === '/cart' ? 'primary' : 'inherit'} />
-            </ListItemIcon>
-            <ListItemText primary="Sell" />
-          </ListItem>
-          <ListItem 
-            button 
-            onClick={() => { navigate('/profile'); setMobileMenuOpen(false); }}
-            selected={location.pathname === '/profile'}
-          >
-            <ListItemIcon>
-              <BuildingIcon color={location.pathname === '/profile' ? 'primary' : 'inherit'} />
-            </ListItemIcon>
-            <ListItemText primary="About" />
-          </ListItem>
-          <ListItem 
-            button 
-            onClick={() => { navigate('/contact'); setMobileMenuOpen(false); }}
-            selected={location.pathname === '/contact'}
-          >
-            <ListItemIcon>
-              <BuildingIcon color={location.pathname === '/contact' ? 'primary' : 'inherit'} />
-            </ListItemIcon>
-            <ListItemText primary="Contact" />
-          </ListItem>
-        </List>
-      </Drawer>
-
-      {/* Voice Agent Settings Dialog */}
-      <VoiceAgentSettings open={settingsOpen} onClose={handleCloseSettings} />
     </AppBar>
   );
 };
