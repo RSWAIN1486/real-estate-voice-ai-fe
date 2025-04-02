@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -23,7 +23,13 @@ import {
   Badge,
   ButtonGroup,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  Chip,
+  Collapse
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -54,6 +60,7 @@ import voiceAgentService from '../../services/voiceAgentService';
 import { addItem } from '../../store/slices/orderSlice';
 import VoiceAgentSettings from './VoiceAgentSettings';
 import { propertyService } from '../../services/propertyService';
+import VoiceAgentTranscript from './VoiceAgentTranscript';
 
 import styles from './VoiceAgent.module.css';
 
@@ -116,6 +123,10 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
   const microphone = useRef<MediaStreamAudioSourceNode | null>(null);
   const audioDataArray = useRef<Uint8Array | null>(null);
   const animationFrameId = useRef<number | null>(null);
+  
+  // Add state for property search results
+  const [propertyResults, setPropertyResults] = useState<any[]>([]);
+  const [searchParams, setSearchParams] = useState<any>(null);
   
   // Initialize and clean up the agent when the dialog opens/closes
   useEffect(() => {
@@ -212,6 +223,9 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       
       // Initialize the Ultravox session
       const newSession = voiceAgentService.initializeUltravoxSession();
+      
+      // Register tool implementations
+      voiceAgentService.registerToolImplementations();
       
       // Join the call
       voiceAgentService.joinCall(callData.joinUrl);
@@ -1047,6 +1061,123 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     };
   }, []);  // Empty dependency array since we don't need any props/state
   
+  // Add effect for handling property search results
+  useEffect(() => {
+    const handlePropertySearchResults = (event: any) => {
+      try {
+        console.log('🏠 Received property search results event:', event);
+        const { results, search_parameters } = event.detail;
+        
+        // Validate results
+        if (!results || !Array.isArray(results)) {
+          console.error('🏠 Invalid property search results received:', results);
+          return;
+        }
+        
+        console.log('🏠 Setting property results:', results.length, 'properties');
+        console.log('🏠 Setting search parameters:', search_parameters);
+        
+        setPropertyResults(results);
+        setSearchParams(search_parameters);
+        
+        // Add a system message to indicate property results are being displayed
+        dispatch(addTranscript({
+          text: `Here are ${results.length} properties that match your search:`,
+          isFinal: true,
+          speaker: "agent",
+          medium: Medium.TEXT
+        }));
+        
+        console.log('🏠 Property results should now be displayed in the UI');
+      } catch (error) {
+        console.error('🏠 Error handling property search results:', error);
+      }
+    };
+
+    window.addEventListener('propertySearchResults', handlePropertySearchResults);
+    return () => {
+      window.removeEventListener('propertySearchResults', handlePropertySearchResults);
+    };
+  }, [dispatch]);
+  
+  // Add a function to render property cards
+  const renderPropertyCards = () => {
+    if (propertyResults.length === 0) return null;
+
+    return (
+      <Box sx={{ mt: 2, mb: 2 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 2,
+            backgroundColor: '#f5f5f5',
+            borderRadius: 2,
+            maxHeight: '400px',
+            overflowY: 'auto'
+          }}
+        >
+          <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+            Property Search Results
+            {searchParams && (
+              <Chip 
+                label={`${searchParams.location || 'Any location'} ${searchParams.is_rental ? '(Rental)' : '(Sale)'}`} 
+                size="small" 
+                sx={{ ml: 1 }} 
+                color="primary"
+              />
+            )}
+          </Typography>
+          
+          <Grid container spacing={2}>
+            {propertyResults.map((property, index) => (
+              <Grid item xs={12} key={index}>
+                <Card sx={{ display: 'flex', mb: 1 }}>
+                  <CardMedia
+                    component="img"
+                    sx={{ width: 150, height: 120, objectFit: 'cover' }}
+                    image={property.image_url || '/placeholder-property.jpg'}
+                    alt={property.property_type}
+                  />
+                  <CardContent sx={{ flex: '1 0 auto', p: 2 }}>
+                    <Typography variant="subtitle1" component="div" fontWeight="bold">
+                      {property.property_type} in {property.location}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {property.bedrooms} beds • {property.bathrooms} baths • {property.area_display}
+                    </Typography>
+                    <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
+                      {property.price_display}
+                      {property.is_rental && <Typography component="span" variant="caption" sx={{ ml: 1 }}>(Rental)</Typography>}
+                    </Typography>
+                    {property.amenities && (
+                      <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                        {property.amenities}
+                      </Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+      </Box>
+    );
+  };
+
+  // Add a useEffect specifically for checking tool registrations
+  useEffect(() => {
+    if (session) {
+      console.log('🔊 VoiceAgent: Checking tool registrations with session');
+      // Force re-register tools to ensure they're properly set up
+      voiceAgentService.registerToolImplementations();
+      
+      // Log registered tools (if the API exposes this)
+      if (session.hasOwnProperty('toolImplementations')) {
+        console.log('🔊 VoiceAgent: Registered tools:', Object.keys((session as any).toolImplementations || {}));
+      }
+    }
+  }, [session]);
+
   return (
     <Dialog 
       open={open} 
@@ -1161,6 +1292,9 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
                   </Box>
                 )}
               </Box>
+              
+              {/* Render property cards between the transcript and controls */}
+              {renderPropertyCards()}
               
               <Stack direction="row" spacing={3} className={styles.controls} sx={{ mt: 2 }}>
                 <Tooltip title={micMuted ? "Unmute Microphone" : "Mute Microphone"}>

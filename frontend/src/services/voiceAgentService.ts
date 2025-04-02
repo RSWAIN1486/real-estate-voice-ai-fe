@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { UltravoxSession, Medium } from 'ultravox-client';
 import { API_BASE_URL } from '../utils/CONSTANTS';
-import { updateOrderTool, orderCheckoutTool, hangUpTool } from './clientTools';
+import { updateOrderTool, orderCheckoutTool, hangUpTool, propertySearchTool } from './clientTools';
 import { store } from '../store/store';
 
 // Default voice options with preselected female voice
@@ -33,24 +33,20 @@ You are an AI voice agent for a real estate company. Your job is to help custome
 
 Here are some guidelines:
 1. Greet the customer warmly and ask how you can help them find their ideal property
-2. Help them search for properties based on:
+2. When a customer searches for properties, use the "propertySearch" tool with their query
+3. Help them search for properties based on:
    - Location (e.g., Dubai Marina, Palm Jumeirah)
    - Property type (apartment, villa, etc.)
    - Number of bedrooms and bathrooms
    - Price range
    - Rental vs Sale
    - Amenities
-3. Listen carefully to their preferences and search the property database accordingly
-4. Present search results clearly, including key details like:
-   - Property type and location
-   - Number of bedrooms and bathrooms
-   - Price
-   - Area
-   - Available amenities
-5. If no properties match their criteria, suggest alternatives or ask them to modify their search
-6. Be professional, friendly, and helpful
-7. Stay engaged in the conversation and ask if they need to search for other properties
-8. When the customer asks to end the call or hang up:
+4. Listen carefully to their preferences and use the propertySearch tool to find matching properties
+5. After showing search results, help answer questions about specific properties
+6. If no properties match their criteria, suggest alternatives or ask them to modify their search
+7. Be professional, friendly, and helpful
+8. Stay engaged in the conversation and ask if they need to search for other properties
+9. When the customer asks to end the call or hang up:
    - Thank them for their interest
    - Call the "hangUp" tool
    - Wait for confirmation that the call has ended
@@ -58,11 +54,17 @@ Here are some guidelines:
 
 Remember to:
 - Be patient and professional
+- Use the propertySearch tool whenever the user is looking for properties
 - Provide clear, organized property information
 - Help refine searches if initial results don't match preferences
 - Maintain a helpful and knowledgeable demeanor
 
 ## Tool Usage Rules
+- Call "propertySearch" when:
+  - The user asks to find or search for properties
+  - The user specifies property criteria
+  - The user wants to see properties in a specific location
+
 - Call "hangUp" when:
   - The user asks to end the call
   - The user says goodbye or indicates they're done
@@ -153,6 +155,24 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
       temperature: settings.temperature,
       recordingEnabled: settings.enableCallRecording,
       selectedTools: [
+        {
+          temporaryTool: {
+            modelToolName: "propertySearch",
+            description: "Search for properties based on user's criteria",
+            dynamicParameters: [
+              {
+                name: "query",
+                location: "PARAMETER_LOCATION_BODY",
+                schema: {
+                  type: "string",
+                  description: "The search query with the user's property criteria"
+                },
+                required: true
+              }
+            ],
+            client: {}
+          }
+        },
         {
           temporaryTool: {
             modelToolName: "hangUp",
@@ -337,32 +357,28 @@ export const initializeUltravoxSession = () => {
   if (!uvSession) {
     uvSession = new UltravoxSession();
     
-    // Register only the hangUp tool
+    // Register both tools immediately
     uvSession.registerToolImplementation('hangUp', hangUpTool);
+    uvSession.registerToolImplementation('propertySearch', propertySearchTool);
     
-    console.log('Ultravox session initialized with hangUp tool registered');
+    console.log('Ultravox session initialized with hangUp and propertySearch tools registered');
   }
   return uvSession;
 };
 
-export const registerToolImplementations = (
-  session: UltravoxSession, 
-  orderCheckoutCallback: (orderItems: any) => void
-) => {
-  // Register the orderCheckout tool
-  session.registerToolImplementation('orderCheckout', (parameters) => {
-    const { order } = parameters;
-    try {
-      // Parse the order JSON
-      const orderItems = JSON.parse(order);
-      // Call the callback function to handle the checkout
-      orderCheckoutCallback(orderItems);
-      return 'Order has been added to cart and navigating to checkout.';
-    } catch (error) {
-      console.error('Error processing order checkout:', error);
-      return 'There was an error processing your order. Please try again.';
-    }
-  });
+// Register tool implementations for the Ultravox session
+export const registerToolImplementations = () => {
+  if (uvSession) {
+    // Register property search tool
+    uvSession.registerToolImplementation('propertySearch', propertySearchTool);
+    
+    // Register hangUp tool
+    uvSession.registerToolImplementation('hangUp', hangUpTool);
+    
+    console.log('Tool implementations registered with Ultravox session');
+  } else {
+    console.error('Cannot register tool implementations: No active Ultravox session');
+  }
 };
 
 export const joinCall = (joinUrl: string) => {

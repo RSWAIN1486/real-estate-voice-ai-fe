@@ -147,3 +147,118 @@ This approach allows us to leverage the robust voice agent technology while prov
 - Secure API key management
 - Proper error handling without exposing sensitive information
 - Content validation before sending to external services 
+
+## Feature: RAG-based Property Search with DeepInfra API
+
+### Purpose
+
+Implement a Retrieval-Augmented Generation (RAG) system that uses DeepInfra's Llama 3.2 model to understand property search queries and extract structured parameters for property filtering. This implementation replaces the previous basic property search approach with a more sophisticated AI-powered system.
+
+### Components
+
+1. **Backend Endpoint**: A new `/property-search` endpoint in the `voice_agent.py` file that:
+   - Accepts natural language search queries
+   - Uses DeepInfra's API to extract search parameters
+   - Performs structured search on the property database
+   - Returns matching properties as JSON
+
+2. **Frontend Tool Implementation**: 
+   - Add a `propertySearchTool` in `clientTools.ts` that calls the backend endpoint
+   - Register this tool with the Ultravox session
+   - Process the results and display them in the chat window
+
+3. **Voice Agent Integration**:
+   - Update the system prompt to instruct the agent to use the property search tool
+   - Ensure proper handling of property search results
+   - Display property cards in the UI for good user experience
+
+### Technical Design
+
+#### Backend Implementation
+
+1. **RAG Endpoint**:
+   ```python
+   @router.post("/property-search")
+   async def search_properties(request: PropertySearchRequest):
+       # Initialize DeepInfra client
+       # Process query with Llama 3.2 model
+       # Extract search parameters
+       # Search property database
+       # Return results
+   ```
+
+2. **Data Flow**:
+   - User query → Voice Agent → Backend API → DeepInfra Llama 3.2 → Parameter Extraction → Database Search → Results → Frontend Display
+
+3. **Parameter Extraction**:
+   The system extracts the following parameters from natural language queries:
+   - Location
+   - Property type
+   - Number of bedrooms
+   - Number of bathrooms
+   - Price range
+   - Rental vs. Sale
+   - Amenities
+
+#### Frontend Implementation
+
+1. **Property Search Tool**:
+   ```typescript
+   export const propertySearchTool: ClientToolImplementation = async (parameters) => {
+     // Call backend API
+     // Process results
+     // Display in UI
+     // Return summary message
+   };
+   ```
+
+2. **Property Cards UI**:
+   - Display property information in card format
+   - Show key details like price, location, bedrooms, bathrooms
+   - Include amenities and property type
+   - Provide visual distinction between rental and sale properties
+
+3. **Tool Registration**:
+   ```typescript
+   uvSession.registerToolImplementation('propertySearch', propertySearchTool);
+   ```
+
+### Design Considerations
+
+1. **User Experience**:
+   - Voice Agent should provide clear feedback about search results
+   - Property cards should be visually appealing and easy to scan
+   - Agent should be able to answer follow-up questions about properties
+
+2. **Performance**:
+   - DeepInfra API calls optimize for low latency
+   - Property database queries are efficient for quick results
+   - Frontend caches results to avoid redundant searches
+
+3. **Error Handling**:
+   - Handle cases where no properties match the criteria
+   - Provide graceful error messages for API failures
+   - Fall back to simpler search if DeepInfra is unavailable
+
+### Future Enhancements
+
+1. **Search Refinement**: Allow users to refine their search results with follow-up queries
+2. **Property Comparison**: Enable comparing multiple properties side by side
+3. **Saved Searches**: Let users save their property searches for later
+4. **Image Gallery**: Show multiple property images in a gallery view
+5. **Map Integration**: Display property locations on an interactive map
+
+## Integration with Existing System
+
+- The RAG-based search integrates with the existing Ultravox voice agent
+- The system maintains the conversation history for context-aware responses
+- The UI adapts to show property cards within the chat interface
+- The search parameters flow seamlessly from voice input to property results
+
+## Implementation Timeline
+
+1. **Backend RAG Endpoint**: Implement the property search endpoint with DeepInfra integration
+2. **Frontend Tool Implementation**: Create the property search tool in the frontend
+3. **UI Updates**: Design and implement property cards in the voice agent interface
+4. **Testing**: Test various property search queries and refine the system
+5. **Deployment**: Deploy the complete system with the new RAG-based search functionality 
