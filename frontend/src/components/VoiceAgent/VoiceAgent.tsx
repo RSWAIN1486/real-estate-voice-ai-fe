@@ -53,6 +53,7 @@ import { setVoice } from '../../store/slices/voiceAgentSettingsSlice';
 import voiceAgentService from '../../services/voiceAgentService';
 import { addItem } from '../../store/slices/orderSlice';
 import VoiceAgentSettings from './VoiceAgentSettings';
+import { propertyService } from '../../services/propertyService';
 
 import styles from './VoiceAgent.module.css';
 
@@ -273,21 +274,70 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     }
   };
   
-  const handleTranscripts = (event: Event) => {
+  const handleTranscripts = async (event: Event) => {
     if (session) {
       // Get all transcripts from the session
       const ultravoxTranscripts = session.transcripts;
       
       // Process both agent and user transcripts
       if (ultravoxTranscripts.length > 0) {
-        // Clear existing transcripts and rebuild the list to ensure we have both user and agent messages
+        // Get the latest user transcript
+        const latestUserTranscript = [...ultravoxTranscripts]
+          .reverse()
+          .find(transcript => transcript.speaker === 'user' && transcript.isFinal);
+
+        if (latestUserTranscript) {
+          // Check if it's a property search query
+          const query = latestUserTranscript.text.toLowerCase();
+          if (query.includes('show') || query.includes('find') || query.includes('search') || query.includes('list')) {
+            try {
+              // Wait for properties to load if they haven't already
+              await propertyService.waitForProperties();
+              
+              // Search for properties
+              const properties = propertyService.searchProperties(query);
+              
+              // Format the response
+              let response = properties.length > 0 
+                ? "Here are the properties I found:\n\n" 
+                : "I couldn't find any properties matching your criteria. Please try a different search.";
+              
+              if (properties.length > 0) {
+                properties.forEach((property, index) => {
+                  response += `${index + 1}. ${property.property_type} in ${property.location}\n`;
+                  response += `   ${property.bedrooms} bedrooms, ${property.bathrooms} bathrooms\n`;
+                  response += `   ${property.is_rental ? 'For Rent: ' : 'For Sale: '}${property.price_display}\n`;
+                  response += `   Area: ${property.area_display}\n`;
+                  response += `   Amenities: ${property.amenities}\n\n`;
+                });
+              }
+
+              // Add the agent's response
+              dispatch(addTranscript({
+                text: response,
+                isFinal: true,
+                speaker: 'agent',
+                medium: Medium.TEXT
+              }));
+            } catch (error) {
+              console.error('Error searching properties:', error);
+              dispatch(addTranscript({
+                text: "I apologize, but I'm having trouble accessing the property database at the moment. Please try again in a few moments.",
+                isFinal: true,
+                speaker: 'agent',
+                medium: Medium.TEXT
+              }));
+            }
+          }
+        }
+
+        // Clear existing transcripts and rebuild the list
         dispatch(clearTranscripts());
         
-        // First, add all final transcripts
+        // Add all final transcripts
         ultravoxTranscripts
           .filter(transcript => transcript.isFinal)
           .forEach(transcript => {
-            // Convert API medium format to our internal format
             let medium: Medium;
             if (transcript.medium === 'voice') {
               medium = Medium.VOICE;
@@ -1087,7 +1137,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
                 {transcripts.length === 0 ? (
                   <Box className={styles.emptyTranscriptContainer}>
                     <Typography variant="body1" color="textSecondary">
-                      Say something like "I want to order a pizza" to start your order.
+                      Say something like "Show me properties for rent in Dubai Marina" or "Find villas for sale in Palm Jumeirah" to start searching.
                     </Typography>
                   </Box>
                 ) : (
@@ -1100,7 +1150,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
                           transcript.speaker === 'agent' ? styles.agentTranscript : styles.userTranscript
                         }`}
                       >
-                        <Typography variant="body1">
+                        <Typography variant="body1" style={{ whiteSpace: 'pre-line' }}>
                           {transcript.text}
                         </Typography>
                         <Typography variant="caption" color="textSecondary" className={styles.transcriptSpeaker}>

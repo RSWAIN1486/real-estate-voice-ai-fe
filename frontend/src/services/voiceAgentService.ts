@@ -27,83 +27,46 @@ export const DEFAULT_VOICE_OPTIONS: VoiceOption[] = [
   { value: 'alloy', label: 'Alloy', description: 'Neutral English voice (OpenAI)' }
 ];
 
-// Pizza ordering system prompt 
+// System prompt for real estate property search
 export const SYSTEM_PROMPT = `
-You are an AI voice agent for Dontminos Pizza Restaurant. Your job is to help customers place pizza orders.
+You are an AI voice agent for a real estate company. Your job is to help customers find properties based on their preferences.
 
 Here are some guidelines:
-1. Greet the customer with the voice name assigned warmly and ask what they would like to order
-2. Guide them through ordering pizza, sides, drinks, and desserts
-3. Ask for their preferences on pizza size, crust type, and toppings
-4. Suggest popular items or pairings when appropriate
-5. Explain menu items if the customer has questions
-6. Keep track of their order and confirm items
-7. When they're done ordering, ask if they want to proceed to checkout
-8. Be friendly, helpful, and conversational
-9. You are in India and the customer is in India and the currency is INR. However, when you bill the total, say it as "your total bill is X Rupees".
-10. When the customer asks to end the call or hang up, or when you're about to hang up:
-    - Call the "hangUp" tool
-    - Wait for confirmation that the call has ended
-    - Do not start a new conversation after hanging up
+1. Greet the customer warmly and ask how you can help them find their ideal property
+2. Help them search for properties based on:
+   - Location (e.g., Dubai Marina, Palm Jumeirah)
+   - Property type (apartment, villa, etc.)
+   - Number of bedrooms and bathrooms
+   - Price range
+   - Rental vs Sale
+   - Amenities
+3. Listen carefully to their preferences and search the property database accordingly
+4. Present search results clearly, including key details like:
+   - Property type and location
+   - Number of bedrooms and bathrooms
+   - Price
+   - Area
+   - Available amenities
+5. If no properties match their criteria, suggest alternatives or ask them to modify their search
+6. Be professional, friendly, and helpful
+7. Stay engaged in the conversation and ask if they need to search for other properties
+8. When the customer asks to end the call or hang up:
+   - Thank them for their interest
+   - Call the "hangUp" tool
+   - Wait for confirmation that the call has ended
+   - Do not start a new conversation after hanging up
 
-You have access to the following menu information:
-
-Pizza Options:
-- Sizes: Small (8"), Medium (12"), Large (14")
-- Crust Types: Cheese Burst, Classic Hand Tossed, Wheat Thin Crust, Fresh Pan Pizza, New Hand Tossed
-- Veg Toppings: Black Olives, Crisp Capsicum, Paneer, Mushroom, Golden Corn, Fresh Tomato, Jalapeno, Red Pepper, Babycorn, Extra Cheese
-- Non-Veg Toppings: Barbeque Chicken, Hot 'n' Spicy Chicken, Chunky Chicken, Chicken Salami
-
-Popular Veg Pizzas:
-- The 4 Cheese Pizza: Cheese Overloaded pizza with 4 different varieties of cheese
-- Margherita: A hugely popular margherita, with a deliciously tangy single cheese topping
-- Double Cheese Margherita: The ever-popular Margherita - loaded with extra cheese
-- Farm House: A pizza with crunchy capsicum, succulent mushrooms and fresh tomatoes
-- Peppy Paneer: Chunky paneer with crisp capsicum and spicy red pepper
-- Mexican Green Wave: Loaded with crunchy onions, crisp capsicum, juicy tomatoes and jalapeno
-- Deluxe Veggie: Onions, capsicum, mushrooms with paneer and golden corn
-- Veg Extravaganza: Golden corn, black olives, onions, capsicum, mushrooms, tomatoes and jalapeno with extra cheese
-
-Popular Non-Veg Pizzas:
-- Chicken Golden Delight: Barbeque chicken with golden corn and extra cheese
-- Non Veg Supreme: Black olives, onions, mushrooms, pepper BBQ chicken, peri-peri chicken, grilled chicken rashers
-- Chicken Dominator: Double pepper barbecue chicken, peri-peri chicken, chicken tikka & grilled chicken rashers
-- Pepper Barbecue Chicken: Pepper Barbecue Chicken with Cheese
-- Chicken Sausage: Chicken Sausage & Cheese
-- Indi Chicken Tikka: Tandoori masala with Chicken tikka, onion, red paprika & mint mayo
-
-Sides:
-- Garlic Breadsticks: Freshly baked breadsticks with garlic butter and herbs
-- Stuffed Garlic Bread: Freshly baked garlic bread with cheese, onion and herbs
-- Paneer Tikka Stuffed Garlic Bread: Garlic bread with cheese, onion, paneer tikka and herbs
-- Chicken Pepperoni Stuffed Garlic Bread: Garlic bread with chicken pepperoni, cheese and basil parsley
-- Potato Cheese Shots: Crisp and golden outside, flavorful burst of cheese, potato & spice inside
-- Crinkle Fries
-
-Beverages:
-- Pepsi
-- 7Up
-- Mountain Dew
-- Tropicana Orange Juice
-- Bottled Water
-
-Desserts:
-- Lava Cake: Chocolate cake with a gooey molten chocolate center
-- Red Velvet Lava Cake: Rich red velvet cake on a creamy cheese flavoured base
-- Butterscotch Mousse Cake: Butterscotch flavored mousse
-- Brownie Fantasy
+Remember to:
+- Be patient and professional
+- Provide clear, organized property information
+- Help refine searches if initial results don't match preferences
+- Maintain a helpful and knowledgeable demeanor
 
 ## Tool Usage Rules
-- You must call the tool "updateOrder" immediately when:
-  - User confirms an item
-  - User requests item removal
-  - User modifies quantity
-- Call "orderCheckout" when the user wants to finalize their order and proceed to checkout
 - Call "hangUp" when:
   - The user asks to end the call
   - The user says goodbye or indicates they're done
   - You're about to end the call yourself
-- Validate menu items before calling updateOrder
 `;
 
 /**
@@ -196,59 +159,13 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
             description: "End the current call and close the conversation window",
             client: {}
           }
-        },
-        {
-          temporaryTool: {
-            modelToolName: "updateOrder",
-            description: "Update order details. Used any time items are added or removed or when the order is finalized. Call this any time the user updates their order.",
-            dynamicParameters: [
-              {
-                name: "orderDetailsData",
-                location: "PARAMETER_LOCATION_BODY",
-                schema: {
-                  description: "An array of objects contain order items.",
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      name: { type: "string", description: "The name of the item to be added to the order." },
-                      quantity: { type: "number", description: "The quantity of the item for the order." },
-                      specialInstructions: { type: "string", description: "Any special instructions that pertain to the item." },
-                      price: { type: "number", description: "The unit price for the item." }
-                    },
-                    required: ["name", "quantity", "price"]
-                  }
-                },
-                required: true
-              }
-            ],
-            client: {}
-          }
-        },
-        {
-          temporaryTool: {
-            modelToolName: "orderCheckout",
-            description: "Go to checkout with the current order",
-            dynamicParameters: [
-              {
-                name: "order",
-                location: "PARAMETER_LOCATION_BODY",
-                schema: {
-                  type: "string",
-                  description: "JSON string of the order items"
-                },
-                required: true
-              }
-            ],
-            client: {}
-          }
         }
       ],
       // Add inactivity settings to automatically end call after periods of silence
-      inactivity_messages: [
+      inactivityMessages: [
         {
           "duration": "30s",
-          "message": "Are you still there? I can help you place an order or answer questions about our menu."
+          "message": "Are you still there? I can help you find real estate properties that match your preferences."
         },
         {
           "duration": "15s",
@@ -256,7 +173,7 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
         },
         {
           "duration": "10s",
-          "message": "Thank you for calling. Have a great day. Goodbye.",
+          "message": "Thank you for calling Global Estates. Have a great day. Goodbye.",
           "endBehavior": "END_BEHAVIOR_HANG_UP_SOFT"
         }
       ]
@@ -268,65 +185,44 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
         console.log('Using initial messages without priorCallId.');
         
         // Format the messages in a structured way that our backend can parse correctly
-        // Backend expects 'speaker', 'text', and 'type' fields
         const formattedMessages = initialMessages.map(msg => {
-          // Ensure we have all required fields
           if (!msg.text) {
             console.warn('Message missing text:', msg);
             return null;
           }
           
-          // Normalize the speaker value: could be 'speaker' or 'role'
-          let speaker = 'user'; // Default
-          if (msg.speaker) {
-            speaker = msg.speaker === 'agent' || msg.speaker === 'assistant' ? 'assistant' : 'user';
-          } else if (msg.role) {
-            speaker = msg.role === 'ASSISTANT' || msg.role === 'assistant' ? 'assistant' : 'user';
-          }
-          
-          // Normalize the medium/type value
-          let type = 'text'; // Default
-          if (msg.medium) {
-            type = typeof msg.medium === 'string' 
-              ? (msg.medium.toLowerCase() === 'voice' ? 'voice' : 'text')
-              : (msg.medium === Medium.VOICE ? 'voice' : 'text');
-          } else if (msg.type) {
-            type = msg.type.toLowerCase() === 'voice' ? 'voice' : 'text';
-          }
-          
-          // Return a consistently formatted message object
           return {
-            text: msg.text,
-            speaker: speaker,
-            type: type
+            role: msg.speaker === 'agent' ? 'assistant' : 'user',
+            content: msg.text
           };
-        }).filter(Boolean); // Remove any null entries
+        }).filter(Boolean);
         
         if (formattedMessages.length > 0) {
-          payload.initialMessages = formattedMessages;
-          console.log('Sending initialMessages with proper format:', JSON.stringify(formattedMessages));
-        } else {
-          console.warn('No valid initial messages to send');
+          payload.messages = formattedMessages;
+          console.log('Sending messages with proper format:', JSON.stringify(formattedMessages));
         }
       } catch (error) {
-        console.error('Error formatting initialMessages:', error);
-        // Continue without initialMessages if there was an error
-        delete payload.initialMessages;
+        console.error('Error formatting messages:', error);
       }
     }
 
-    // Construct the API endpoint - add priorCallId as a query parameter if provided
-    let endpoint = `${API_BASE_URL}/api/voice-agent/calls`;
-    if (priorCallId) {
-      console.log(`Resuming previous conversation with priorCallId: ${priorCallId} (as query parameter)`);
-      endpoint += `?priorCallId=${encodeURIComponent(priorCallId)}`;
-    }
+    // If priorCallId is provided, add it to the payload
+    // if (priorCallId) {
+    //   payload.priorCallId = priorCallId;
+    // }
 
-    const response = await axios.post(endpoint, payload);
-    
+    // Log the final payload for debugging
+    console.log('Sending payload to create call:', JSON.stringify(payload, null, 2));
+
+    // Make the API call to create a new voice agent call
+    const response = await axios.post(
+      `${API_BASE_URL}/api/voice-agent/calls`,
+      payload
+    );
+
     return response.data;
   } catch (error) {
-    console.error('Error creating Ultravox call:', error);
+    console.error('Error creating voice agent call:', error);
     throw error;
   }
 };
@@ -441,12 +337,10 @@ export const initializeUltravoxSession = () => {
   if (!uvSession) {
     uvSession = new UltravoxSession();
     
-    // Register client tools
-    uvSession.registerToolImplementation('updateOrder', updateOrderTool);
-    uvSession.registerToolImplementation('orderCheckout', orderCheckoutTool);
+    // Register only the hangUp tool
     uvSession.registerToolImplementation('hangUp', hangUpTool);
     
-    console.log('Ultravox session initialized with all tools registered');
+    console.log('Ultravox session initialized with hangUp tool registered');
   }
   return uvSession;
 };
