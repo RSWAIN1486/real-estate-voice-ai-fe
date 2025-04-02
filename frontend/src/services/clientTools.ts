@@ -44,10 +44,14 @@ export const propertySearchTool: ClientToolImplementation = async (parameters) =
     );
     
     // Get the results from the response
-    const { results, total_count, search_parameters } = response.data;
+    const { results, total_count, search_parameters, resolved_location, no_results_reason } = response.data;
     
     console.log(`🏠 PROPERTY SEARCH TOOL: Found ${total_count} properties, showing top ${results.length}`);
     console.log('🏠 PROPERTY SEARCH TOOL: Search parameters:', search_parameters);
+    console.log('🏠 PROPERTY SEARCH TOOL: Resolved location:', resolved_location);
+    if (no_results_reason) {
+      console.log('🏠 PROPERTY SEARCH TOOL: Reason for no exact matches:', no_results_reason);
+    }
     console.log('🏠 PROPERTY SEARCH TOOL: Sample result:', results.length > 0 ? results[0] : 'No results');
     
     // Format the results to be displayed in the chat
@@ -59,15 +63,47 @@ export const propertySearchTool: ClientToolImplementation = async (parameters) =
       window.dispatchEvent(new CustomEvent('propertySearchResults', {
         detail: { 
           results,
-          search_parameters
+          search_parameters,
+          resolved_location,
+          no_results_reason
         }
       }));
       
       // Return a summary message for the voice agent to read
-      return `I found ${total_count} properties matching your criteria. Here are the top ${results.length} matches. I've displayed them in the chat window for you to review.`;
+      let responseMessage = `I found ${total_count} properties matching your criteria.`;
+      
+      // Add location context if resolved
+      if (resolved_location && resolved_location !== search_parameters.location) {
+        responseMessage += ` I identified that ${parameters.query} is in ${resolved_location}.`;
+      }
+      
+      // Add context if we're showing alternative neighborhoods
+      if (no_results_reason && no_results_reason.includes("similar upscale neighborhoods")) {
+        responseMessage = `I couldn't find properties specifically in ${resolved_location}, so I'm showing you options in similar upscale neighborhoods instead. Here are the top ${results.length} matches. I've displayed them in the chat window for you to review.`;
+      } else {
+        responseMessage += ` Here are the top ${results.length} matches. I've displayed them in the chat window for you to review.`;
+      }
+      
+      return responseMessage;
     } else {
       console.log('🏠 PROPERTY SEARCH TOOL: No matching properties found');
-      return "I couldn't find any properties matching your criteria. Could you try with different search parameters?";
+      
+      // Create a more helpful response when no properties are found
+      let notFoundMessage = "I couldn't find any properties matching your exact criteria.";
+      
+      // Add context about why no results were found if available
+      if (no_results_reason) {
+        notFoundMessage = `${no_results_reason}.`;
+      }
+      
+      // Add location context if resolved
+      if (resolved_location) {
+        notFoundMessage += ` I understood that you're looking in ${resolved_location}.`;
+      }
+      
+      notFoundMessage += " Could you try with different search parameters? For example, you could broaden your search to nearby areas or adjust your requirements.";
+      
+      return notFoundMessage;
     }
   } catch (error) {
     console.error('🏠 PROPERTY SEARCH TOOL: Error searching for properties:', error);

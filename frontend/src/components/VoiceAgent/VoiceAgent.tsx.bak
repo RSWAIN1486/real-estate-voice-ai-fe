@@ -62,6 +62,8 @@ import VoiceAgentSettings from './VoiceAgentSettings';
 import { propertyService } from '../../services/propertyService';
 import { AppDispatch } from '../../store/store';
 import styles from './VoiceAgent.module.css';
+import Transcript from '../Transcript/Transcript';
+import { Medium as TranscriptMedium } from '../../types/Transcript';
 
 // Extend Window interface to add our temporary audio stream
 declare global {
@@ -317,6 +319,56 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       
       // Process both agent and user transcripts
       if (ultravoxTranscripts.length > 0) {
+        // Get the latest user transcript
+        const latestUserTranscript = [...ultravoxTranscripts]
+          .reverse()
+          .find(transcript => transcript.speaker === 'user' && transcript.isFinal);
+
+        if (latestUserTranscript) {
+          // Check if it's a property search query
+          const query = latestUserTranscript.text.toLowerCase();
+          if (query.includes('show') || query.includes('find') || query.includes('search') || query.includes('list')) {
+            try {
+              // Wait for properties to load if they haven't already
+              await propertyService.waitForProperties();
+              
+              // Search for properties
+              const properties = propertyService.searchProperties(query);
+              
+              // Format the response
+              let response = properties.length > 0 
+                ? "Here are the properties I found:\n\n" 
+                : "I couldn't find any properties matching your criteria. Please try a different search.";
+              
+              if (properties.length > 0) {
+                properties.forEach((property, index) => {
+                  response += `${index + 1}. ${property.property_type} in ${property.location}\n`;
+                  response += `   ${property.bedrooms} bedrooms, ${property.bathrooms} bathrooms\n`;
+                  response += `   ${property.is_rental ? 'For Rent: ' : 'For Sale: '}${property.price_display}\n`;
+                  response += `   Area: ${property.area_display}\n`;
+                  response += `   Amenities: ${property.amenities}\n\n`;
+                });
+              }
+
+              // Add the agent's response
+              dispatch(addTranscript({
+                text: response,
+                isFinal: true,
+                speaker: 'agent',
+                medium: Medium.TEXT
+              }));
+            } catch (error) {
+              console.error('Error searching properties:', error);
+              dispatch(addTranscript({
+                text: "I apologize, but I'm having trouble accessing the property database at the moment. Please try again in a few moments.",
+                isFinal: true,
+                speaker: 'agent',
+                medium: Medium.TEXT
+              }));
+            }
+          }
+        }
+
         // Clear existing transcripts and rebuild the list
         dispatch(clearTranscripts());
         

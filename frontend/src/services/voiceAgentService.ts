@@ -366,19 +366,32 @@ export const initializeUltravoxSession = () => {
   return uvSession;
 };
 
-// Register tool implementations for the Ultravox session
+// Check if the propertySearchTool is defined
+const hasPropertySearch = typeof propertySearchTool === 'function';
+
+// Register tool implementations with the Ultravox session
 export const registerToolImplementations = () => {
-  if (uvSession) {
-    // Register property search tool
-    uvSession.registerToolImplementation('propertySearch', propertySearchTool);
-    
-    // Register hangUp tool
-    uvSession.registerToolImplementation('hangUp', hangUpTool);
-    
-    console.log('Tool implementations registered with Ultravox session');
-  } else {
-    console.error('Cannot register tool implementations: No active Ultravox session');
+  if (!uvSession) {
+    console.error('Cannot register tools - session is not initialized');
+    return;
   }
+  
+  console.log('Registering tool implementations with Ultravox...');
+  
+  // Register both hangUp and propertySearch tools
+  if (hasPropertySearch) {
+    console.log('Registering propertySearch tool implementation');
+    uvSession.registerToolImplementation('propertySearch', propertySearchTool);
+  } else {
+    console.warn('propertySearch tool not available for registration - check if it exists in clientTools.ts');
+  }
+  
+  console.log('Registering hangUp tool implementation');
+  uvSession.registerToolImplementation('hangUp', hangUpTool);
+  
+  // Log all registered tools
+  const registeredTools = Object.keys((uvSession as any).toolImplementations || {});
+  console.log(`Currently registered tools: ${registeredTools.join(', ')}`);
 };
 
 export const joinCall = (joinUrl: string) => {
