@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { UltravoxSession, Medium } from 'ultravox-client';
 import { API_BASE_URL } from '../utils/CONSTANTS';
-import { updateOrderTool, orderCheckoutTool, hangUpTool, propertySearchTool } from './clientTools';
+import { hangUpTool } from './clientTools';
 import { store } from '../store/store';
 
 // Default voice options with preselected female voice
@@ -29,11 +29,11 @@ export const DEFAULT_VOICE_OPTIONS: VoiceOption[] = [
 
 // System prompt for real estate property search
 export const SYSTEM_PROMPT = `
-You are an AI voice agent for a real estate company. Your job is to help customers find properties based on their preferences.
+You are an AI voice agent for a real estate company. Your job is to help customers find properties based on their preferences using your own knowledge and experience.
 
 Here are some guidelines:
 1. Greet the customer warmly and ask how you can help them find their ideal property
-2. When a customer searches for properties, use the "propertySearch" tool with their query
+2. When a customer searches for properties, use your own knowledge to answer their questions and provide helpful information. You do not have access to a property search tool.
 3. Help them search for properties based on:
    - Location (e.g., Dubai Marina, Palm Jumeirah)
    - Property type (apartment, villa, etc.)
@@ -41,7 +41,7 @@ Here are some guidelines:
    - Price range
    - Rental vs Sale
    - Amenities
-4. Listen carefully to their preferences and use the propertySearch tool to find matching properties
+4. Listen carefully to their preferences and use your own knowledge to suggest matching properties (use dummy data if needed)
 5. After showing search results, help answer questions about specific properties
 6. If no properties match their criteria, suggest alternatives or ask them to modify their search
 7. Be professional, friendly, and helpful
@@ -54,17 +54,11 @@ Here are some guidelines:
 
 Remember to:
 - Be patient and professional
-- Use the propertySearch tool whenever the user is looking for properties
 - Provide clear, organized property information
 - Help refine searches if initial results don't match preferences
 - Maintain a helpful and knowledgeable demeanor
 
 ## Tool Usage Rules
-- Call "propertySearch" when:
-  - The user asks to find or search for properties
-  - The user specifies property criteria
-  - The user wants to see properties in a specific location
-
 - Call "hangUp" when:
   - The user asks to end the call
   - The user says goodbye or indicates they're done
@@ -155,24 +149,6 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
       temperature: settings.temperature,
       recordingEnabled: settings.enableCallRecording,
       selectedTools: [
-        {
-          temporaryTool: {
-            modelToolName: "propertySearch",
-            description: "Search for properties based on user's criteria",
-            dynamicParameters: [
-              {
-                name: "query",
-                location: "PARAMETER_LOCATION_BODY",
-                schema: {
-                  type: "string",
-                  description: "The search query with the user's property criteria"
-                },
-                required: true
-              }
-            ],
-            client: {}
-          }
-        },
         {
           temporaryTool: {
             modelToolName: "hangUp",
@@ -356,40 +332,19 @@ let uvSession: UltravoxSession | null = null;
 export const initializeUltravoxSession = () => {
   if (!uvSession) {
     uvSession = new UltravoxSession();
-    
-    // Register both tools immediately
     uvSession.registerToolImplementation('hangUp', hangUpTool);
-    uvSession.registerToolImplementation('propertySearch', propertySearchTool);
-    
-    console.log('Ultravox session initialized with hangUp and propertySearch tools registered');
+    console.log('Ultravox session initialized with hangUp tool registered');
   }
   return uvSession;
 };
 
-// Check if the propertySearchTool is defined
-const hasPropertySearch = typeof propertySearchTool === 'function';
-
-// Register tool implementations with the Ultravox session
 export const registerToolImplementations = () => {
   if (!uvSession) {
     console.error('Cannot register tools - session is not initialized');
     return;
   }
-  
-  console.log('Registering tool implementations with Ultravox...');
-  
-  // Register both hangUp and propertySearch tools
-  if (hasPropertySearch) {
-    console.log('Registering propertySearch tool implementation');
-    uvSession.registerToolImplementation('propertySearch', propertySearchTool);
-  } else {
-    console.warn('propertySearch tool not available for registration - check if it exists in clientTools.ts');
-  }
-  
-  console.log('Registering hangUp tool implementation');
+  console.log('Registering hangUp tool implementation with Ultravox...');
   uvSession.registerToolImplementation('hangUp', hangUpTool);
-  
-  // Log all registered tools
   const registeredTools = Object.keys((uvSession as any).toolImplementations || {});
   console.log(`Currently registered tools: ${registeredTools.join(', ')}`);
 };

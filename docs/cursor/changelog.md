@@ -38,4 +38,10 @@ Features planned for upcoming releases:
 - Map integration for property locations
 - Advanced filtering options for property search
 - Saved properties functionality
-- User account management for saved preferences 
+- User account management for saved preferences
+
+- Removed property search tool and all related code (frontend and backend)
+- Removed DeepInfra RAG-based property search
+- Added support for Ultravox Agent API via new /agent-calls endpoint in backend
+- Added requirement for ULTRAVOX_AGENT_ID environment variable
+- Updated documentation and README accordingly 

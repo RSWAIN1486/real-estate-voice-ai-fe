@@ -6,15 +6,15 @@ A voice-powered real estate search platform that allows users to search for prop
 
 This project converts a restaurant voice agent into a real estate property search application. It uses a voice-powered AI assistant to help users search for properties across multiple locations and with various criteria.
 
-The frontend is built using React, TypeScript, and Material-UI. The voice agent functionality is powered by Ultravox, and property search leverages DeepInfra's Llama 3.2 model with a Retrieval-Augmented Generation (RAG) approach.
+The frontend is built using React, TypeScript, and Material-UI. The voice agent functionality is powered by Ultravox. Property search is now handled by the agent's pretrained knowledge (no external property search tool or RAG).
 
 ## Key Features
 
 - Modern real estate search interface
 - Voice-powered property search assistant
-- AI-powered property search using RAG and LLM processing
+- AI-powered property search using Ultravox Agent API (pretrained knowledge)
 - Natural language understanding for property search queries
-- Property filtering by location, price, bedrooms, and more
+- Property filtering by location, price, bedrooms, and more (using agent's knowledge)
 - Property results displayed directly in chat interface
 - Responsive design for desktop and mobile devices
 
@@ -38,15 +38,14 @@ The frontend is built using React, TypeScript, and Material-UI. The voice agent 
 │   │   │       └── voiceAgentSlice.ts  # Voice agent state management
 │   │   ├── services/   # API services
 │   │   │   ├── voiceAgentService.ts    # Voice agent service
-│   │   │   ├── propertyService.ts      # Property search service
 │   │   │   └── clientTools.ts          # Tool implementations
 │   │   └── utils/      # Utility functions
 │   ├── public/         # Static assets
 ├── backend/            # Backend API server
 │   ├── routes/         # API routes
-│   │   └── voice_agent.py  # Voice agent routes including property search
+│   │   └── voice_agent.py  # Voice agent routes (now using Ultravox Agent API)
 │   ├── public/         # Public assets
-│   │   └── properties_rows.csv # Property data
+│   │   └── properties_rows.csv # Property data (legacy, not used by agent)
 │   └── ...
 └── docs/              # Documentation files
 ```
@@ -78,12 +77,12 @@ The frontend is built using React, TypeScript, and Material-UI. The voice agent 
 Create a `.env` file in the backend directory with the following:
 
 ```
-# Ultravox API Configuration (for voice agent)
+# Ultravox API Configuration
 ULTRAVOX_API_KEY=your_ultravox_api_key
 ULTRAVOX_BASE_URL=https://api.ultravox.ai
 
-# DeepInfra API Configuration (for RAG-based property search)
-DEEPINFRA_API_KEY=your_deepinfra_api_key
+# Ultravox Agent API Configuration
+ULTRAVOX_AGENT_ID=your_ultravox_agent_id
 ```
 
 ### Running the Application
@@ -111,17 +110,22 @@ The voice agent can understand and process requests like:
 
 ## How It Works
 
-1. When a user speaks to the voice agent asking about properties, the agent recognizes this as a property search query
-2. The agent calls the `propertySearch` tool with the user's query
-3. On the backend, the query is processed by DeepInfra's Llama 3.2 model to extract search parameters
-4. The backend performs a RAG (Retrieval-Augmented Generation) search on the property database
-5. Results are returned to the frontend and displayed in an easy-to-read format
-6. The voice agent can then answer follow-up questions about the properties
+1. When a user speaks to the voice agent asking about properties, the agent uses its own pretrained knowledge to answer the query.
+2. The backend creates a call using the Ultravox Agent API (`/api/agents/{agent_id}/calls`).
+3. The agent responds to property search questions using its built-in knowledge and can provide dummy data as needed.
+4. Results are returned to the frontend and displayed in an easy-to-read format.
+5. The voice agent can then answer follow-up questions about the properties.
 
 ## Technologies Used
 
 - **Frontend**: React, TypeScript, Material-UI, Redux
 - **Backend**: FastAPI, Python
 - **Voice Processing**: Ultravox API
-- **Natural Language Understanding**: DeepInfra Llama 3.2 model
-- **Search**: RAG (Retrieval-Augmented Generation) 
+- **Natural Language Understanding**: Ultravox Agent (pretrained knowledge)
+- **Search**: Ultravox Agent (no external property search tool)
+
+## Backend API Changes
+
+- The `/property-search` endpoint and DeepInfra RAG-based search have been removed.
+- A new endpoint `/agent-calls` is available, which proxies requests to the Ultravox Agent API (`/api/agents/{agent_id}/calls`).
+- You must set `ULTRAVOX_AGENT_ID` in your backend `.env` file. 

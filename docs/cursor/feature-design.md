@@ -262,3 +262,15 @@ Implement a Retrieval-Augmented Generation (RAG) system that uses DeepInfra's Ll
 3. **UI Updates**: Design and implement property cards in the voice agent interface
 4. **Testing**: Test various property search queries and refine the system
 5. **Deployment**: Deploy the complete system with the new RAG-based search functionality 
+
+## Voice Agent Property Search (Current)
+
+- The voice agent now uses the Ultravox Agent API to answer property search questions using its own pretrained knowledge.
+- There is no longer a property search tool or RAG-based backend search.
+- When a user initiates a call, the backend uses the `/agent-calls` endpoint to create a call via Ultravox Agent API (`/api/agents/{agent_id}/calls`).
+- The agent can answer property search questions, provide dummy data, and handle follow-up queries using its built-in knowledge.
+- The environment variable `ULTRAVOX_AGENT_ID` must be set in the backend for this to work.
+
+## Deprecated/Removed
+
+- The property search tool and DeepInfra RAG-based search have been removed from both frontend and backend. 

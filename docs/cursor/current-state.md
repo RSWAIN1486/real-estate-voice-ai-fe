@@ -1,5 +1,21 @@
 # Real Estate Voice Agent - Current State
 
+## Completed
+- Property search now handled by Ultravox Agent's pretrained knowledge (no tool or RAG)
+- /agent-calls endpoint implemented in backend
+- Ultravox Agent API integration complete
+- ULTRAVOX_AGENT_ID env variable required and documented
+
+## Removed/Deprecated
+- Property search tool (frontend and backend)
+- DeepInfra RAG-based property search
+
+## In Progress
+- None (as of this update)
+
+## Planned
+- Further improvements to agent's conversational abilities (future)
+
 ## Tasks Completed
 
 | Feature | Status | Notes |

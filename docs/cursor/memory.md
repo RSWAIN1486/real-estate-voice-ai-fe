@@ -556,4 +556,11 @@ When converting a domain-specific application (like a restaurant ordering system
 3. **Modular CSS**: Component-specific styles helped maintain styling isolation.
 4. **Interface Definitions**: TypeScript interfaces for data structures ensured type safety throughout the application.
 
-These insights will guide future development of the Real Estate Voice Agent and provide valuable guidance for similar domain conversion projects. 
+These insights will guide future development of the Real Estate Voice Agent and provide valuable guidance for similar domain conversion projects.
+
+# Memory / Learnings
+
+- When deprecating a tool or feature (e.g., property search tool, DeepInfra RAG), ensure all references are removed from frontend, backend, environment variables, and documentation.
+- Always update architecture, changelog, feature-design, and current-state docs to reflect major changes.
+- Make minimal changes to avoid breaking unrelated functionality.
+- Clearly document new endpoints, environment variables, and architectural changes. 
