@@ -153,15 +153,27 @@ export const createAgentCallDirect = async (initialMessages?: Array<any>, priorC
     // Determine if we're in development or production
     const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
-    // Choose the appropriate base URL
-    let baseUrl = isDevelopment 
-      ? '/ultravox-api' // Use proxy in development
-      : 'https://api.ultravox.ai'; // Use direct URL in production
+    // Setup URL and headers based on environment
+    let url;
+    let headers: HeadersInit = {
+      'Content-Type': 'application/json'
+    };
     
-    // If priorCallId is provided, use it as a query parameter
-    let url = `${baseUrl}/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
+    if (isDevelopment) {
+      // In development, use the Vite proxy
+      url = `/ultravox-api/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
+      // Add API key to headers in development
+      headers['X-API-Key'] = ULTRAVOX_API_KEY;
+    } else {
+      // In production, use our serverless function
+      url = `/api/ultravox-proxy?url=/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
+      // No need to add X-API-Key as our serverless function will add it
+    }
+    
+    // Add query parameter for priorCallId if provided
     if (priorCallId) {
-      url += `?priorCallId=${priorCallId}`;
+      const separator = url.includes('?') ? '&' : '?';
+      url += `${separator}priorCallId=${priorCallId}`;
     }
 
     // If initialMessages are provided, format and include them
@@ -189,16 +201,13 @@ export const createAgentCallDirect = async (initialMessages?: Array<any>, priorC
     }
 
     // Log the final payload for debugging
-    console.log('Sending payload directly to Ultravox Agent API:', JSON.stringify(payload, null, 2));
+    console.log('Sending payload to Ultravox API via:', isDevelopment ? 'development proxy' : 'serverless function');
     console.log('Using URL:', url);
 
     // Make the API call
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': ULTRAVOX_API_KEY
-      },
+      headers,
       body: JSON.stringify(payload)
     });
 
@@ -211,13 +220,20 @@ export const createAgentCallDirect = async (initialMessages?: Array<any>, priorC
     const data = await response.json();
     
     // Fix the joinUrl if needed
-    if (data.joinUrl && isDevelopment) {
-      // Replace the original Ultravox API URL with our proxy URL in development
-      data.joinUrl = data.joinUrl.replace(
-        'https://api.ultravox.ai', 
-        window.location.origin + '/ultravox-api'
-      );
-      console.log('Modified joinUrl to use proxy:', data.joinUrl);
+    if (data.joinUrl) {
+      if (isDevelopment) {
+        // In development, use the Vite proxy
+        data.joinUrl = data.joinUrl.replace(
+          'https://api.ultravox.ai', 
+          window.location.origin + '/ultravox-api'
+        );
+      } else {
+        // In production, also modify the joinUrl to use our serverless function
+        const originalJoinUrl = new URL(data.joinUrl);
+        const pathWithSearch = originalJoinUrl.pathname + originalJoinUrl.search;
+        data.joinUrl = `${window.location.origin}/api/ultravox-proxy?url=${encodeURIComponent(pathWithSearch)}`;
+      }
+      console.log('Modified joinUrl:', data.joinUrl);
     }
 
     return data;
@@ -251,20 +267,22 @@ export const getCallInfo = async (callId: string) => {
     // Determine if we're in development or production
     const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
-    // Choose the appropriate base URL
-    let baseUrl = isDevelopment 
-      ? '/ultravox-api' // Use proxy in development
-      : 'https://api.ultravox.ai'; // Use direct URL in production
-    
-    // Use the appropriate URL
-    const url = `${baseUrl}/api/calls/${callId}`;
-    console.log('Getting call info from:', url);
-    
-    // Add API key to headers for direct API calls
+    // Choose the appropriate URL
+    let url;
     const headers: HeadersInit = {};
-    if (!isDevelopment) {
+    
+    if (isDevelopment) {
+      // Use proxy in development
+      url = `/ultravox-api/api/calls/${callId}`;
+      // Add API key to headers in development
       headers['X-API-Key'] = ULTRAVOX_API_KEY;
+    } else {
+      // Use serverless function in production
+      url = `/api/ultravox-proxy?url=/api/calls/${callId}`;
+      // No need to add API key as the serverless function will add it
     }
+    
+    console.log('Getting call info from:', url);
     
     const response = await fetch(url, { headers });
     
@@ -401,22 +419,30 @@ export const joinCall = (joinUrl: string) => {
     
     let finalJoinUrl = joinUrl;
     
-    // In production, ensure we're using the direct Ultravox URL
-    if (!isDevelopment && joinUrl.includes('/ultravox-api')) {
-      finalJoinUrl = joinUrl.replace(
-        `${window.location.origin}/ultravox-api`,
-        'https://api.ultravox.ai'
-      );
-      console.log('Modified joinUrl for production:', finalJoinUrl);
-    }
-    
-    // In development, ensure we're using the proxy
+    // For development environment handling
     if (isDevelopment && !joinUrl.includes('/ultravox-api')) {
       finalJoinUrl = joinUrl.replace(
         'https://api.ultravox.ai',
         `${window.location.origin}/ultravox-api`
       );
       console.log('Modified joinUrl for development:', finalJoinUrl);
+    }
+    
+    // For production environment, we need to handle the Ultravox joinUrl special case
+    // In the Ultravox SDK, it actually expects the direct URL to api.ultravox.ai
+    // This is opposite of our other API calls where we use the proxy
+    if (!isDevelopment && joinUrl.includes('/api/ultravox-proxy')) {
+      // Extract the original URL from our proxy URL
+      try {
+        const urlObj = new URL(joinUrl, window.location.origin);
+        const proxyUrlParam = urlObj.searchParams.get('url');
+        if (proxyUrlParam) {
+          finalJoinUrl = `https://api.ultravox.ai${proxyUrlParam}`;
+          console.log('Modified proxy joinUrl for production SDK usage:', finalJoinUrl);
+        }
+      } catch (error) {
+        console.error('Error parsing join URL:', error);
+      }
     }
 
     // Initialize the session if it doesn't exist

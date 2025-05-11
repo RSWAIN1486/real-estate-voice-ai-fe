@@ -118,4 +118,22 @@ Features planned for upcoming releases:
 
 ### Added
 - Added environment detection logic to all Ultravox API calls
-- Added detailed logging for API call URLs and paths for easier debugging 
+- Added detailed logging for API call URLs and paths for easier debugging
+
+## [2023-09-09] - CORS Fix with Serverless Proxy
+
+### Fixed
+- Resolved CORS issues when calling Ultravox API in production by implementing a serverless proxy function
+- Fixed API key authentication issues with direct Ultravox API calls
+- Fixed URL handling for joinCall function to correctly work with the proxy in production
+
+### Added
+- Added serverless function `/api/ultravox-proxy.js` to proxy API calls to Ultravox
+- Added environment detection logic in API calls to use different strategies for dev vs prod
+- Added better error handling and response parsing in the proxy function
+- Added vercel.json for proper configuration of the serverless function
+
+### Changed
+- Updated voiceAgentService.ts to use the serverless proxy in production
+- Modified handling of Ultravox joinUrl to work with the proxy
+- Added documentation about CORS issues and serverless proxy solution 

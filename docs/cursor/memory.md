@@ -603,6 +603,74 @@ const url = `${baseUrl}/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
 3. API keys and authentication need to be handled differently in production vs development
 4. Consider environment-specific configuration for API endpoints
 
+### Issue: CORS Errors When Calling Ultravox API in Production (Date: 2023-09-08)
+
+**Problem:**
+After deploying to Vercel with frontend-only mode, the application encountered CORS errors when trying to make direct API calls to the Ultravox API. The browser was blocking the requests with this error:
+
+```
+Access to fetch at 'https://api.ultravox.ai/api/agents/{agent-id}/calls' from origin 'https://real-estate-voice-ai.vercel.app' has been blocked by CORS policy: Request header field x-api-key is not allowed by Access-Control-Allow-Headers in preflight response.
+```
+
+**Root Cause:**
+The Ultravox API doesn't allow the `X-API-Key` header in cross-origin requests from browser domains. This is a common security measure for APIs that use API keys for authentication.
+
+**Solution:**
+Implemented a serverless function in Vercel to act as a proxy for all Ultravox API calls:
+
+1. Created a serverless function in `/api/ultravox-proxy.js` that forwards requests to the Ultravox API:
+```javascript
+export default async function handler(req, res) {
+  const { url } = req.query;
+  const API_KEY = process.env.VITE_ULTRAVOX_API_KEY;
+  
+  const targetUrl = `https://api.ultravox.ai${url}`;
+  const response = await fetch(targetUrl, {
+    method: req.method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Key': API_KEY
+    },
+    body: req.method !== 'GET' && req.body ? JSON.stringify(req.body) : undefined
+  });
+  
+  // Return the proxied response...
+}
+```
+
+2. Updated the `voiceAgentService.ts` to use different endpoints based on the environment:
+```typescript
+// For development (local)
+if (isDevelopment) {
+  url = `/ultravox-api/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
+  headers['X-API-Key'] = ULTRAVOX_API_KEY;
+} else {
+  // For production (Vercel)
+  url = `/api/ultravox-proxy?url=/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
+  // No need to add X-API-Key as the serverless function adds it
+}
+```
+
+3. Created a `vercel.json` configuration file to ensure proper routing:
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
+```
+
+**Lessons Learned:**
+1. Browser security restrictions (CORS) prevent sending API keys in headers for cross-origin requests
+2. Serverless functions provide a clean way to proxy API requests without exposing API keys to the client
+3. When working with third-party APIs in frontend-only applications, always plan for a server-side proxy
+4. Different environments (development vs. production) often require different API access strategies
+
 # Real Estate Voice Agent - Lessons Learned
 
 ## UI Conversion Strategy 
