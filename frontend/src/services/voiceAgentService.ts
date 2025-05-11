@@ -1,8 +1,12 @@
 import axios from 'axios';
 import { UltravoxSession, Medium } from 'ultravox-client';
-import { API_BASE_URL } from '../utils/CONSTANTS';
+import { ULTRAVOX_BASE_URL, FRONTEND_ONLY_MODE } from '../utils/CONSTANTS';
 import { hangUpTool } from './clientTools';
 import { store } from '../store/store';
+
+// Add these environment variables at the top of the file
+const ULTRAVOX_API_KEY = import.meta.env.VITE_ULTRAVOX_API_KEY;
+const ULTRAVOX_AGENT_ID = import.meta.env.VITE_ULTRAVOX_AGENT_ID;
 
 // Default voice options with preselected female voice
 export const DEFAULT_VOICE_ID = 'Emily-English'; // Default to Emily-English
@@ -71,25 +75,10 @@ Remember to:
 export const fetchAvailableVoices = async (): Promise<VoiceOption[]> => {
   try {
     console.log("Fetching available voices...");
-    const response = await axios.get(
-      `${API_BASE_URL}/api/voice-agent/voices`
-    );
     
-    console.log("Voice API response:", response.data);
-    
-    if (response.data && response.data.results && Array.isArray(response.data.results)) {
-      // Transform the voice data into options format
-      const voiceOptions = response.data.results.map((voice: any) => ({
-        value: voice.voiceId,
-        label: voice.name,
-        description: voice.description
-      }));
-      
-      console.log("Transformed voice options:", voiceOptions);
-      return voiceOptions;
-    }
-    
-    console.log("Using DEFAULT_VOICE_OPTIONS as fallback");
+    // In frontend-only mode, just return the default voices
+    // since we don't have direct access to the Ultravox voices API
+    console.log("Using DEFAULT_VOICE_OPTIONS in frontend-only mode");
     return DEFAULT_VOICE_OPTIONS;
   } catch (error) {
     console.error('Error fetching available voices:', error);
@@ -125,15 +114,18 @@ export const getVoiceModel = () => {
 };
 
 /**
- * Create a new call to the Ultravox API via our backend proxy
+ * Create a new call directly to the Ultravox Agent API without using our backend
  * @param initialMessages Optional array of previous conversation messages to provide context
  * @param priorCallId Optional ID of a previous call to resume
  */
-export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCallId?: string) => {
+export const createAgentCallDirect = async (initialMessages?: Array<any>, priorCallId?: string) => {
   try {
+    // Check if API key and agent ID are available
+    if (!ULTRAVOX_API_KEY || !ULTRAVOX_AGENT_ID) {
+      throw new Error('Ultravox API key or agent ID not configured. Please set VITE_ULTRAVOX_API_KEY and VITE_ULTRAVOX_AGENT_ID in your environment.');
+    }
+
     // Get settings from Redux store
-    const systemPrompt = getSystemPrompt();
-    const voiceModel = getVoiceModel();
     const state = store.getState();
     const settings = state.voiceAgentSettings;
 
@@ -143,44 +135,30 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
 
     // Prepare the request payload
     const payload: any = {
-      model: voiceModel,
-      voice: voice,
-      systemPrompt: systemPrompt,
-      temperature: settings.temperature,
+      templateContext: {},
+      initialOutputMedium: "MESSAGE_MEDIUM_VOICE",
       recordingEnabled: settings.enableCallRecording,
-      selectedTools: [
-        {
-          temporaryTool: {
-            modelToolName: "hangUp",
-            description: "End the current call and close the conversation window",
-            client: {}
-          }
+      medium: {
+        webRtc: {}
+      },
+      firstSpeakerSettings: {
+        agent: {
+          text: "Hello, I'm your real estate assistant. How can I help you find your ideal property today?",
+          uninterruptible: true
         }
-      ],
-      // Add inactivity settings to automatically end call after periods of silence
-      inactivityMessages: [
-        {
-          "duration": "30s",
-          "message": "Are you still there? I can help you find real estate properties that match your preferences."
-        },
-        {
-          "duration": "15s",
-          "message": "If there's nothing else you need at the moment, I'll end this call."
-        },
-        {
-          "duration": "10s",
-          "message": "Thank you for calling Global Estates. Have a great day. Goodbye.",
-          "endBehavior": "END_BEHAVIOR_HANG_UP_SOFT"
-        }
-      ]
+      }
     };
 
-    // If priorCallId is NOT provided but initialMessages are, use the formatted messages
-    if (!priorCallId && initialMessages && initialMessages.length > 0) {
+    // If priorCallId is provided, use it as a query parameter
+    // Use the Vite proxy path instead of direct Ultravox URL to avoid CORS issues
+    let url = `/ultravox-api/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
+    if (priorCallId) {
+      url += `?priorCallId=${priorCallId}`;
+    }
+
+    // If initialMessages are provided, format and include them
+    if (initialMessages && initialMessages.length > 0 && !priorCallId) {
       try {
-        console.log('Using initial messages without priorCallId.');
-        
-        // Format the messages in a structured way that our backend can parse correctly
         const formattedMessages = initialMessages.map(msg => {
           if (!msg.text) {
             console.warn('Message missing text:', msg);
@@ -188,35 +166,68 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
           }
           
           return {
-            role: msg.speaker === 'agent' ? 'assistant' : 'user',
-            content: msg.text
+            role: msg.speaker === 'agent' ? 'MESSAGE_ROLE_AGENT' : 'MESSAGE_ROLE_USER',
+            text: msg.text,
+            medium: msg.medium === 'voice' ? 'MESSAGE_MEDIUM_VOICE' : 'MESSAGE_MEDIUM_TEXT'
           };
         }).filter(Boolean);
         
         if (formattedMessages.length > 0) {
-          payload.messages = formattedMessages;
-          console.log('Sending messages with proper format:', JSON.stringify(formattedMessages));
+          payload.initialMessages = formattedMessages;
         }
       } catch (error) {
         console.error('Error formatting messages:', error);
       }
     }
 
-    // If priorCallId is provided, add it to the payload
-    // if (priorCallId) {
-    //   payload.priorCallId = priorCallId;
-    // }
-
     // Log the final payload for debugging
-    console.log('Sending payload to create call:', JSON.stringify(payload, null, 2));
+    console.log('Sending payload directly to Ultravox Agent API via proxy:', JSON.stringify(payload, null, 2));
 
-    // Make the API call to create a new voice agent call
-    const response = await axios.post(
-      `${API_BASE_URL}/api/voice-agent/calls`,
-      payload
-    );
+    // Make the API call through our Vite proxy
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': ULTRAVOX_API_KEY
+      },
+      body: JSON.stringify(payload)
+    });
 
-    return response.data;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Ultravox API error (${response.status}): ${errorText}`);
+    }
+
+    // Get the response data
+    const data = await response.json();
+    
+    // Fix the joinUrl to use the proxy as well
+    if (data.joinUrl) {
+      // Replace the original Ultravox API URL with our proxy URL
+      data.joinUrl = data.joinUrl.replace(
+        'https://api.ultravox.ai', 
+        window.location.origin + '/ultravox-api'
+      );
+      console.log('Modified joinUrl to use proxy:', data.joinUrl);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error creating voice agent call directly:', error);
+    throw error;
+  }
+};
+
+/**
+ * Create a new call to the Ultravox API directly
+ * @param initialMessages Optional array of previous conversation messages to provide context
+ * @param priorCallId Optional ID of a previous call to resume
+ */
+export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCallId?: string) => {
+  try {
+    // Always use direct API call in frontend-only mode
+    console.log('Using frontend-only mode: calling Ultravox Agent API directly');
+    return await createAgentCallDirect(initialMessages, priorCallId);
   } catch (error) {
     console.error('Error creating voice agent call:', error);
     throw error;
@@ -224,15 +235,19 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
 };
 
 /**
- * Get call information from the Ultravox API via our backend proxy
+ * Get call information from the Ultravox API directly
  */
 export const getCallInfo = async (callId: string) => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/voice-agent/calls/${callId}`
-    );
+    // Use the Vite proxy to avoid CORS issues
+    const response = await fetch(`/ultravox-api/api/calls/${callId}`);
     
-    return response.data;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Ultravox API error (${response.status}): ${errorText}`);
+    }
+    
+    return await response.json();
   } catch (error) {
     console.error('Error getting call info:', error);
     throw error;
@@ -355,6 +370,16 @@ export const joinCall = (joinUrl: string) => {
     if (!uvSession) {
       console.log('No session found, initializing new Ultravox session');
       uvSession = initializeUltravoxSession();
+    }
+    
+    // If we're in frontend-only mode, ensure the URL uses the original Ultravox domain
+    // because the Ultravox SDK expects the real domain, not our proxy
+    if (FRONTEND_ONLY_MODE && joinUrl.includes('/ultravox-api')) {
+      joinUrl = joinUrl.replace(
+        window.location.origin + '/ultravox-api', 
+        'https://api.ultravox.ai'
+      );
+      console.log('Modified joinUrl to use original domain for SDK:', joinUrl);
     }
     
     uvSession.joinCall(joinUrl);

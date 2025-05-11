@@ -14,6 +14,14 @@ export default defineConfig({
   server: {
     host: true, // Listen on all addresses
     port: PORT,
-    strictPort: true // Fail if port is already in use
+    strictPort: true, // Fail if port is already in use
+    proxy: {
+      // Proxy all requests to the Ultravox API
+      '/ultravox-api': {
+        target: 'https://api.ultravox.ai',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ultravox-api/, '')
+      }
+    }
   }
 });

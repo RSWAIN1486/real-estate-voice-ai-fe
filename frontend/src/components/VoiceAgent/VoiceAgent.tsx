@@ -53,7 +53,7 @@ import {
   clearTranscripts, 
   setError,
   resetAgent,
-  VoiceAgentStatus
+  VoiceAgentStatus as VoiceAgentStatusEnum
 } from '../../store/slices/voiceAgentSlice';
 import { setVoice } from '../../store/slices/voiceAgentSettingsSlice';
 import voiceAgentService from '../../services/voiceAgentService';
@@ -62,6 +62,7 @@ import VoiceAgentSettings from './VoiceAgentSettings';
 import { propertyService } from '../../services/propertyService';
 import { AppDispatch } from '../../store/store';
 import styles from './VoiceAgent.module.css';
+import VoiceAgentStatus from './VoiceAgentStatus';
 
 // Extend Window interface to add our temporary audio stream
 declare global {
@@ -176,13 +177,13 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       }
     } else {
       // Clean up if the dialog closes
-      if (status === VoiceAgentStatus.ACTIVE) {
+      if (status === VoiceAgentStatusEnum.ACTIVE) {
         handleEndCall();
       }
     }
     
     return () => {
-      if (status === VoiceAgentStatus.ACTIVE) {
+      if (status === VoiceAgentStatusEnum.ACTIVE) {
         handleEndCall();
       }
     };
@@ -192,7 +193,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     try {
       setIsInitializing(true);
       dispatch(setError(null));
-      dispatch(setStatus(VoiceAgentStatus.INITIALIZING));
+      dispatch(setStatus(VoiceAgentStatusEnum.INITIALIZING));
       
       // Request microphone permissions explicitly
       try {
@@ -281,29 +282,29 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
   const handleSessionStatus = (event: Event) => {
     if (session) {
       // Map Ultravox session status to our VoiceAgentStatus
-      let agentStatus: VoiceAgentStatus;
+      let agentStatus: VoiceAgentStatusEnum;
       
       // Use string comparison since the types might not match exactly
       const status = String(session.status);
       
       switch (status) {
         case 'connecting':
-          agentStatus = VoiceAgentStatus.CONNECTING;
+          agentStatus = VoiceAgentStatusEnum.CONNECTING;
           break;
         case 'connected':
-          agentStatus = VoiceAgentStatus.CONNECTED;
+          agentStatus = VoiceAgentStatusEnum.CONNECTED;
           break;
         case 'active':
-          agentStatus = VoiceAgentStatus.ACTIVE;
+          agentStatus = VoiceAgentStatusEnum.ACTIVE;
           break;
         case 'error':
-          agentStatus = VoiceAgentStatus.ERROR;
+          agentStatus = VoiceAgentStatusEnum.ERROR;
           break;
         case 'disconnected':
-          agentStatus = VoiceAgentStatus.DISCONNECTED;
+          agentStatus = VoiceAgentStatusEnum.DISCONNECTED;
           break;
         default:
-          agentStatus = VoiceAgentStatus.IDLE;
+          agentStatus = VoiceAgentStatusEnum.IDLE;
       }
       
       dispatch(setStatus(agentStatus));
@@ -397,10 +398,10 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
   };
   
   const handleEndCall = async () => {
-    if (status === VoiceAgentStatus.ACTIVE || status === VoiceAgentStatus.CONNECTED) {
+    if (status === VoiceAgentStatusEnum.ACTIVE || status === VoiceAgentStatusEnum.CONNECTED) {
       try {
         console.log('Ending active call');
-        setStatus(VoiceAgentStatus.ENDING);
+        setStatus(VoiceAgentStatusEnum.ENDING);
         
         // Get the call ID from Redux
         const currentState = store.getState();
@@ -434,7 +435,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
         }
       } finally {
         // Always reset the Redux state
-        dispatch(setStatus(VoiceAgentStatus.IDLE));
+        dispatch(setStatus(VoiceAgentStatusEnum.IDLE));
         dispatch(setActive(false));
       }
     } else {
@@ -507,15 +508,15 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
   
   const renderStatusMessage = () => {
     switch (status) {
-      case VoiceAgentStatus.INITIALIZING:
+      case VoiceAgentStatusEnum.INITIALIZING:
         return 'Initializing...';
-      case VoiceAgentStatus.CONNECTING:
+      case VoiceAgentStatusEnum.CONNECTING:
         return 'Connecting...';
-      case VoiceAgentStatus.CONNECTED:
+      case VoiceAgentStatusEnum.CONNECTED:
         return 'Connected';
-      case VoiceAgentStatus.DISCONNECTED:
+      case VoiceAgentStatusEnum.DISCONNECTED:
         return 'Disconnected';
-      case VoiceAgentStatus.ERROR:
+      case VoiceAgentStatusEnum.ERROR:
         return 'Error';
       default:
         return 'Waiting for your voice...';
@@ -555,8 +556,8 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       const currentCallId = currentState.voiceAgent.callId;
       
       // First check if there's an active call based on redux state
-      if (status === VoiceAgentStatus.ACTIVE || 
-          status === VoiceAgentStatus.CONNECTED || 
+      if (status === VoiceAgentStatusEnum.ACTIVE || 
+          status === VoiceAgentStatusEnum.CONNECTED || 
           currentCallId) {
         console.log('Active call detected, ending call before closing dialog');
         
@@ -578,7 +579,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       }
       
       // Reset the Redux state to ensure clean slate
-      dispatch(setStatus(VoiceAgentStatus.IDLE));
+      dispatch(setStatus(VoiceAgentStatusEnum.IDLE));
       dispatch(setActive(false));
       
       // Clean up audio resources regardless of call status
@@ -772,7 +773,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
    * Reset the conversation - clears transcripts and starts a new call
    */
   const handleResetConversation = async () => {
-    if (status === VoiceAgentStatus.ACTIVE) {
+    if (status === VoiceAgentStatusEnum.ACTIVE) {
       // End the current call
       await handleEndCall();
     }
@@ -798,7 +799,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
         console.log(`🔊🔊 EXIT CALL: Terminating call ${callId}`);
         
         // First, make sure we're in the right state for proper cleanup
-        dispatch(setStatus(VoiceAgentStatus.ENDING));
+        dispatch(setStatus(VoiceAgentStatusEnum.ENDING));
         
         // Use the SDK method directly to ensure immediate hanging up
         if (session) {
@@ -850,7 +851,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       console.error('🔊🔊 EXIT CALL: Top-level error in handleExitCall:', error);
     } finally {
       // Always reset the Redux state
-      dispatch(setStatus(VoiceAgentStatus.IDLE));
+      dispatch(setStatus(VoiceAgentStatusEnum.IDLE));
       dispatch(setActive(false));
       console.log('🔊🔊 EXIT CALL: Redux state reset to IDLE');
       
@@ -912,7 +913,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
         }
         
         // Ensure Redux state is reset
-        dispatch(setStatus(VoiceAgentStatus.IDLE));
+        dispatch(setStatus(VoiceAgentStatusEnum.IDLE));
         dispatch(setActive(false));
         
       } catch (error) {
@@ -1100,7 +1101,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
 
   // When transcripts change, update saved transcripts
   // Fix voiceQuality reference
-  const audioQuality = status === VoiceAgentStatus.ACTIVE ? "High" : "Standard";
+  const audioQuality = status === VoiceAgentStatusEnum.ACTIVE ? "High" : "Standard";
 
   return (
     <Dialog 
@@ -1149,142 +1150,144 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       
       <DialogContent className={styles.dialogContent}>
         {activeTab === 0 ? (
-          // Voice Agent Tab
-          isInitializing ? (
-            <Box className={styles.loadingContainer}>
-              <CircularProgress />
-              <Typography variant="body1" sx={{ mt: 2 }}>
-                Initializing voice agent...
-              </Typography>
-            </Box>
-          ) : error ? (
-            <Box className={styles.errorContainer}>
-              <Typography variant="body1" color="error">
-                {error}
-              </Typography>
-              {error?.includes('microphone') || error?.includes('Microphone') ? (
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  onClick={requestMicrophoneAccess}
-                  sx={{ mt: 2 }}
-                >
-                  Grant Microphone Access
-                </Button>
-              ) : (
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    initializeAgent();
-                  }}
-                  sx={{ mt: 2 }}
-                >
-                  Retry
-                </Button>
-              )}
-            </Box>
-          ) : (
-            // Main voice agent interface
-            <>
-              <Box className={styles.transcriptContainer}>
-                {transcripts.length === 0 ? (
-                  <Box className={styles.emptyTranscriptContainer}>
-                    <Typography variant="body1" color="textSecondary">
-                      Say something like "Show me properties for rent in Dubai Marina" or "Find villas for sale in Palm Jumeirah" to start searching.
-                    </Typography>
-                  </Box>
+          <>
+            {import.meta.env.DEV && <VoiceAgentStatus />}
+            
+            {isInitializing ? (
+              <Box className={styles.loadingContainer}>
+                <CircularProgress />
+                <Typography variant="body1" sx={{ mt: 2 }}>
+                  Initializing voice agent...
+                </Typography>
+              </Box>
+            ) : error ? (
+              <Box className={styles.errorContainer}>
+                <Typography variant="body1" color="error">
+                  {error}
+                </Typography>
+                {error?.includes('microphone') || error?.includes('Microphone') ? (
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={requestMicrophoneAccess}
+                    sx={{ mt: 2 }}
+                  >
+                    Grant Microphone Access
+                  </Button>
                 ) : (
-                  <Box className={styles.transcriptList}>
-                    {transcripts.map((transcript, index) => (
-                      <Paper
-                        key={index}
-                        elevation={1}
-                        className={`${styles.transcriptItem} ${
-                          transcript.speaker === 'agent' ? styles.agentTranscript : styles.userTranscript
-                        }`}
-                      >
-                        <Typography variant="body1" style={{ whiteSpace: 'pre-line' }}>
-                          {transcript.text}
-                        </Typography>
-                        <Typography variant="caption" color="textSecondary" className={styles.transcriptSpeaker}>
-                          {transcript.speaker === 'agent' ? 'Alice' : 'You'}
-                        </Typography>
-                      </Paper>
-                    ))}
-                  </Box>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      initializeAgent();
+                    }}
+                    sx={{ mt: 2 }}
+                  >
+                    Retry
+                  </Button>
                 )}
               </Box>
-              
-              <Stack direction="row" spacing={3} className={styles.controls} sx={{ mt: 2 }}>
-                <Tooltip title={micMuted ? "Unmute Microphone" : "Mute Microphone"}>
-                  <Fab 
-                    color={micMuted ? "default" : "primary"} 
-                    size="medium" 
-                    onClick={handleMicToggle}
-                    className={styles.controlButton}
-                    sx={{
-                      position: 'relative',
-                      ...(audioLevel > 5 && !micMuted ? {
-                        '&::after': {
-                          content: '""',
-                          position: 'absolute',
-                          top: -4,
-                          right: -4,
-                          bottom: -4,
-                          left: -4,
-                          borderRadius: '50%',
-                          border: '2px solid',
-                          borderColor: 'primary.main',
-                          opacity: audioLevel / 200 + 0.5,
-                          animation: 'pulse 1.5s infinite',
-                        }
-                      } : {})
-                    }}
-                  >
-                    {micMuted ? <MicOffIcon /> : <MicIcon />}
-                  </Fab>
-                </Tooltip>
+            ) : (
+              <>
+                <Box className={styles.transcriptContainer}>
+                  {transcripts.length === 0 ? (
+                    <Box className={styles.emptyTranscriptContainer}>
+                      <Typography variant="body1" color="textSecondary">
+                        Say something like "Show me properties for rent in Dubai Marina" or "Find villas for sale in Palm Jumeirah" to start searching.
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Box className={styles.transcriptList}>
+                      {transcripts.map((transcript, index) => (
+                        <Paper
+                          key={index}
+                          elevation={1}
+                          className={`${styles.transcriptItem} ${
+                            transcript.speaker === 'agent' ? styles.agentTranscript : styles.userTranscript
+                          }`}
+                        >
+                          <Typography variant="body1" style={{ whiteSpace: 'pre-line' }}>
+                            {transcript.text}
+                          </Typography>
+                          <Typography variant="caption" color="textSecondary" className={styles.transcriptSpeaker}>
+                            {transcript.speaker === 'agent' ? 'Alice' : 'You'}
+                          </Typography>
+                        </Paper>
+                      ))}
+                    </Box>
+                  )}
+                </Box>
                 
-                <Tooltip title={speakerMuted ? "Unmute Speaker" : "Mute Speaker"}>
-                  <Fab 
-                    color={speakerMuted ? "default" : "primary"} 
-                    size="medium" 
-                    onClick={handleSpeakerToggle}
-                    className={styles.controlButton}
+                <Stack direction="row" spacing={3} className={styles.controls} sx={{ mt: 2 }}>
+                  <Tooltip title={micMuted ? "Unmute Microphone" : "Mute Microphone"}>
+                    <Fab 
+                      color={micMuted ? "default" : "primary"} 
+                      size="medium" 
+                      onClick={handleMicToggle}
+                      className={styles.controlButton}
+                      sx={{
+                        position: 'relative',
+                        ...(audioLevel > 5 && !micMuted ? {
+                          '&::after': {
+                            content: '""',
+                            position: 'absolute',
+                            top: -4,
+                            right: -4,
+                            bottom: -4,
+                            left: -4,
+                            borderRadius: '50%',
+                            border: '2px solid',
+                            borderColor: 'primary.main',
+                            opacity: audioLevel / 200 + 0.5,
+                            animation: 'pulse 1.5s infinite',
+                          }
+                        } : {})
+                      }}
+                    >
+                      {micMuted ? <MicOffIcon /> : <MicIcon />}
+                    </Fab>
+                  </Tooltip>
+                  
+                  <Tooltip title={speakerMuted ? "Unmute Speaker" : "Mute Speaker"}>
+                    <Fab 
+                      color={speakerMuted ? "default" : "primary"} 
+                      size="medium" 
+                      onClick={handleSpeakerToggle}
+                      className={styles.controlButton}
+                    >
+                      {speakerMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+                    </Fab>
+                  </Tooltip>
+                </Stack>
+
+                <Box mt={2} display="flex" justifyContent="space-between" className={styles.conversationControls}>
+                  <Button 
+                    startIcon={<RestartIcon />}
+                    onClick={handleResetConversation}
+                    className={styles.actionButton}
+                    variant="outlined"
+                    size="small"
                   >
-                    {speakerMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
-                  </Fab>
-                </Tooltip>
-              </Stack>
+                    Reset Conversation
+                  </Button>
+                  
+                  <Button 
+                    variant="outlined" 
+                    color="error"
+                    startIcon={<ExitIcon />}
+                    onClick={handleExitCall}
+                    className={`${styles.actionButton} ${styles.exitButton}`}
+                    size="small"
+                  >
+                    Exit Call
+                  </Button>
+                </Box>
 
-              <Box mt={2} display="flex" justifyContent="space-between" className={styles.conversationControls}>
-                <Button 
-                  startIcon={<RestartIcon />}
-                  onClick={handleResetConversation}
-                  className={styles.actionButton}
-                  variant="outlined"
-                  size="small"
-                >
-                  Reset Conversation
-                </Button>
-                
-                <Button 
-                  variant="outlined" 
-                  color="error"
-                  startIcon={<ExitIcon />}
-                  onClick={handleExitCall}
-                  className={`${styles.actionButton} ${styles.exitButton}`}
-                  size="small"
-                >
-                  Exit Call
-                </Button>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-            </>
-          )
+                <Divider sx={{ my: 2 }} />
+              </>
+            )}
+          </>
         ) : (
           // Settings Tab
           <VoiceAgentSettings open={true} onClose={() => setActiveTab(0)} />

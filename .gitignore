@@ -39,3 +39,5 @@ build/
 *.egg-info/ 
 
 real-estate-voiceagent-main/
+
+backend/

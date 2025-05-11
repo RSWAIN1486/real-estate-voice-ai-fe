@@ -2,7 +2,6 @@ import { ClientToolImplementation } from 'ultravox-client';
 import { store } from '../store/store';
 import { addItem } from '../store/slices/orderSlice';
 import axios from 'axios';
-import { API_BASE_URL } from '../utils/CONSTANTS';
 
 export const hangUpTool = async () => {
   console.log('🔊🔊 HANGUP TOOL: Hangup tool called by agent');

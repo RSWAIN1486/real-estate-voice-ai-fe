@@ -4,9 +4,9 @@ A voice-powered real estate search platform that allows users to search for prop
 
 ## Project Overview
 
-This project converts a restaurant voice agent into a real estate property search application. It uses a voice-powered AI assistant to help users search for properties across multiple locations and with various criteria.
+This project provides a real estate property search application with a voice-powered AI assistant to help users search for properties across multiple locations and with various criteria.
 
-The frontend is built using React, TypeScript, and Material-UI. The voice agent functionality is powered by Ultravox. Property search is now handled by the agent's pretrained knowledge (no external property search tool or RAG).
+The frontend is built using React, TypeScript, and Material-UI. The voice agent functionality is powered by Ultravox. Property search is handled by the agent's pretrained knowledge (no external property search tool or RAG).
 
 ## Key Features
 
@@ -17,6 +17,7 @@ The frontend is built using React, TypeScript, and Material-UI. The voice agent 
 - Property filtering by location, price, bedrooms, and more (using agent's knowledge)
 - Property results displayed directly in chat interface
 - Responsive design for desktop and mobile devices
+- Frontend-only mode for easy deployment without a backend server
 
 ## Project Structure
 
@@ -41,12 +42,6 @@ The frontend is built using React, TypeScript, and Material-UI. The voice agent 
 │   │   │   └── clientTools.ts          # Tool implementations
 │   │   └── utils/      # Utility functions
 │   ├── public/         # Static assets
-├── backend/            # Backend API server
-│   ├── routes/         # API routes
-│   │   └── voice_agent.py  # Voice agent routes (now using Ultravox Agent API)
-│   ├── public/         # Public assets
-│   │   └── properties_rows.csv # Property data (legacy, not used by agent)
-│   └── ...
 └── docs/              # Documentation files
 ```
 
@@ -55,7 +50,6 @@ The frontend is built using React, TypeScript, and Material-UI. The voice agent 
 ### Prerequisites
 
 - Node.js (v14 or later)
-- Python (v3.8 or later)
 - npm or yarn
 
 ### Installation
@@ -66,37 +60,43 @@ The frontend is built using React, TypeScript, and Material-UI. The voice agent 
    cd frontend
    npm install
    ```
-3. Install backend dependencies:
-   ```
-   cd backend
-   pip install -r requirements.txt
-   ```
 
 ### Configuration
 
-Create a `.env` file in the backend directory with the following:
+Create or update the `.env` file in the frontend directory with:
 
 ```
 # Ultravox API Configuration
-ULTRAVOX_API_KEY=your_ultravox_api_key
-ULTRAVOX_BASE_URL=https://api.ultravox.ai
+VITE_ULTRAVOX_API_KEY=your_ultravox_api_key
+VITE_ULTRAVOX_API_URL=https://api.ultravox.ai
+VITE_ULTRAVOX_VOICE_ID=Emily-English
+VITE_ULTRAVOX_AGENT_ID=your_ultravox_agent_id
 
-# Ultravox Agent API Configuration
-ULTRAVOX_AGENT_ID=your_ultravox_agent_id
+# Voice Agent Configuration
+VITE_DEFAULT_LANGUAGE=en-US
+VITE_VOICE_AGENT_NAME=Global Estates Assistant
 ```
 
 ### Running the Application
 
-1. Start the backend:
-   ```
-   cd backend
-   python main.py
-   ```
-2. Start the frontend:
-   ```
-   cd frontend
-   npm start
-   ```
+Start the frontend:
+```
+cd frontend
+npm run dev
+```
+
+### Deployment
+
+To deploy the application to Vercel:
+
+1. Push your code to a GitHub repository
+2. Connect your repository to Vercel
+3. Set the following environment variables in your Vercel project settings:
+   - `VITE_ULTRAVOX_API_KEY`
+   - `VITE_ULTRAVOX_API_URL`
+   - `VITE_ULTRAVOX_VOICE_ID`
+   - `VITE_ULTRAVOX_AGENT_ID`
+4. Deploy the project
 
 ## Voice Commands
 
@@ -111,21 +111,14 @@ The voice agent can understand and process requests like:
 ## How It Works
 
 1. When a user speaks to the voice agent asking about properties, the agent uses its own pretrained knowledge to answer the query.
-2. The backend creates a call using the Ultravox Agent API (`/api/agents/{agent_id}/calls`).
+2. The frontend calls the Ultravox Agent API directly using a proxy to avoid CORS issues.
 3. The agent responds to property search questions using its built-in knowledge and can provide dummy data as needed.
-4. Results are returned to the frontend and displayed in an easy-to-read format.
+4. Results are displayed in an easy-to-read format in the conversation interface.
 5. The voice agent can then answer follow-up questions about the properties.
 
 ## Technologies Used
 
 - **Frontend**: React, TypeScript, Material-UI, Redux
-- **Backend**: FastAPI, Python
 - **Voice Processing**: Ultravox API
 - **Natural Language Understanding**: Ultravox Agent (pretrained knowledge)
-- **Search**: Ultravox Agent (no external property search tool)
-
-## Backend API Changes
-
-- The `/property-search` endpoint and DeepInfra RAG-based search have been removed.
-- A new endpoint `/agent-calls` is available, which proxies requests to the Ultravox Agent API (`/api/agents/{agent_id}/calls`).
-- You must set `ULTRAVOX_AGENT_ID` in your backend `.env` file. 
+- **Search**: Ultravox Agent (no external property search tool) 

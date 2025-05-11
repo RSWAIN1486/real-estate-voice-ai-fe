@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { API_BASE_URL, API_TIMEOUT } from '../utils/CONSTANTS';
+import { API_TIMEOUT } from '../utils/CONSTANTS';
 
 // Create axios instance with timeout
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: '/api',  // Use relative URL for frontend-only mode
   timeout: API_TIMEOUT,
   withCredentials: true, // Include credentials in requests
   headers: {
@@ -36,7 +36,7 @@ export interface LoginData {
 
 export const register = async (userData: RegisterData) => {
   try {
-    const response = await api.post('/api/auth/register/', userData);
+    const response = await api.post('/auth/register/', userData);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -62,10 +62,10 @@ export const login = async (credentials: LoginData) => {
     params.append('username', credentials.username);
     params.append('password', credentials.password);
 
-    console.log('Sending login request to:', `${API_BASE_URL}/api/auth/token-nocors`);
+    console.log('Sending login request to:', `/api/auth/token-nocors`);
     
     // Use the no-cors endpoint with fetch API
-    const response = await fetch(`${API_BASE_URL}/api/auth/token-nocors`, {
+    const response = await fetch(`/api/auth/token-nocors`, {
       method: 'POST',
       body: params,
       credentials: 'include',
@@ -110,7 +110,7 @@ export const getCurrentUser = async () => {
 
     console.log('Fetching user data with token:', token.substring(0, 10) + '...');
     
-    const response = await api.get('/api/auth/me', {
+    const response = await api.get('/auth/me', {
       headers: {
         Authorization: `Bearer ${token}`
       }

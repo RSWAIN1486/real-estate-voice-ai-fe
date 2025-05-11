@@ -2,6 +2,48 @@
 
 This document tracks all significant changes made to the Real Estate Voice Agent project.
 
+## [Unreleased]
+
+## [1.2.0] - 2023-07-03
+- Converted to frontend-only mode
+- Removed backend dependency
+- Added Vite proxy for Ultravox API calls
+- Updated documentation for frontend-only deployment
+- Simplified environment variable configuration
+
+## [1.1.0] - 2023-06-28
+- Implemented frontend-only mode option
+- Added environment variable `VITE_FRONTEND_ONLY_MODE` to toggle between backend proxy and frontend-only mode
+- Added VoiceAgentStatus component to display connection mode
+- Updated documentation with frontend-only mode instructions
+
+## [1.0.0] - 2023-06-15
+- Converted restaurant voice agent to real estate voice agent
+- Removed menu-related components and functionality
+- Added property search interface
+- Integrated with Ultravox Agent API for property search using agent's knowledge
+- Implemented property display in conversation interface
+- Updated system prompt for real estate domain
+- Added voice commands for property search
+- Updated UI with real estate branding and styling
+
+## [0.2.0] - 2023-05-20
+- Added voice agent settings panel
+- Implemented voice selection
+- Added call recording toggle
+- Implemented temperature adjustment for agent responses
+- Added system prompt customization
+- Improved error handling for microphone access
+- Enhanced call termination reliability
+
+## [0.1.0] - 2023-05-01
+- Initial release
+- Basic voice agent functionality
+- Menu ordering capabilities
+- Order management
+- User authentication
+- Basic UI components
+
 ## [0.1.0] - 2023-03-21
 
 ### Added
@@ -39,6 +81,19 @@ Features planned for upcoming releases:
 - Advanced filtering options for property search
 - Saved properties functionality
 - User account management for saved preferences
+
+## [0.2.0] - 2023-04-15
+
+### Added
+- Frontend-only mode to directly call Ultravox Agent API without backend
+- VoiceAgentStatus component to display the current connection mode
+- Support for environment variables in the frontend (.env)
+- Direct API call implementation in voiceAgentService.ts
+
+### Changed
+- Updated createVoiceAgentCall to check for frontend-only mode
+- Modified CONSTANTS.ts to support frontend-only configuration
+- Updated documentation to reflect new deployment options
 
 - Removed property search tool and all related code (frontend and backend)
 - Removed DeepInfra RAG-based property search
