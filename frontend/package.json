@@ -11,7 +11,8 @@
     "backend": "cd ../backend && .\\venv\\Scripts\\activate && .\\venv\\Scripts\\python main.py",
     "start": "concurrently \"npm run dev\" \"npm run backend\"",
     "start:prod": "vite preview --host",
-    "serve": "npm install -g serve && serve -s dist -l $PORT"
+    "serve": "npm install -g serve && serve -s dist -l $PORT",
+    "vercel-build": "vite build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
