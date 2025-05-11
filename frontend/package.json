@@ -12,7 +12,7 @@
     "start": "concurrently \"npm run dev\" \"npm run backend\"",
     "start:prod": "vite preview --host",
     "serve": "npm install -g serve && serve -s dist -l $PORT",
-    "vercel-build": "vite build"
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

@@ -1,4 +1,6 @@
 // Vercel Serverless Function to proxy requests to Ultravox API
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   // Get the URL parameter from the query string
   const { url } = req.query;

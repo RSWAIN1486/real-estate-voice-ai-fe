@@ -4,6 +4,9 @@
   "description": "API proxy for Ultravox API",
   "main": "ultravox-proxy.js",
   "type": "module",
+  "engines": {
+    "node": ">=18.x"
+  },
   "dependencies": {
     "node-fetch": "^3.3.0"
   }
