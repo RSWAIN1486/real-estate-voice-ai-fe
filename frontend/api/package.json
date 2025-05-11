@@ -1,0 +1,10 @@
+{
+  "name": "ultravox-proxy-api",
+  "version": "1.0.0",
+  "description": "API proxy for Ultravox API",
+  "main": "ultravox-proxy.js",
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.3.0"
+  }
+} 
