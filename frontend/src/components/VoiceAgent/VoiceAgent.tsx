@@ -59,7 +59,6 @@ import { setVoice } from '../../store/slices/voiceAgentSettingsSlice';
 import voiceAgentService from '../../services/voiceAgentService';
 import { addItem } from '../../store/slices/orderSlice';
 import VoiceAgentSettings from './VoiceAgentSettings';
-import { propertyService } from '../../services/propertyService';
 import { AppDispatch } from '../../store/store';
 import styles from './VoiceAgent.module.css';
 import VoiceAgentStatus from './VoiceAgentStatus';

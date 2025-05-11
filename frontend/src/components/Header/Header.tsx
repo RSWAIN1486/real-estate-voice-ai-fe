@@ -32,7 +32,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { RootState } from '../../store/store';
 import { toggleTheme } from '../../store/slices/themeSlice';
-import UserMenu from '../Auth/UserMenu';
 import VoiceAgentSettings from '../VoiceAgent/VoiceAgentSettings';
 import styles from './Header.module.css';
 
