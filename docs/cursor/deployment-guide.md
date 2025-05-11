@@ -50,22 +50,76 @@ This guide explains how to deploy the Real Estate Voice Agent application to Ver
 1. In your Vercel project settings, go to "Domains"
 2. Add your custom domain and follow the instructions to configure DNS
 
-## Troubleshooting
+## Deployment Options
 
-### CORS Issues
+### Frontend-Only Mode (Recommended)
 
-If you encounter CORS issues with the Ultravox API:
+For simple deployments, you can use the "frontend-only mode" which allows the application to run without a backend server:
 
-1. Check that the Vite proxy configuration in `vite.config.ts` is correct
-2. Verify that the frontend is correctly using the proxy URLs
+1. Set `VITE_FRONTEND_ONLY_MODE=true` in your environment variables
+2. Ensure the Ultravox API key and agent ID are set
+3. Deploy only the frontend application
 
-### API Key Issues
+This mode makes direct calls to the Ultravox API and doesn't require a backend server for the voice agent functionality.
+
+#### Vercel Deployment (Frontend-Only)
+
+1. Push your code to a Git repository (GitHub, GitLab, etc.)
+2. Create a new Vercel project and connect it to your repository
+3. Configure the following environment variables in the Vercel project settings:
+   - `VITE_ULTRAVOX_API_KEY` = Your Ultravox API key
+   - `VITE_ULTRAVOX_AGENT_ID` = Your Ultravox agent ID
+   - `VITE_FRONTEND_ONLY_MODE` = `true`
+4. Deploy the project
+5. Test the voice agent functionality on the deployed site
+
+#### Netlify Deployment (Frontend-Only)
+
+1. Push your code to a Git repository
+2. Create a new Netlify site and connect it to your repository
+3. Add the required environment variables in the Netlify site settings:
+   - `VITE_ULTRAVOX_API_KEY` = Your Ultravox API key
+   - `VITE_ULTRAVOX_AGENT_ID` = Your Ultravox agent ID
+   - `VITE_FRONTEND_ONLY_MODE` = `true`
+4. Deploy the site
+5. Test the voice agent functionality
+
+### With Backend Server (Advanced)
+
+If you need additional backend functionality, you can deploy with a backend server:
+
+1. Set `VITE_FRONTEND_ONLY_MODE=false` in your frontend environment
+2. Deploy both the frontend and backend servers
+3. Configure the backend server with the required environment variables
+
+## Troubleshooting Deployment Issues
+
+### CORS Errors
+
+If you encounter CORS errors when making direct API calls:
+
+1. Check that you're making calls to the correct URL
+2. Ensure your API key is properly set in the headers
+3. Verify that your Ultravox account has the necessary permissions
+
+### 404 Errors on API Calls
+
+If you get 404 errors when calling the Ultravox API:
+
+1. Ensure you're using the correct URL format:
+   - In development: `/ultravox-api/api/agents/{agent-id}/calls`
+   - In production: `https://api.ultravox.ai/api/agents/{agent-id}/calls`
+2. Verify your agent ID is correct
+3. Check that you're sending the API key in the `X-API-Key` header
+
+### Voice Agent Not Connecting
 
 If the voice agent fails to connect:
 
-1. Check that the environment variables are correctly set in Vercel
-2. Verify that the API key and Agent ID are valid
-3. Check the browser console for any error messages
+1. Check browser console for error messages
+2. Ensure microphone permissions are granted
+3. Verify WebRTC is supported in your browser
+4. Check that your API key and agent ID are correct
 
 ## Updating Your Deployment
 

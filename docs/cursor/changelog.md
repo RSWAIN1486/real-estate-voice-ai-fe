@@ -99,4 +99,23 @@ Features planned for upcoming releases:
 - Removed DeepInfra RAG-based property search
 - Added support for Ultravox Agent API via new /agent-calls endpoint in backend
 - Added requirement for ULTRAVOX_AGENT_ID environment variable
-- Updated documentation and README accordingly 
+- Updated documentation and README accordingly
+
+## [2023-09-08] - Production Deployment Fixes for Frontend-Only Mode
+
+### Fixed
+- Fixed 404 errors when making direct Ultravox API calls in production environment by:
+  - Adding environment detection to distinguish between development and production
+  - Using the direct Ultravox API URL in production instead of the Vite proxy path
+  - Adding proper API key headers for direct API calls
+  - Fixing the Ultravox client session initialization and management
+  - Updating environment variable handling in constants
+
+### Changed
+- Updated README with clearer deployment instructions for frontend-only mode
+- Added memory documentation about the deployment issue and solution
+- Changed environment variable handling to use a proper VITE_FRONTEND_ONLY_MODE flag
+
+### Added
+- Added environment detection logic to all Ultravox API calls
+- Added detailed logging for API call URLs and paths for easier debugging 

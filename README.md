@@ -72,6 +72,11 @@ VITE_ULTRAVOX_API_URL=https://api.ultravox.ai
 VITE_ULTRAVOX_VOICE_ID=Emily-English
 VITE_ULTRAVOX_AGENT_ID=your_ultravox_agent_id
 
+# Application Mode
+# Set to 'true' to enable direct API calls to Ultravox (no backend required)
+# Set to 'false' to use a backend server as a proxy
+VITE_FRONTEND_ONLY_MODE=true
+
 # Voice Agent Configuration
 VITE_DEFAULT_LANGUAGE=en-US
 VITE_VOICE_AGENT_NAME=Global Estates Assistant
@@ -87,16 +92,28 @@ npm run dev
 
 ### Deployment
 
-To deploy the application to Vercel:
+#### Frontend-Only Mode Deployment (Recommended)
+
+The application can be deployed as a standalone frontend app in "frontend-only mode" without needing a backend server:
 
 1. Push your code to a GitHub repository
 2. Connect your repository to Vercel
 3. Set the following environment variables in your Vercel project settings:
-   - `VITE_ULTRAVOX_API_KEY`
-   - `VITE_ULTRAVOX_API_URL`
-   - `VITE_ULTRAVOX_VOICE_ID`
-   - `VITE_ULTRAVOX_AGENT_ID`
+   - `VITE_ULTRAVOX_API_KEY` - Your Ultravox API key
+   - `VITE_ULTRAVOX_AGENT_ID` - Your Ultravox agent ID
+   - `VITE_FRONTEND_ONLY_MODE` - Set to `true`
 4. Deploy the project
+
+When in frontend-only mode, the application makes direct calls to the Ultravox API from the browser, avoiding the need for a backend server.
+
+#### With Backend Deployment (Optional)
+
+If you need to deploy with a backend server (for additional features or security):
+
+1. Deploy both the frontend and backend servers
+2. Set `VITE_FRONTEND_ONLY_MODE` to `false`
+3. Configure the backend server to proxy requests to the Ultravox API
+4. Ensure CORS is properly configured
 
 ## Voice Commands
 

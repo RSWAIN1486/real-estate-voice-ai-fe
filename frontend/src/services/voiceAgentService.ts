@@ -8,6 +8,14 @@ import { store } from '../store/store';
 const ULTRAVOX_API_KEY = import.meta.env.VITE_ULTRAVOX_API_KEY;
 const ULTRAVOX_AGENT_ID = import.meta.env.VITE_ULTRAVOX_AGENT_ID;
 
+// Extend the Window interface to add our custom properties
+declare global {
+  interface Window {
+    ultravoxSession?: UltravoxSession;
+    ultravoxCurrentCall?: any;
+  }
+}
+
 // Default voice options with preselected female voice
 export const DEFAULT_VOICE_ID = 'Emily-English'; // Default to Emily-English
 
@@ -142,9 +150,16 @@ export const createAgentCallDirect = async (initialMessages?: Array<any>, priorC
       }
     };
 
+    // Determine if we're in development or production
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    // Choose the appropriate base URL
+    let baseUrl = isDevelopment 
+      ? '/ultravox-api' // Use proxy in development
+      : 'https://api.ultravox.ai'; // Use direct URL in production
+    
     // If priorCallId is provided, use it as a query parameter
-    // Use the Vite proxy path instead of direct Ultravox URL to avoid CORS issues
-    let url = `/ultravox-api/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
+    let url = `${baseUrl}/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
     if (priorCallId) {
       url += `?priorCallId=${priorCallId}`;
     }
@@ -174,9 +189,10 @@ export const createAgentCallDirect = async (initialMessages?: Array<any>, priorC
     }
 
     // Log the final payload for debugging
-    console.log('Sending payload directly to Ultravox Agent API via proxy:', JSON.stringify(payload, null, 2));
+    console.log('Sending payload directly to Ultravox Agent API:', JSON.stringify(payload, null, 2));
+    console.log('Using URL:', url);
 
-    // Make the API call through our Vite proxy
+    // Make the API call
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -194,9 +210,9 @@ export const createAgentCallDirect = async (initialMessages?: Array<any>, priorC
     // Get the response data
     const data = await response.json();
     
-    // Fix the joinUrl to use the proxy as well
-    if (data.joinUrl) {
-      // Replace the original Ultravox API URL with our proxy URL
+    // Fix the joinUrl if needed
+    if (data.joinUrl && isDevelopment) {
+      // Replace the original Ultravox API URL with our proxy URL in development
       data.joinUrl = data.joinUrl.replace(
         'https://api.ultravox.ai', 
         window.location.origin + '/ultravox-api'
@@ -232,8 +248,25 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
  */
 export const getCallInfo = async (callId: string) => {
   try {
-    // Use the Vite proxy to avoid CORS issues
-    const response = await fetch(`/ultravox-api/api/calls/${callId}`);
+    // Determine if we're in development or production
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    // Choose the appropriate base URL
+    let baseUrl = isDevelopment 
+      ? '/ultravox-api' // Use proxy in development
+      : 'https://api.ultravox.ai'; // Use direct URL in production
+    
+    // Use the appropriate URL
+    const url = `${baseUrl}/api/calls/${callId}`;
+    console.log('Getting call info from:', url);
+    
+    // Add API key to headers for direct API calls
+    const headers: HeadersInit = {};
+    if (!isDevelopment) {
+      headers['X-API-Key'] = ULTRAVOX_API_KEY;
+    }
+    
+    const response = await fetch(url, { headers });
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -248,62 +281,49 @@ export const getCallInfo = async (callId: string) => {
 };
 
 /**
- * End a call using only the Ultravox SDK with multiple safeguards
+ * End a call by sending a request to the Ultravox API
  */
 export const endCall = async (callId: string) => {
-  console.log(`🔊🔊 ENDCALL SERVICE: Starting hangup process for call ID: ${callId}`);
+  console.log('🔊🔊 ENDCALL SERVICE: Attempting to end call:', callId);
   
   try {
-    if (!uvSession) {
-      console.log('🔊🔊 ENDCALL SERVICE: No active session found to end');
-      return { status: "success", callEnded: true, message: "No active session to end" };
-    }
-    
-    console.log(`🔊🔊 ENDCALL SERVICE: Using SDK's leaveCall method to end the call`);
-    
-    // First try to leave the call through the SDK directly
-    try {
-      // Try immediate termination with a timeout
-      const leavePromise = uvSession.leaveCall();
+    // First try to leave the call through the SDK if session exists
+    if (window.ultravoxSession) {
+      console.log('🔊🔊 ENDCALL SERVICE: Active session found, attempting to leave call via SDK');
       
-      // Create a timeout promise
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('leaveCall timeout')), 2000);
-      });
-      
-      // Race the promises to ensure we don't hang
-      await Promise.race([leavePromise, timeoutPromise])
-        .catch(error => {
-          console.warn('🔊🔊 ENDCALL SERVICE: leaveCall timed out or failed:', error);
-        });
-      
-      console.log('🔊🔊 ENDCALL SERVICE: Successfully executed leaveCall via Ultravox SDK');
-    } catch (leaveError) {
-      console.error('🔊🔊 ENDCALL SERVICE: Error in uvSession.leaveCall():', leaveError);
-      // Continue execution - we'll try other methods
-    }
-    
-    // Force terminate any media connections that might be keeping the call alive
-    try {
-      // Access peerConnection using type assertion
-      const session = uvSession as any;
-      if (session.peerConnection) {
-        console.log('🔊🔊 ENDCALL SERVICE: Found active peer connection, forcing close');
-        session.peerConnection.close();
-        console.log('🔊🔊 ENDCALL SERVICE: Peer connection closed');
+      try {
+        await window.ultravoxSession.leaveCall();
+        console.log('🔊🔊 ENDCALL SERVICE: Successfully left call via SDK');
+      } catch (leaveError) {
+        console.error('🔊🔊 ENDCALL SERVICE: Error in leaveCall:', leaveError);
+        // Continue execution even if this fails
       }
-    } catch (peerError) {
-      console.error('🔊🔊 ENDCALL SERVICE: Error closing peer connection:', peerError);
+    } else {
+      console.log('🔊🔊 ENDCALL SERVICE: No active session found, skipping SDK call');
     }
     
-    // Dispatch callEnded event to notify other parts of the application
-    window.dispatchEvent(new CustomEvent('callEnded', { detail: { callId } }));
-    console.log('🔊🔊 ENDCALL SERVICE: Dispatched callEnded event with callId:', callId);
+    // Try to directly close any peer connections that might be keeping the call alive
+    if (window.ultravoxSession) {
+      try {
+        // Access peerConnection using type assertion
+        const session = window.ultravoxSession as any;
+        if (session.peerConnection) {
+          console.log('🔊🔊 ENDCALL SERVICE: Found active peer connection, forcing close');
+          session.peerConnection.close();
+          console.log('🔊🔊 ENDCALL SERVICE: Peer connection closed');
+        }
+      } catch (peerError) {
+        console.error('🔊🔊 ENDCALL SERVICE: Error closing peer connection:', peerError);
+      }
+    }
     
-    // Reset our session reference
-    const oldSession = uvSession;
-    uvSession = null;
-    console.log('🔊🔊 ENDCALL SERVICE: Reset uvSession to null');
+    // Keep a reference to the old session for cleanup
+    const oldSession = window.ultravoxSession;
+    
+    // Reset the session reference
+    window.ultravoxSession = undefined;
+    window.ultravoxCurrentCall = undefined;
+    console.log('🔊🔊 ENDCALL SERVICE: Reset session references to null');
     
     // Try one last method to forcibly clean up the session
     try {
@@ -322,9 +342,10 @@ export const endCall = async (callId: string) => {
   } catch (error) {
     console.error('🔊🔊 ENDCALL SERVICE: Error ending call via SDK:', error);
     
-    // Even if there was an error, set uvSession to null
-    uvSession = null;
-    console.log('🔊🔊 ENDCALL SERVICE: Reset uvSession to null despite error');
+    // Even if there was an error, reset the session
+    window.ultravoxSession = undefined;
+    window.ultravoxCurrentCall = undefined;
+    console.log('🔊🔊 ENDCALL SERVICE: Reset session references despite error');
     
     // Still dispatch callEnded event as we're considering the call ended
     window.dispatchEvent(new CustomEvent('callEnded', { detail: { callId, error: true } }));
@@ -338,55 +359,84 @@ export const endCall = async (callId: string) => {
 let uvSession: UltravoxSession | null = null;
 
 export const initializeUltravoxSession = () => {
-  if (!uvSession) {
-    uvSession = new UltravoxSession();
-    uvSession.registerToolImplementation('hangUp', hangUpTool);
-    console.log('Ultravox session initialized with hangUp tool registered');
+  try {
+    if (!window.ultravoxSession) {
+      console.log('Initializing new Ultravox session');
+      window.ultravoxSession = new UltravoxSession();
+      window.ultravoxSession.registerToolImplementation('hangUp', hangUpTool);
+      console.log('Ultravox session initialized with hangUp tool registered');
+    } else {
+      console.log('Using existing Ultravox session');
+    }
+    
+    // Keep the uvSession reference in sync with window.ultravoxSession for backward compatibility
+    uvSession = window.ultravoxSession;
+    
+    return window.ultravoxSession;
+  } catch (error) {
+    console.error('Error initializing Ultravox session:', error);
+    throw error;
   }
-  return uvSession;
 };
 
 export const registerToolImplementations = () => {
-  if (!uvSession) {
+  if (!window.ultravoxSession) {
     console.error('Cannot register tools - session is not initialized');
+    initializeUltravoxSession();
     return;
   }
   console.log('Registering hangUp tool implementation with Ultravox...');
-  uvSession.registerToolImplementation('hangUp', hangUpTool);
-  const registeredTools = Object.keys((uvSession as any).toolImplementations || {});
+  window.ultravoxSession.registerToolImplementation('hangUp', hangUpTool);
+  const registeredTools = Object.keys((window.ultravoxSession as any).toolImplementations || {});
   console.log(`Currently registered tools: ${registeredTools.join(', ')}`);
 };
 
+/**
+ * Join a call using the Ultravox client
+ */
 export const joinCall = (joinUrl: string) => {
   try {
-    console.log('Joining Ultravox call with URL:', joinUrl);
-    if (!uvSession) {
-      console.log('No session found, initializing new Ultravox session');
-      uvSession = initializeUltravoxSession();
-    }
+    // Determine if we're in development or production
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
-    // If we're in frontend-only mode, ensure the URL uses the original Ultravox domain
-    // because the Ultravox SDK expects the real domain, not our proxy
-    if (FRONTEND_ONLY_MODE && joinUrl.includes('/ultravox-api')) {
-      joinUrl = joinUrl.replace(
-        window.location.origin + '/ultravox-api', 
+    let finalJoinUrl = joinUrl;
+    
+    // In production, ensure we're using the direct Ultravox URL
+    if (!isDevelopment && joinUrl.includes('/ultravox-api')) {
+      finalJoinUrl = joinUrl.replace(
+        `${window.location.origin}/ultravox-api`,
         'https://api.ultravox.ai'
       );
-      console.log('Modified joinUrl to use original domain for SDK:', joinUrl);
+      console.log('Modified joinUrl for production:', finalJoinUrl);
     }
     
-    uvSession.joinCall(joinUrl);
-    console.log('Successfully joined call');
-    
-    // Ensure microphone is unmuted when joining
-    setTimeout(() => {
-      if (uvSession && uvSession.isMicMuted) {
-        console.log('Ensuring microphone is unmuted after join');
-        uvSession.unmuteMic();
-      }
-    }, 1000);
-    
-    return uvSession;
+    // In development, ensure we're using the proxy
+    if (isDevelopment && !joinUrl.includes('/ultravox-api')) {
+      finalJoinUrl = joinUrl.replace(
+        'https://api.ultravox.ai',
+        `${window.location.origin}/ultravox-api`
+      );
+      console.log('Modified joinUrl for development:', finalJoinUrl);
+    }
+
+    // Initialize the session if it doesn't exist
+    if (!window.ultravoxSession) {
+      console.log('No Ultravox session found, initializing...');
+      initializeUltravoxSession();
+    }
+
+    // Check if we have an active Ultravox session after initialization
+    if (!window.ultravoxSession) {
+      console.error('Failed to initialize Ultravox session');
+      throw new Error('Failed to initialize Ultravox session');
+    }
+
+    // Join the call using the Ultravox client's joinCall method
+    console.log('Joining call with URL:', finalJoinUrl);
+    window.ultravoxCurrentCall = window.ultravoxSession.joinCall(finalJoinUrl);
+    console.log('Call joined', window.ultravoxCurrentCall);
+
+    return window.ultravoxCurrentCall;
   } catch (error) {
     console.error('Error joining call:', error);
     throw error;
@@ -400,7 +450,7 @@ export const leaveCurrentCall = async () => {
   console.log('🔊🔊 LEAVE CALL SERVICE: Starting force cleanup process');
   
   try {
-    if (!uvSession) {
+    if (!window.ultravoxSession) {
       console.log('🔊🔊 LEAVE CALL SERVICE: No active session to leave');
       return true;
     }
@@ -409,7 +459,7 @@ export const leaveCurrentCall = async () => {
     
     // First try to leave the call through the SDK
     try {
-      await uvSession.leaveCall();
+      await window.ultravoxSession.leaveCall();
       console.log('🔊🔊 LEAVE CALL SERVICE: Successfully left call via SDK');
     } catch (leaveError) {
       console.error('🔊🔊 LEAVE CALL SERVICE: Error in leaveCall:', leaveError);
@@ -419,7 +469,7 @@ export const leaveCurrentCall = async () => {
     // Try to directly close any peer connections that might be keeping the call alive
     try {
       // Access peerConnection using type assertion
-      const session = uvSession as any;
+      const session = window.ultravoxSession as any;
       if (session.peerConnection) {
         console.log('🔊🔊 LEAVE CALL SERVICE: Found active peer connection, forcing close');
         session.peerConnection.close();
@@ -432,7 +482,7 @@ export const leaveCurrentCall = async () => {
     // Try one last method to forcibly clean up the session
     try {
       // Access destroy method using type assertion
-      const session = uvSession as any;
+      const session = window.ultravoxSession as any;
       if (typeof session.destroy === 'function') {
         console.log('🔊🔊 LEAVE CALL SERVICE: Found destroy method, calling it as last resort');
         session.destroy();
@@ -443,9 +493,9 @@ export const leaveCurrentCall = async () => {
     }
     
     // Final step - completely replace the session reference
-    const oldSession = uvSession;
-    uvSession = null;
-    console.log('🔊🔊 LEAVE CALL SERVICE: Reset session reference to null');
+    window.ultravoxSession = undefined;
+    window.ultravoxCurrentCall = undefined;
+    console.log('🔊🔊 LEAVE CALL SERVICE: Reset session references to null');
     
     // Dispatch event for any listeners
     window.dispatchEvent(new CustomEvent('callEnded'));
@@ -456,8 +506,9 @@ export const leaveCurrentCall = async () => {
     console.error('🔊🔊 LEAVE CALL SERVICE: Error in leaveCurrentCall:', error);
     
     // Force reset the session even if there was an error
-    uvSession = null;
-    console.log('🔊🔊 LEAVE CALL SERVICE: Reset session reference despite error');
+    window.ultravoxSession = undefined;
+    window.ultravoxCurrentCall = undefined;
+    console.log('🔊🔊 LEAVE CALL SERVICE: Reset session references despite error');
     
     // Still dispatch event
     window.dispatchEvent(new CustomEvent('callEnded', { detail: { error: true } }));
@@ -467,22 +518,22 @@ export const leaveCurrentCall = async () => {
 };
 
 export const setOutputMedium = (medium: Medium) => {
-  if (uvSession) {
-    uvSession.setOutputMedium(medium);
+  if (window.ultravoxSession) {
+    window.ultravoxSession.setOutputMedium(medium);
   }
 };
 
 export const sendText = (text: string) => {
-  if (uvSession) {
-    uvSession.sendText(text);
+  if (window.ultravoxSession) {
+    window.ultravoxSession.sendText(text);
   }
 };
 
 export const muteMic = () => {
   try {
     console.log('Muting microphone in Ultravox session');
-    if (uvSession) {
-      uvSession.muteMic();
+    if (window.ultravoxSession) {
+      window.ultravoxSession.muteMic();
       console.log('Microphone muted successfully');
       return true;
     } else {
@@ -498,8 +549,8 @@ export const muteMic = () => {
 export const unmuteMic = () => {
   try {
     console.log('Unmuting microphone in Ultravox session');
-    if (uvSession) {
-      uvSession.unmuteMic();
+    if (window.ultravoxSession) {
+      window.ultravoxSession.unmuteMic();
       console.log('Microphone unmuted successfully');
       return true;
     } else {
@@ -513,23 +564,23 @@ export const unmuteMic = () => {
 };
 
 export const muteSpeaker = () => {
-  if (uvSession) {
-    uvSession.muteSpeaker();
+  if (window.ultravoxSession) {
+    window.ultravoxSession.muteSpeaker();
   }
 };
 
 export const unmuteSpeaker = () => {
-  if (uvSession) {
-    uvSession.unmuteSpeaker();
+  if (window.ultravoxSession) {
+    window.ultravoxSession.unmuteSpeaker();
   }
 };
 
 export const isMicMuted = () => {
-  return uvSession ? uvSession.isMicMuted : false;
+  return window.ultravoxSession?.isMicMuted || false;
 };
 
 export const isSpeakerMuted = () => {
-  return uvSession ? uvSession.isSpeakerMuted : false;
+  return window.ultravoxSession?.isSpeakerMuted || false;
 };
 
 export default {

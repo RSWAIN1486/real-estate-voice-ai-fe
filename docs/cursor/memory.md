@@ -563,4 +563,96 @@ These insights will guide future development of the Real Estate Voice Agent and 
 - When deprecating a tool or feature (e.g., property search tool, DeepInfra RAG), ensure all references are removed from frontend, backend, environment variables, and documentation.
 - Always update architecture, changelog, feature-design, and current-state docs to reflect major changes.
 - Make minimal changes to avoid breaking unrelated functionality.
+- Clearly document new endpoints, environment variables, and architectural changes.
+
+## Deployment Issues and Solutions
+
+### Issue: Ultravox API Calls in Frontend-Only Mode Not Working in Production (Date: 2023-09-08)
+
+**Problem:**
+When deploying the application to Vercel in frontend-only mode, direct calls to the Ultravox API failed with 404 errors. The application was attempting to call:
+`https://real-estate-voice-ai-qmdber0hl-rswain1486s-projects.vercel.app/ultravox-api/api/agents/{agent-id}/calls`
+
+**Root Cause:**
+The code was attempting to use the development proxy configuration (`/ultravox-api`) in the production environment. The Vite proxy only works in the development environment and isn't available in the production build on Vercel.
+
+**Solution:**
+1. Updated `createAgentCallDirect` and other related functions to detect the environment (development vs. production)
+2. In development, continued to use the `/ultravox-api` proxy path
+3. In production, used the direct Ultravox API URL (`https://api.ultravox.ai`)
+4. Added proper error handling and logging
+5. Made sure the API key header was included in all direct API calls in production
+
+**Code Changes:**
+```javascript
+// Determine if we're in development or production
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Choose the appropriate base URL
+let baseUrl = isDevelopment 
+  ? '/ultravox-api' // Use proxy in development
+  : 'https://api.ultravox.ai'; // Use direct URL in production
+
+// Use the appropriate URL
+const url = `${baseUrl}/api/agents/${ULTRAVOX_AGENT_ID}/calls`;
+```
+
+**Lessons Learned:**
+1. Always test deployment configurations in a production-like environment before actual deployment
+2. Development proxies set up in Vite/Webpack don't carry over to production builds
+3. API keys and authentication need to be handled differently in production vs development
+4. Consider environment-specific configuration for API endpoints
+
+# Real Estate Voice Agent - Lessons Learned
+
+## UI Conversion Strategy 
+
+When converting a domain-specific application (like a restaurant ordering system) to a different domain (real estate):
+
+1. **Incremental Approach Works Best**: Converting UI components one by one while maintaining the core functionality helped maintain stability.
+2. **Keep Core Infrastructure**: We leveraged the existing voice agent technology while changing only the presentation layer.
+3. **Theme Consistency**: Updating the color scheme and typography early provides a consistent foundation for the new domain.
+4. **Component Architecture**: Well-structured React components with clear interfaces made the conversion process smoother.
+
+## UI Development Insights
+
+1. **Layout Structure**: Starting with the main page layout (HeroSection, SearchFilters, PropertyList) established the foundation for the real estate interface.
+2. **Responsive Design Maintenance**: Ensuring all new components followed responsive design principles maintained cross-device compatibility.
+3. **Component Props**: Well-defined interfaces for component props (like Filters and VoiceFilterCriteria) provided clarity during development.
+4. **Shared State Management**: Using React state combined with props for filter handling created a clean data flow.
+
+## Integration Challenges
+
+1. **Voice Agent Context**: The existing voice agent was designed for restaurant ordering, so integrating it with real estate search required careful UI adaptation.
+2. **State Management**: Ensuring state is properly shared between the voice agent and the new real estate components was important for functionality.
+3. **Content Adaptation**: The transition from food ordering to property search required thoughtful content changes in UI elements.
+
+## Best Practices Identified
+
+1. **Clear Component Boundaries**: Defining clear responsibilities for each component (HeroSection for main search, SearchFilters for filtering, PropertyList for results).
+2. **Mock Data Structure**: Creating a well-structured property data model early helped shape the UI development.
+3. **Consistent Styling**: Following Material-UI patterns consistently across components created a cohesive look and feel.
+4. **Gradual Voice Integration**: Focusing on UI first, then voice integration helped manage complexity.
+
+## Future Improvements
+
+1. **Voice Agent Responses**: The voice agent still needs response adaptation for real estate terminology and searches.
+2. **Data Integration**: Connecting to a real property database would make the application fully functional.
+3. **Advanced Features**: Property details, map integration, and saved properties would enhance the user experience.
+4. **Voice Command Set**: Expanding the voice command vocabulary for property-specific searches would improve usability.
+
+## Technical Decisions
+
+1. **Material-UI**: Continuing to use MUI provided a robust component library for building the real estate UI.
+2. **Functional Components**: Using React functional components with hooks maintained code consistency.
+3. **Modular CSS**: Component-specific styles helped maintain styling isolation.
+4. **Interface Definitions**: TypeScript interfaces for data structures ensured type safety throughout the application.
+
+These insights will guide future development of the Real Estate Voice Agent and provide valuable guidance for similar domain conversion projects. 
+
+# Memory / Learnings
+
+- When deprecating a tool or feature (e.g., property search tool, DeepInfra RAG), ensure all references are removed from frontend, backend, environment variables, and documentation.
+- Always update architecture, changelog, feature-design, and current-state docs to reflect major changes.
+- Make minimal changes to avoid breaking unrelated functionality.
 - Clearly document new endpoints, environment variables, and architectural changes. 

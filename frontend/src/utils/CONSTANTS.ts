@@ -5,7 +5,8 @@ export const API_TIMEOUT = 10000; // 10 seconds
 
 // Ultravox Configuration
 export const ULTRAVOX_BASE_URL = import.meta.env.VITE_ULTRAVOX_API_URL || 'https://api.ultravox.ai';
-export const FRONTEND_ONLY_MODE = true; // Always use frontend-only mode
+// Parse the FRONTEND_ONLY_MODE from environment variables
+export const FRONTEND_ONLY_MODE = (import.meta.env.VITE_FRONTEND_ONLY_MODE === 'true');
 
 // Client Configuration
 export const CLIENT_PORT = 5173; // Default Vite dev server port
