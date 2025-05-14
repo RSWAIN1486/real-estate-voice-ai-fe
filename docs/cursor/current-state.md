@@ -67,3 +67,15 @@ The current focus is to:
 2. Adapt voice agent responses to handle real estate specific queries
 3. Connect to a real property database with more listings
 4. Implement property detail pages 
+
+## Backend Cleanup & API Update
+- **Status:** Completed
+- **Description:** Removed unused backend modules (models, routes, utils, database), static assets, and updated `main.py` accordingly. Switched to the new Ultravox Agent API, removing frontend configurations for voice, system prompt, and model, and updating backend/frontend call initiation logic.
+
+## Documentation
+- **Status:** Completed
+- **Task:** Document API routing flow.
+  - **Sub-task:** Create `docs/cursor/api_routing_layman.md` with layman-friendly explanation. (Completed)
+  - **Sub-task:** Create `docs/cursor/api_routing.md` with technical explanation. (Completed)
+  - **Sub-task:** Update `current-state.md` with progress. (Completed)
+  - **Sub-task:** Update `changelog.md` with changes. (Pending) 
