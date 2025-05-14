@@ -137,21 +137,19 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       dispatch(resetAgent());
       dispatch(clearTranscripts());
       
-      // Check if we have a previous conversation to load
-      const lastCallId = window.lastCallId || sessionStorage.getItem('lastVoiceAgentCallId') || localStorage.getItem('lastVoiceAgentCallId');
+      // Check if we have a previous conversation to load (excluding priorCallId logic now)
       const savedTranscripts = window.savedTranscripts || JSON.parse(localStorage.getItem('savedTranscripts') || '[]');
       
-      if ((lastCallId || (savedTranscripts && Array.isArray(savedTranscripts) && savedTranscripts.length > 0))) {
-        console.log('Found previous conversation, attempting to load it');
+      if (savedTranscripts && Array.isArray(savedTranscripts) && savedTranscripts.length > 0) {
+        console.log('Found previous transcripts, attempting to load them into a new call');
         
-        // Validate saved transcripts
         const validatedTranscripts = validateTranscripts(savedTranscripts);
         
-        // Start a new call with previous context
+        // Start a new call with previous context if transcripts exist
         initializeAgent(validatedTranscripts);
       } else {
-        // Start a completely new call
-        console.log('No previous conversation found, starting new conversation');
+        // Start a completely new call if no saved transcripts
+        console.log('No previous transcripts found, starting new conversation');
         initializeAgent();
       }
     } else {
@@ -195,24 +193,18 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       // Create a new call (with past transcripts if provided)
       let callData;
       
-      // Check if we have a previous call ID in session or local storage
-      const lastCallId = window.lastCallId || sessionStorage.getItem('lastVoiceAgentCallId') || localStorage.getItem('lastVoiceAgentCallId');
-      
-      if (lastCallId && pastTranscripts && pastTranscripts.length > 0) {
-        // If we have both transcripts and a callId, prefer using callId for resuming
-        console.log('Resuming conversation with previous call ID:', lastCallId);
-        callData = await voiceAgentService.createVoiceAgentCall(undefined, lastCallId);
-      } else if (pastTranscripts && pastTranscripts.length > 0) {
-        // If we only have transcripts, use them
-        console.log('Initializing with past transcripts');
+      // The logic for resuming with priorCallId has been removed.
+      // We now only pass initialMessages if they exist.
+      if (pastTranscripts && pastTranscripts.length > 0) {
+        console.log('Initializing agent call with past transcripts');
         callData = await voiceAgentService.createVoiceAgentCall(pastTranscripts);
       } else {
         // Start a completely new conversation
-        console.log('Starting new conversation');
+        console.log('Starting new agent call without past transcripts');
         callData = await voiceAgentService.createVoiceAgentCall();
       }
       
-      // Store the new call ID for future use
+      // Store the new call ID for future use (primarily for logging or if needed by other parts)
       const newCallId = callData.callId;
       window.lastCallId = newCallId;
       sessionStorage.setItem('lastVoiceAgentCallId', newCallId);
@@ -238,18 +230,6 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       
       // Set active state
       dispatch(setActive(true));
-      
-      // If we don't have past transcripts but used a callId, we need to show a message
-      // that we're continuing a previous conversation
-      if (lastCallId && (!pastTranscripts || pastTranscripts.length === 0)) {
-        // Add a system message that we're resuming a previous conversation
-        dispatch(addTranscript({
-          text: "Resuming your previous conversation...",
-          isFinal: true,
-          speaker: "agent",
-          medium: Medium.TEXT
-        }));
-      }
       
       setIsInitializing(false);
     } catch (error) {

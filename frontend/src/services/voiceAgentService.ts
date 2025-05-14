@@ -4,223 +4,69 @@ import { API_BASE_URL } from '../utils/CONSTANTS';
 import { hangUpTool } from './clientTools';
 // import { store } from '../store/store'; // Unused
 
-// Default voice options with preselected female voice
-export const DEFAULT_VOICE_ID = 'Emily-English'; // Default to Emily-English
-export const DEFAULT_VOICE_MODEL = 'fixie-ai/ultravox-70B'; // Added default model
-
-// Available voice options based on the available Ultravox voices
-export interface VoiceOption {
-  value: string;
-  label: string;
-  description?: string;
-}
-
-export const DEFAULT_VOICE_OPTIONS: VoiceOption[] = [
-  { value: 'Emily-English', label: 'Emily-English', description: 'Female English voice' },
-  { value: 'Steve-English-Australian', label: 'Steve-English-Australian', description: 'Male Australian English voice' },
-  { value: 'Tanya-English', label: 'Tanya-English', description: 'Female English voice' },
-  { value: 'Aaron-English', label: 'Aaron-English', description: 'Male English voice' },
-  { value: 'echo', label: 'Echo', description: 'Female English voice (OpenAI)' },
-  { value: 'nova', label: 'Nova', description: 'Female English voice (OpenAI)' },
-  { value: 'shimmer', label: 'Shimmer', description: 'Female English voice (OpenAI)' },
-  { value: 'fable', label: 'Fable', description: 'Male English voice (OpenAI)' },
-  { value: 'onyx', label: 'Onyx', description: 'Male English voice (OpenAI)' },
-  { value: 'alloy', label: 'Alloy', description: 'Neutral English voice (OpenAI)' }
-];
-
-// System prompt for real estate property search
-export const SYSTEM_PROMPT = `
-You are an AI voice agent for a real estate company. Your job is to help customers find properties based on their preferences using your own knowledge and experience.
-
-Here are some guidelines:
-1. Greet the customer warmly and ask how you can help them find their ideal property
-2. When a customer searches for properties, use your own knowledge to answer their questions and provide helpful information. You do not have access to a property search tool.
-3. Help them search for properties based on:
-   - Location (e.g., Dubai Marina, Palm Jumeirah)
-   - Property type (apartment, villa, etc.)
-   - Number of bedrooms and bathrooms
-   - Price range
-   - Rental vs Sale
-   - Amenities
-4. Listen carefully to their preferences and use your own knowledge to suggest matching properties (use dummy data if needed)
-5. After showing search results, help answer questions about specific properties
-6. If no properties match their criteria, suggest alternatives or ask them to modify their search
-7. Be professional, friendly, and helpful
-8. Stay engaged in the conversation and ask if they need to search for other properties
-9. When the customer asks to end the call or hang up:
-   - Thank them for their interest
-   - Call the "hangUp" tool
-   - Wait for confirmation that the call has ended
-   - Do not start a new conversation after hanging up
-
-Remember to:
-- Be patient and professional
-- Provide clear, organized property information
-- Help refine searches if initial results don't match preferences
-- Maintain a helpful and knowledgeable demeanor
-
-## Tool Usage Rules
-- Call "hangUp" when:
-  - The user asks to end the call
-  - The user says goodbye or indicates they're done
-  - You're about to end the call yourself
-`;
+// Constants for system prompt, voice ID, model, and options are no longer needed
+// as they are configured on the Ultravox platform per agent.
 
 /**
- * Fetch available voices from the Ultravox API
- */
-export const fetchAvailableVoices = async (): Promise<VoiceOption[]> => {
-  try {
-    console.log("Fetching available voices...");
-    const response = await axios.get(
-      `${API_BASE_URL}/api/voice-agent/voices`
-    );
-    
-    console.log("Voice API response:", response.data);
-    
-    if (response.data && response.data.results && Array.isArray(response.data.results)) {
-      // Transform the voice data into options format
-      const voiceOptions = response.data.results.map((voice: any) => ({
-        value: voice.voiceId,
-        label: voice.name,
-        description: voice.description
-      }));
-      
-      console.log("Transformed voice options:", voiceOptions);
-      return voiceOptions;
-    }
-    
-    console.log("Using DEFAULT_VOICE_OPTIONS as fallback");
-    return DEFAULT_VOICE_OPTIONS;
-  } catch (error) {
-    console.error('Error fetching available voices:', error);
-    console.log("Using DEFAULT_VOICE_OPTIONS due to error");
-    return DEFAULT_VOICE_OPTIONS;
-  }
-};
-
-/**
- * Get the system prompt based on voice agent settings
- */
-export const getSystemPrompt = () => {
-  // const state = store.getState(); // Removed store access
-  // const settings = state.voiceAgentSettings; // Removed store access
-
-  // // If custom prompt is empty, return the default // Logic for custom prompt removed
-  // if (!settings.customSystemPrompt) {
-  return SYSTEM_PROMPT;
-  // }
-
-  // // Return custom system prompt
-  // return settings.customSystemPrompt;
-};
-
-/**
- * Get the voice model based on voice agent settings
- */
-export const getVoiceModel = () => {
-  // const state = store.getState(); // Removed store access
-  // const settings = state.voiceAgentSettings; // Removed store access
-  
-  return DEFAULT_VOICE_MODEL; // Return hardcoded default model
-  // return settings.voiceModel;
-};
-
-/**
- * Create a new call to the Ultravox API via our backend proxy
+ * Create a new call to the Ultravox API via our backend proxy using the Agent API
  * @param initialMessages Optional array of previous conversation messages to provide context
- * @param priorCallId Optional ID of a previous call to resume
  */
-export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCallId?: string) => {
+export const createVoiceAgentCall = async (initialMessages?: Array<any>) => {
   try {
-    // Get settings from Redux store - Now using defaults
-    const systemPrompt = getSystemPrompt(); // Will use default
-    const voiceModel = getVoiceModel();   // Will use default
-    // const state = store.getState(); // Removed store access
-    // const settings = state.voiceAgentSettings; // Removed store access
-
-    // Use the user's selected voice, or DEFAULT_VOICE_ID if none is set
-    const voice = DEFAULT_VOICE_ID; // Directly use default, was: settings.voice || DEFAULT_VOICE_ID;
-    console.log(`Using voice: ${voice}`);
-
-    // Prepare the request payload
+    // Payload for the new Agent API.
+    // Fields like voice, model, systemPrompt, temperature are configured on the Ultravox platform.
     const payload: any = {
-      model: voiceModel,
-      voice: voice,
-      systemPrompt: systemPrompt,
-      temperature: 0.7, // Hardcoded default, was: settings.temperature,
-      recordingEnabled: false, // Hardcoded default, was: settings.enableCallRecording,
-      selectedTools: [
-        {
-          temporaryTool: {
-            modelToolName: "hangUp",
-            description: "End the current call and close the conversation window",
-            client: {}
-          }
-        }
-      ],
-      // Add inactivity settings to automatically end call after periods of silence
-      inactivityMessages: [
-        {
-          "duration": "30s",
-          "message": "Are you still there? I can help you find real estate properties that match your preferences."
-        },
-        {
-          "duration": "15s",
-          "message": "If there's nothing else you need at the moment, I'll end this call."
-        },
-        {
-          "duration": "10s",
-          "message": "Thank you for calling Global Estates. Have a great day. Goodbye.",
-          "endBehavior": "END_BEHAVIOR_HANG_UP_SOFT"
-        }
-      ]
+      recordingEnabled: false, // Default to false, can be made configurable if needed
+      // templateContext: {}, // Add if specific template context is needed
+      // metadata: {}, // Add if metadata is needed
     };
 
-    // If priorCallId is NOT provided but initialMessages are, use the formatted messages
-    if (!priorCallId && initialMessages && initialMessages.length > 0) {
+    // If initialMessages are provided, format and add them to the payload.
+    if (initialMessages && initialMessages.length > 0) {
       try {
-        console.log('Using initial messages without priorCallId.');
+        console.log('Using initial messages for new agent call.');
         
-        // Format the messages in a structured way that our backend can parse correctly
         const formattedMessages = initialMessages.map(msg => {
           if (!msg.text) {
             console.warn('Message missing text:', msg);
             return null;
           }
           
+          // Ensure role is one of the accepted values by Ultravox Agent API
+          // MESSAGE_ROLE_UNSPECIFIED, MESSAGE_ROLE_USER, MESSAGE_ROLE_ASSISTANT
+          // We'll map our 'agent' to 'ASSISTANT' and 'user' to 'USER'
+          let role = 'MESSAGE_ROLE_USER'; // Default to user
+          if (msg.speaker === 'agent' || msg.role?.toUpperCase() === 'ASSISTANT') {
+            role = 'MESSAGE_ROLE_AGENT';
+          }
+
           return {
-            role: msg.speaker === 'agent' ? 'assistant' : 'user',
-            content: msg.text
+            role: role,
+            text: msg.text,
+            // medium: msg.medium === Medium.VOICE ? 'MESSAGE_MEDIUM_VOICE' : 'MESSAGE_MEDIUM_TEXT' // Optional, let Ultravox handle or set explicitly if needed
           };
         }).filter(Boolean);
         
         if (formattedMessages.length > 0) {
-          payload.messages = formattedMessages;
-          console.log('Sending messages with proper format:', JSON.stringify(formattedMessages));
+          payload.initialMessages = formattedMessages;
+          console.log('Sending formatted initialMessages for agent call:', JSON.stringify(formattedMessages, null, 2));
         }
       } catch (error) {
-        console.error('Error formatting messages:', error);
+        console.error('Error formatting initialMessages for agent call:', error);
       }
     }
 
-    // If priorCallId is provided, add it to the payload
-    // if (priorCallId) {
-    //   payload.priorCallId = priorCallId;
-    // }
+    console.log('Sending payload to create agent call:', JSON.stringify(payload, null, 2));
 
-    // Log the final payload for debugging
-    console.log('Sending payload to create call:', JSON.stringify(payload, null, 2));
-
-    // Make the API call to create a new voice agent call
+    // Make the API call to the new backend endpoint for agent calls
     const response = await axios.post(
-      `${API_BASE_URL}/api/voice-agent/calls`,
+      `${API_BASE_URL}/api/voice-agent/agent-calls`, // Updated endpoint
       payload
     );
 
     return response.data;
   } catch (error) {
-    console.error('Error creating voice agent call:', error);
+    console.error('Error creating voice agent call (agent API):', error);
     throw error;
   }
 };
@@ -295,7 +141,6 @@ export const endCall = async (callId: string) => {
     console.log('🔊🔊 ENDCALL SERVICE: Dispatched callEnded event with callId:', callId);
     
     // Reset our session reference
-    // const oldSession = uvSession; // Unused
     uvSession = null;
     console.log('🔊🔊 ENDCALL SERVICE: Reset uvSession to null');
     
@@ -532,5 +377,5 @@ export default {
   unmuteSpeaker,
   isMicMuted,
   isSpeakerMuted,
-  fetchAvailableVoices
+  // fetchAvailableVoices, // This function is being removed
 }; 
