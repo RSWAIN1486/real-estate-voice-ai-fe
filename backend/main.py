@@ -98,7 +98,7 @@ origins = get_cors_origins()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Explicitly specify frontend origin
+    allow_origins=origins,  # Use the dynamic origins list from get_cors_origins()
     allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:[0-9]+)?",  # Allow localhost with any port
     allow_credentials=True,
     allow_methods=["*"],
@@ -111,23 +111,25 @@ app.add_middleware(
 )
 
 # Add CORS headers middleware
-@app.middleware("http")
-async def add_cors_headers(request: Request, call_next):
-    response = await call_next(request)
-    
-    # Get origin from request headers
-    origin = request.headers.get("origin")
-    
-    # Only add CORS headers if origin is present and matches our allowed origins
-    if origin and (origin == "http://localhost:5173" or origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:")):
-        response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Cache-Control, Pragma, Expires, X-Requested-With"
-        response.headers["Access-Control-Max-Age"] = "86400"  # Cache preflight response for 24 hours
-    
-    return response
+# @app.middleware("http") # Commenting out custom CORS middleware
+# async def add_cors_headers(request: Request, call_next):
+#     response = await call_next(request)
+#     
+#     # Get origin from request headers
+#     origin = request.headers.get("origin")
+#     
+#     # Only add CORS headers if origin is present and matches our allowed origins
+#     if origin and (origin == "http://localhost:5173" or origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:")):
+#         response.headers["Access-Control-Allow-Origin"] = origin
+#         response.headers["Access-Control-Allow-Credentials"] = "true"
+#         response.headers["Access-Control-Allow-Methods"] = "*"
+#         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Cache-Control, Pragma, Expires, X-Requested-With"
+#         response.headers["Access-Control-Max-Age"] = "86400"  # Cache preflight response for 24 hours
+#     
+#     return response
 
+# Mount static files directory with proper caching headers
+# app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Include routers
 from routes import voice_agent
