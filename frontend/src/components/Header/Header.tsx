@@ -3,84 +3,17 @@ import {
   Toolbar, 
   Typography, 
   IconButton, 
-  Badge, 
   Box,
   Button,
   Container,
-  useTheme,
-  useMediaQuery,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
-  Tooltip
 } from '@mui/material';
 import { 
-  ShoppingCart as ShoppingCartIcon,
-  Brightness4 as DarkModeIcon,
-  Brightness7 as LightModeIcon,
   Home as HomeIcon,
-  Menu as MenuIcon,
-  Close as CloseIcon,
-  Settings as SettingsIcon,
-  AccountBalance as BuildingIcon
 } from '@mui/icons-material';
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { RootState } from '../../store/store';
-import { toggleTheme } from '../../store/slices/themeSlice';
-import UserMenu from '../Auth/UserMenu';
-import VoiceAgentSettings from '../VoiceAgent/VoiceAgentSettings';
-import styles from './Header.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const cartItems = useSelector((state: RootState) => state.order.items);
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
-  const handleCartClick = () => {
-    navigate('/cart');
-    setMobileMenuOpen(false);
-  };
-
-  const handleHomeClick = () => {
-    navigate('/');
-    setMobileMenuOpen(false);
-  };
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
-  const handleOpenSettings = () => {
-    setSettingsOpen(true);
-  };
-
-  const handleCloseSettings = () => {
-    setSettingsOpen(false);
-  };
-
-  const menuItems = [
-    { text: 'Home', icon: <HomeIcon />, onClick: handleHomeClick },
-    { 
-      text: 'Cart', 
-      icon: (
-        <Badge badgeContent={totalItems} color="error">
-          <ShoppingCartIcon />
-        </Badge>
-      ), 
-      onClick: handleCartClick 
-    }
-  ];
 
   return (
     <AppBar 

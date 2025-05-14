@@ -1,4 +1,5 @@
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Fab, /*useTheme,*/ Box } from "@mui/material";
+// import MicIcon from "@mui/icons-material/Mic";
 import voiceAgentGif from "../../assets/voice_agent4.gif";
 
 interface VoiceAssistantIconProps {
@@ -6,11 +7,11 @@ interface VoiceAssistantIconProps {
   size?: number;
 }
 
-const VoiceAssistantIcon = ({ onClick, size = 64 }: VoiceAssistantIconProps) => {
-  const theme = useTheme();
+const VoiceAssistantIcon: React.FC<VoiceAssistantIconProps> = ({ onClick, size = 56 }) => {
+  // const theme = useTheme(); // Unused
 
   return (
-    <IconButton
+    <Fab
       onClick={onClick}
       sx={{
         position: "relative",
@@ -37,7 +38,7 @@ const VoiceAssistantIcon = ({ onClick, size = 64 }: VoiceAssistantIconProps) => 
           borderRadius: "50%",
         }}
       />
-    </IconButton>
+    </Fab>
   );
 };
 

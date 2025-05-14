@@ -77,7 +77,7 @@ const voiceAgentSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    resetAgent: (state) => {
+    resetAgent: (/*state*/) => { // state variable is unused
       return initialState;
     }
   },

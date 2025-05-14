@@ -1,35 +1,21 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  DialogProps,
   IconButton,
   Box,
   Typography,
   CircularProgress,
   Paper,
-  Avatar,
   Divider,
   Button,
   Stack,
   Fab,
   Tooltip,
-  useTheme,
   Tabs,
   Tab,
-  Badge,
-  ButtonGroup,
-  DialogContentText,
-  DialogActions,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Chip,
-  Collapse
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -37,8 +23,6 @@ import {
   MicOff as MicOffIcon,
   VolumeUp as VolumeUpIcon,
   VolumeOff as VolumeOffIcon,
-  SmartToy as SmartToyIcon,
-  Settings as SettingsIcon,
   RestartAlt as RestartIcon,
   ExitToApp as ExitIcon
 } from '@mui/icons-material';
@@ -55,11 +39,7 @@ import {
   resetAgent,
   VoiceAgentStatus
 } from '../../store/slices/voiceAgentSlice';
-import { setVoice } from '../../store/slices/voiceAgentSettingsSlice';
 import voiceAgentService from '../../services/voiceAgentService';
-import { addItem } from '../../store/slices/orderSlice';
-import VoiceAgentSettings from './VoiceAgentSettings';
-import { propertyService } from '../../services/propertyService';
 import { AppDispatch } from '../../store/store';
 import styles from './VoiceAgent.module.css';
 
@@ -103,16 +83,21 @@ const CustomDialogTitle = (props: CustomDialogTitleProps) => {
 
 const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = false }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-  const theme = useTheme();
   
-  const { status, transcripts, error, isActive, callId } = useSelector((state: RootState) => state.voiceAgent);
-  const settings = useSelector((state: RootState) => state.voiceAgentSettings);
+  const { status, transcripts, error } = useSelector((state: RootState) => state.voiceAgent);
+  // Placeholder for settings - these would ideally come from a config or a simplified local state if needed
+  // const hardcodedSettings = { // REMOVED as it's unused
+  //   voice: 'Emily-English', // Default voice
+  //   temperature: 0.7,
+  //   enableCallRecording: false,
+  //   customSystemPrompt: ''
+  //   // voiceModel is handled by voiceAgentService directly now
+  // };
+
   const [isInitializing, setIsInitializing] = useState(false);
   const [session, setSession] = useState<UltravoxSession | null>(null);
   const [micMuted, setMicMuted] = useState(false);
   const [speakerMuted, setSpeakerMuted] = useState(false);
-  const [currentText, setCurrentText] = useState<string>('');
   const [activeTab, setActiveTab] = useState<number>(showSettings ? 1 : 0);
   
   // Add audio level detection
@@ -122,11 +107,6 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
   const microphone = useRef<MediaStreamAudioSourceNode | null>(null);
   const audioDataArray = useRef<Uint8Array | null>(null);
   const animationFrameId = useRef<number | null>(null);
-  
-  // Add state for property search results
-  const [propertyResults, setPropertyResults] = useState<any[]>([]);
-  const [searchParams, setSearchParams] = useState<any>(null);
-  const [resolvedLocation, setResolvedLocation] = useState<string | null>(null);
   
   // Session ref to access the current session in effects
   const sessionRef = useRef<UltravoxSession | null>(null);
@@ -176,17 +156,18 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       }
     } else {
       // Clean up if the dialog closes
-      if (status === VoiceAgentStatus.ACTIVE) {
+      if (status === VoiceAgentStatus.ACTIVE || status === VoiceAgentStatus.CONNECTED || status === VoiceAgentStatus.INITIALIZING || status === VoiceAgentStatus.CONNECTING) {
         handleEndCall();
       }
     }
     
     return () => {
-      if (status === VoiceAgentStatus.ACTIVE) {
+      if (status === VoiceAgentStatus.ACTIVE || status === VoiceAgentStatus.CONNECTED || status === VoiceAgentStatus.INITIALIZING || status === VoiceAgentStatus.CONNECTING) {
         handleEndCall();
       }
     };
-  }, [open]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]); // dispatch, resetAgent, clearTranscripts, initializeAgent, handleEndCall, status were implicitly dependencies remove them to avoid loops
   
   const initializeAgent = async (pastTranscripts?: Array<any>) => {
     try {
@@ -278,7 +259,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     }
   };
   
-  const handleSessionStatus = (event: Event) => {
+  const handleSessionStatus = (/*event: Event*/) => {
     if (session) {
       // Map Ultravox session status to our VoiceAgentStatus
       let agentStatus: VoiceAgentStatus;
@@ -310,7 +291,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     }
   };
   
-  const handleTranscripts = async (event: Event) => {
+  const handleTranscripts = async (/*event: Event*/) => {
     if (session) {
       // Get all transcripts from the session
       const ultravoxTranscripts = session.transcripts;
@@ -379,18 +360,6 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
             speaker: latestAgentNonFinal.speaker,
             medium: medium
           }));
-          
-          // Also update current text with the agent's message
-          setCurrentText(latestAgentNonFinal.text);
-        } else {
-          // If no non-final agent transcript, use the latest final one for current text
-          const latestAgentFinal = [...ultravoxTranscripts]
-            .reverse()
-            .find(transcript => transcript.speaker === 'agent' && transcript.isFinal);
-            
-          if (latestAgentFinal) {
-            setCurrentText(latestAgentFinal.text);
-          }
         }
       }
     }
@@ -477,30 +446,6 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     setSpeakerMuted(!speakerMuted);
   };
   
-  const handleCheckout = (orderItems: any) => {
-    try {
-      // Process the order items and add them to the cart
-      const parsedItems = typeof orderItems === 'string' ? JSON.parse(orderItems) : orderItems;
-      
-      parsedItems.forEach((item: any) => {
-        dispatch(addItem({
-          id: item.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity || 1
-        }));
-      });
-      
-      // Close the voice agent dialog
-      onClose();
-      
-      // Navigate to the cart page
-      navigate('/cart');
-    } catch (error) {
-      console.error('Error handling checkout:', error);
-    }
-  };
-  
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
@@ -528,18 +473,10 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
       session.addEventListener('status', handleSessionStatus);
       session.addEventListener('transcripts', handleTranscripts);
       
-      // Add event listener for orderCheckout
-      window.addEventListener('orderCheckout', ((event: CustomEvent) => {
-        handleCheckout(event.detail);
-      }) as EventListener);
-      
       // Clean up
       return () => {
         session.removeEventListener('status', handleSessionStatus);
         session.removeEventListener('transcripts', handleTranscripts);
-        window.removeEventListener('orderCheckout', ((event: CustomEvent) => {
-          handleCheckout(event.detail);
-        }) as EventListener);
       };
     }
   }, [session]);
@@ -861,7 +798,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
   };
   
   // Get call info from Redux
-  const callInfo = useSelector((state: RootState) => state.voiceAgent);
+  // const callInfo = useSelector((state: RootState) => state.voiceAgent);
 
   // Set up cleanup for component unmount
   useEffect(() => {
@@ -997,22 +934,9 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     };
   }, [transcripts]);
 
-  // Get the latest transcript being spoken
-  useEffect(() => {
-    if (transcripts.length > 0) {
-      const latestAgentTranscript = [...transcripts]
-        .reverse()
-        .find(transcript => transcript.speaker === 'agent');
-      
-      if (latestAgentTranscript) {
-        setCurrentText(latestAgentTranscript.text);
-      }
-    }
-  }, [transcripts]);
-  
   // Add event listener for agent-requested hangup
   useEffect(() => {
-    const handleAgentHangup = async (event: Event) => {
+    const handleAgentHangup = async (/*event: Event*/) => {
       console.log('🔊🔊 AGENT HANGUP: Agent requested call termination');
       
       try {
@@ -1038,7 +962,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     const handlePropertySearchResults = (event: any) => {
       try {
         console.log('🏠 Received property search results event:', event);
-        const { results, search_parameters, resolved_location, no_results_reason } = event.detail;
+        const { results, search_parameters, resolved_location /*, no_results_reason*/ } = event.detail; // no_results_reason unused
         
         // Validate results
         if (!results || !Array.isArray(results)) {
@@ -1049,10 +973,6 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
         console.log('🏠 Setting property results:', results.length, 'properties');
         console.log('🏠 Setting search parameters:', search_parameters);
         console.log('🏠 Setting resolved location:', resolved_location);
-        
-        setPropertyResults(results);
-        setSearchParams(search_parameters);
-        setResolvedLocation(resolved_location);
         
         // Create a text representation of the properties
         let propertiesText = `## ${results.length} Properties Found\n\n`;
@@ -1095,30 +1015,15 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
     };
   }, [dispatch]);
 
-  // Reference to selectedVoice in the code
-  const selectedVoice = settings.voice;
-
-  // When transcripts change, update saved transcripts
-  // Fix voiceQuality reference
-  const audioQuality = status === VoiceAgentStatus.ACTIVE ? "High" : "Standard";
-
   return (
     <Dialog 
       open={open} 
       maxWidth="md" 
       fullWidth
       className={styles.dialog}
-      onClose={(event, reason) => {
-        console.log('Dialog onClose triggered with reason:', reason);
-        // In MUI v5, we can prevent certain close reasons by checking here
-        if (reason === 'backdropClick') {
-          console.log('Preventing dialog close from backdrop click');
-          return; // Don't close on backdrop click
-        }
-        // Only proceed with close for explicit actions like close button
+      onClose={(/*event, reason*/) => {
         handleClose();
       }}
-      // Prevent escape key from closing dialog
       disableEscapeKeyDown={true}
     >
       <CustomDialogTitle onClose={handleClose}>
@@ -1287,7 +1192,7 @@ const VoiceAgent: React.FC<VoiceAgentProps> = ({ open, onClose, showSettings = f
           )
         ) : (
           // Settings Tab
-          <VoiceAgentSettings open={true} onClose={() => setActiveTab(0)} />
+          <Box p={3}><Typography>Settings will be configured here later.</Typography></Box> // Placeholder
         )}
       </DialogContent>
     </Dialog>

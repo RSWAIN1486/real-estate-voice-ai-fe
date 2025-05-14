@@ -2,10 +2,11 @@ import axios from 'axios';
 import { UltravoxSession, Medium } from 'ultravox-client';
 import { API_BASE_URL } from '../utils/CONSTANTS';
 import { hangUpTool } from './clientTools';
-import { store } from '../store/store';
+// import { store } from '../store/store'; // Unused
 
 // Default voice options with preselected female voice
 export const DEFAULT_VOICE_ID = 'Emily-English'; // Default to Emily-English
+export const DEFAULT_VOICE_MODEL = 'fixie-ai/ultravox-70B'; // Added default model
 
 // Available voice options based on the available Ultravox voices
 export interface VoiceOption {
@@ -102,26 +103,27 @@ export const fetchAvailableVoices = async (): Promise<VoiceOption[]> => {
  * Get the system prompt based on voice agent settings
  */
 export const getSystemPrompt = () => {
-  const state = store.getState();
-  const settings = state.voiceAgentSettings;
+  // const state = store.getState(); // Removed store access
+  // const settings = state.voiceAgentSettings; // Removed store access
 
-  // If custom prompt is empty, return the default
-  if (!settings.customSystemPrompt) {
-    return SYSTEM_PROMPT;
-  }
+  // // If custom prompt is empty, return the default // Logic for custom prompt removed
+  // if (!settings.customSystemPrompt) {
+  return SYSTEM_PROMPT;
+  // }
 
-  // Return custom system prompt
-  return settings.customSystemPrompt;
+  // // Return custom system prompt
+  // return settings.customSystemPrompt;
 };
 
 /**
  * Get the voice model based on voice agent settings
  */
 export const getVoiceModel = () => {
-  const state = store.getState();
-  const settings = state.voiceAgentSettings;
+  // const state = store.getState(); // Removed store access
+  // const settings = state.voiceAgentSettings; // Removed store access
   
-  return settings.voiceModel;
+  return DEFAULT_VOICE_MODEL; // Return hardcoded default model
+  // return settings.voiceModel;
 };
 
 /**
@@ -131,14 +133,14 @@ export const getVoiceModel = () => {
  */
 export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCallId?: string) => {
   try {
-    // Get settings from Redux store
-    const systemPrompt = getSystemPrompt();
-    const voiceModel = getVoiceModel();
-    const state = store.getState();
-    const settings = state.voiceAgentSettings;
+    // Get settings from Redux store - Now using defaults
+    const systemPrompt = getSystemPrompt(); // Will use default
+    const voiceModel = getVoiceModel();   // Will use default
+    // const state = store.getState(); // Removed store access
+    // const settings = state.voiceAgentSettings; // Removed store access
 
     // Use the user's selected voice, or DEFAULT_VOICE_ID if none is set
-    const voice = settings.voice || DEFAULT_VOICE_ID;
+    const voice = DEFAULT_VOICE_ID; // Directly use default, was: settings.voice || DEFAULT_VOICE_ID;
     console.log(`Using voice: ${voice}`);
 
     // Prepare the request payload
@@ -146,8 +148,8 @@ export const createVoiceAgentCall = async (initialMessages?: Array<any>, priorCa
       model: voiceModel,
       voice: voice,
       systemPrompt: systemPrompt,
-      temperature: settings.temperature,
-      recordingEnabled: settings.enableCallRecording,
+      temperature: 0.7, // Hardcoded default, was: settings.temperature,
+      recordingEnabled: false, // Hardcoded default, was: settings.enableCallRecording,
       selectedTools: [
         {
           temporaryTool: {
@@ -293,14 +295,14 @@ export const endCall = async (callId: string) => {
     console.log('🔊🔊 ENDCALL SERVICE: Dispatched callEnded event with callId:', callId);
     
     // Reset our session reference
-    const oldSession = uvSession;
+    // const oldSession = uvSession; // Unused
     uvSession = null;
     console.log('🔊🔊 ENDCALL SERVICE: Reset uvSession to null');
     
     // Try one last method to forcibly clean up the session
     try {
       // Access destroy method using type assertion
-      const session = oldSession as any;
+      const session = uvSession as any;
       if (session && typeof session.destroy === 'function') {
         console.log('🔊🔊 ENDCALL SERVICE: Found destroy method, calling it as last resort');
         session.destroy();
@@ -425,7 +427,7 @@ export const leaveCurrentCall = async () => {
     }
     
     // Final step - completely replace the session reference
-    const oldSession = uvSession;
+    // const oldSession = uvSession; // Unused
     uvSession = null;
     console.log('🔊🔊 LEAVE CALL SERVICE: Reset session reference to null');
     
