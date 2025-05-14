@@ -15,8 +15,6 @@ from pydantic import BaseModel
 # Load environment variables
 load_dotenv()
 
-from database import connect_to_mongodb, close_mongodb_connection
-
 # Configure logging
 logger = logging.getLogger("dontminos")
 coloredlogs.install(level='INFO', logger=logger, 
@@ -63,9 +61,8 @@ def generate_default_origins() -> List[str]:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Connect to MongoDB
+    # Startup
     logger.info("Starting Dontminos API server...")
-    await connect_to_mongodb()
     
     # Log server information
     local_ip = get_local_ip()
@@ -88,26 +85,10 @@ async def lifespan(app: FastAPI):
     
     logger.info(f"JWT_SECRET configured: {'Yes' if jwt_secret else 'No'}")
     
-    # Check if menu items file exists
-    menu_file_path = os.path.join(os.path.dirname(__file__), "public", "menuitems.json")
-    if os.path.exists(menu_file_path):
-        logger.info(f"Menu items file found at: {menu_file_path}")
-    else:
-        logger.warning(f"Menu items file NOT found at: {menu_file_path}")
-    
-    # Check if images directory exists
-    images_dir = os.path.join(os.path.dirname(__file__), "public", "imagedump")
-    if os.path.exists(images_dir):
-        image_count = len([f for f in os.listdir(images_dir) if f.endswith(('.jpg', '.jpeg', '.png'))])
-        logger.info(f"Image directory found at: {images_dir} with {image_count} images")
-    else:
-        logger.warning(f"Image directory NOT found at: {images_dir}")
-    
     yield
     
-    # Shutdown: Close MongoDB connection
+    # Shutdown
     logger.info("Shutting down Dontminos API server...")
-    await close_mongodb_connection()
 
 app = FastAPI(title="Dontminos API", lifespan=lifespan)
 
@@ -167,11 +148,7 @@ class CachingStaticFiles(StaticFiles):
 app.mount("/public", CachingStaticFiles(directory=public_dir), name="public")
 
 # Include routers
-from routes import menu, order, auth, users, voice_agent
-app.include_router(menu.router, prefix="/api/menu", tags=["menu"])
-app.include_router(order.router, prefix="/api/orders", tags=["orders"])
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(users.router, prefix="/api/users", tags=["users"])
+from routes import voice_agent
 app.include_router(voice_agent.router, prefix="/api/voice-agent", tags=["voice-agent"])
 
 # Root endpoint for API health check
@@ -183,10 +160,6 @@ async def root():
         "version": "1.0.0",
         "docs": "/docs",
         "endpoints": {
-            "menu": "/api/menu",
-            "orders": "/api/orders",
-            "auth": "/api/auth",
-            "users": "/api/users",
             "voice-agent": "/api/voice-agent"
         }
     }
