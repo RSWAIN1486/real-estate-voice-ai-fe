@@ -128,24 +128,6 @@ async def add_cors_headers(request: Request, call_next):
     
     return response
 
-# Mount static files directory with proper caching headers
-public_dir = os.path.join(os.path.dirname(__file__), "public")
-logger.info(f"Mounting static files from: {public_dir}")
-
-# Create a custom StaticFiles class that adds caching headers for images
-class CachingStaticFiles(StaticFiles):
-    async def get_response(self, path: str, scope):
-        response = await super().get_response(path, scope)
-        
-        # Add caching headers for image files
-        if path.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
-            # Cache images for 24 hours
-            response.headers['Cache-Control'] = 'public, max-age=86400'
-            response.headers['Pragma'] = 'cache'
-        
-        return response
-
-app.mount("/public", CachingStaticFiles(directory=public_dir), name="public")
 
 # Include routers
 from routes import voice_agent
