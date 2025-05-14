@@ -14,6 +14,7 @@ export default defineConfig({
   server: {
     host: true, // Listen on all addresses
     port: PORT,
-    strictPort: true // Fail if port is already in use
+    strictPort: true, // Fail if port is already in use
+    allowedHosts: ['.onrender.com'] // Allow requests from any *.onrender.com domain
   }
 });

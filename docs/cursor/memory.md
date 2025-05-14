@@ -563,4 +563,40 @@ These insights will guide future development of the Real Estate Voice Agent and 
 - When deprecating a tool or feature (e.g., property search tool, DeepInfra RAG), ensure all references are removed from frontend, backend, environment variables, and documentation.
 - Always update architecture, changelog, feature-design, and current-state docs to reflect major changes.
 - Make minimal changes to avoid breaking unrelated functionality.
-- Clearly document new endpoints, environment variables, and architectural changes. 
+- Clearly document new endpoints, environment variables, and architectural changes.
+
+## Vite Hostname Blocking on PaaS (e.g., Render)
+
+**Issue:** When deploying a Vite frontend application to a Platform-as-a-Service (PaaS) like Render, accessing the deployed application URL (e.g., `your-app-name.onrender.com`) can result in a "Blocked request. This host (...) is not allowed" error from Vite.
+
+**Root Cause:** Vite's development server and preview server (`vite preview`) have a security feature to prevent DNS rebinding attacks. By default, they might restrict access to only `localhost` or specific hosts. Even if `host: true` is set (to listen on all network interfaces), this hostname check can still apply.
+
+**Solution:** Modify the `vite.config.ts` (or `vite.config.js`) to explicitly allow the PaaS provider's domain. For Render, this involves adding the `.onrender.com` domain to the `server.allowedHosts` array.
+
+```typescript
+// frontend/vite.config.ts
+import {{ defineConfig }} from 'vite';
+import react from '@vitejs/plugin-react';
+
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5173;
+
+export default defineConfig({
+  plugins: [react()],
+  preview: {{
+    host: true,
+    port: PORT,
+    strictPort: true
+  }},
+  server: {{
+    host: true,
+    port: PORT,
+    strictPort: true,
+    allowedHosts: ['.onrender.com'] // Allows any subdomain of onrender.com
+  }}
+});
+```
+
+**Learning:** When deploying Vite applications to PaaS environments:
+1. Be aware of Vite's built-in host checking security feature.
+2. If you encounter host blocking errors, configure `server.allowedHosts` in your `vite.config.ts` to include the domain of your hosting provider.
+3. Using a wildcard like `'.yourprovider.com'` is generally a good approach for these platforms. 
